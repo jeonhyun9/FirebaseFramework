@@ -1,6 +1,6 @@
 public class PathDefine
 {
-    public const string ExcelPath = "Assets/Data/Excel";
-    public const string JsonPath = "Assets/Data/Json";
-    public const string DataClassPath = "Assets/Scripts/DataClass";
+    public const string ExcelPath = "Assets/Data/Excels";
+    public const string JsonPath = "Assets/Data/Jsons";
+    public const string DataStructPath = "Assets/Data/Scripts";
 }
