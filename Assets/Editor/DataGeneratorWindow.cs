@@ -1,15 +1,24 @@
 #if UNITY_EDITOR
+using System;
+using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 namespace Tools
 {
     public class DataGeneratorWindow : EditorWindow
     {
+        private const float windowWidth = 400.0f;
+        private const float windowHeight = 100.0f;
+
+        private string excelPath;
 
         [MenuItem("Tools/Generate Data From Excel Folder")]
         public static void OpenGenerateDataWindow()
         {
-            GetWindow(typeof(DataGeneratorWindow));
+            DataGeneratorWindow window = (DataGeneratorWindow)GetWindow(typeof(DataGeneratorWindow));
+            window.minSize = new Vector2(windowWidth, windowHeight);
+            window.maxSize = new Vector2(windowWidth * 2, windowHeight);
         }
 
         [MenuItem("Assets/Generate Data From Excel")]
@@ -20,10 +29,25 @@ namespace Tools
 
         public void OnGUI()
         {
-            EditorGUILayout.LabelField($"엑셀 파일 경로 : {PathDefine.ExcelPath}");
+            excelPath = EditorGUILayout.TextField(excelPath);
 
-            bool backupExcel = false;
-            EditorGUILayout.Toggle("생성 후 엑셀파일 백업", backupExcel);
+            GUILayout.Space(10);
+
+            if (GUILayout.Button("Generate", GUILayout.Height(50)))
+                DataGenerator.GenerateDataFromExcelFoler(excelPath);
+        }
+
+        private void OnEnable()
+        {
+            excelPath = EditorPrefs.GetString("ExcelPath");
+
+            if (string.IsNullOrEmpty(excelPath))
+                excelPath = PathDefine.ExcelPath;
+        }
+
+        private void OnDisable()
+        {
+            EditorPrefs.SetString("ExcelPath", excelPath);
         }
     }
 }

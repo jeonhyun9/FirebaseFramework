@@ -1,5 +1,3 @@
-//Generated Date : 2023-03-10 오후 7:02:09
-//Author : Jhg
 #pragma warning disable 0649
 using Newtonsoft.Json;
 

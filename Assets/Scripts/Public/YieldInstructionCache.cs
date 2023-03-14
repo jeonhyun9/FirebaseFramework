@@ -16,27 +16,33 @@ internal static class YieldInstructionCache
         }
     }
 
-    public static readonly WaitForEndOfFrame WaitForEndOfFrame = new();
-    public static readonly WaitForFixedUpdate WaitForFixedUpdate = new();
+    public static readonly WaitForEndOfFrame waitForEndOfFrame = new();
+    public static readonly WaitForFixedUpdate waitForFixedUpdate = new();
 
     private static readonly Dictionary<float, WaitForSeconds> timeInterval = new(new FloatComparer());
-    private static readonly Dictionary<float, WaitForSecondsRealtime> timeInterval_Real = new(new FloatComparer());
+    private static readonly Dictionary<float, WaitForSecondsRealtime> timeIntervalReal = new(new FloatComparer());
 
     public static WaitForSeconds WaitForSeconds(float seconds)
     {
-        WaitForSeconds wfs;
-        if (!timeInterval.TryGetValue(seconds, out wfs))
-            timeInterval.Add(seconds, wfs = new WaitForSeconds(seconds));
-        return wfs;
+        WaitForSeconds waitForSeconds;
+
+        if (!timeInterval.TryGetValue(seconds, out waitForSeconds))
+            timeInterval.Add(seconds, waitForSeconds = new WaitForSeconds(seconds));
+        return waitForSeconds;
     }
 
     public static WaitForSecondsRealtime WaitForSecondsRealtime(float seconds)
     {
-        WaitForSecondsRealtime wfs;
-        if (!timeInterval_Real.TryGetValue(seconds, out wfs))
-            timeInterval_Real.Add(seconds, wfs = new WaitForSecondsRealtime(seconds));
+        WaitForSecondsRealtime waitForSecondsRealTime;
+
+        if (!timeIntervalReal.TryGetValue(seconds, out waitForSecondsRealTime))
+        {
+            timeIntervalReal.Add(seconds, waitForSecondsRealTime = new WaitForSecondsRealtime(seconds));
+        }
         else
-            wfs.Reset();
-        return wfs;
+        {
+            waitForSecondsRealTime.Reset();
+        }
+        return waitForSecondsRealTime;
     }
 }

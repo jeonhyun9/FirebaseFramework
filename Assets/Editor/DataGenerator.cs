@@ -52,8 +52,8 @@ namespace Tools
                 return;
             }
 
-            foreach (string excelPath in Directory.GetFiles(folderPath, ".xlsx"))
-                GenerateDataFromExcel(excelPath);
+            foreach (string excelPath in Directory.GetFiles(folderPath, "*.xlsx"))
+                GenerateDataFromExcel(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
             AssetDatabase.Refresh();
         }
@@ -115,13 +115,12 @@ namespace Tools
                     if (dataType.Contains("[]"))
                     {
                         string[] values = value.Split(',');
-                        Type arrayType = GetDataType(dataType);
-                        Type valueType = GetDataType(dataType.Replace("[]", ""));
+                        Type arrayType = GetDataType(dataType.Replace("[]", ""));
 
                         Array array = Array.CreateInstance(arrayType, values.Length);
                         for (int k = 0; k < values.Length; k++)
                         {
-                            object arrayValue = GetConvertValue(valueType, values[k]);
+                            object arrayValue = GetConvertValue(arrayType, values[k]);
                             array.SetValue(arrayValue, k);
                         }
                         dataDic.Add(name, array);
@@ -138,20 +137,25 @@ namespace Tools
 
             string newJson = JsonConvert.SerializeObject(dataDicList);
 
+            bool changed = false;
             if (File.Exists(saveJsonPath))
             {
                 string oldJson = File.ReadAllText(saveJsonPath);
 
-                if (CheckJsonChange(newJson, oldJson))
+                if (JToken.DeepEquals(newJson, oldJson))
                 {
                     Debug.LogError($"Json 변경점이 없습니다. {saveJsonPath}");
                     return;
+                }
+                else
+                {
+                    changed = true;
                 }
             }
 
             File.WriteAllText(saveJsonPath, newJson);
 
-            Debug.Log($"{jsonName}.json 생성 완료");
+            Debug.Log($"{jsonName}.json {(changed ? "수정" : "생성")} 완료");
         }
 
         private static void GenerateStructFromExcelSheet(string fileName, DataTable sheet)
@@ -176,9 +180,6 @@ namespace Tools
 
             StringBuilder sb = new();
 
-            sb.AppendLine($"//Generated Date : {DateTime.Now}");
-            sb.AppendLine($"//Author : Jhg");
-
             //할당안했다고 waring 뜨는 것 제거용
             sb.AppendLine("#pragma warning disable 0649");
 
@@ -199,6 +200,8 @@ namespace Tools
 
             sb.AppendLine("}");
 
+            bool changed = false;
+
             if (File.Exists(saveDataStructPath))
             {
                 if (File.ReadAllText(saveDataStructPath).Equals(sb.ToString()))
@@ -206,18 +209,19 @@ namespace Tools
                     Debug.LogError($"Struct 변경점이 없습니다. {saveDataStructPath}");
                     return;
                 }
+                else
+                {
+                    changed = true;
+                }
             }
 
             File.WriteAllText(saveDataStructPath, sb.ToString());
 
-            Debug.Log($"{className}.cs 생성 완료");
+            Debug.Log($"{className}.cs {(changed ? "수정" : "생성")} 완료");
         }
 
         private static Type GetDataType(string columnType)
         {
-            if (columnType.Contains("[]"))
-                columnType = columnType.Replace("[]", "");
-
             switch (columnType)
             {
                 case "int":
@@ -235,7 +239,8 @@ namespace Tools
                 case string s when s.StartsWith("enum:"):
                     return Type.GetType(s.Replace("enum:", ""));
                 default:
-                    throw new Exception("Invalid column type: " + columnType);
+                    Debug.LogError("Type 확인");
+                    return null;
             }
         }
 
@@ -252,13 +257,9 @@ namespace Tools
                 case TypeCode.Object when type.IsEnum:
                     return Enum.Parse(type, value);
                 default:
-                    throw new Exception("Invalid column type: " + type.FullName);
+                    Debug.LogError("Type 확인");
+                    return null;
             }
-        }
-
-        public static bool CheckJsonChange(string newJson, string oldJson)
-        {
-            return JToken.DeepEquals(newJson, oldJson);
         }
     }
 }
