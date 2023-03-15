@@ -120,15 +120,14 @@ namespace Tools
                         Array array = Array.CreateInstance(arrayType, values.Length);
                         for (int k = 0; k < values.Length; k++)
                         {
-                            object arrayValue = GetConvertValue(arrayType, values[k]);
+                            object arrayValue = GetConvertValue(values[k]);
                             array.SetValue(arrayValue, k);
                         }
                         dataDic.Add(name, array);
                     }
                     else
                     {
-                        Type type = GetDataType(dataTypeRow[j].ToString());
-                        object convertValue = GetConvertValue(type, value);
+                        object convertValue = GetConvertValue(value);
                         dataDic.Add(name, convertValue);
                     }
                 }
@@ -244,18 +243,16 @@ namespace Tools
             }
         }
 
-        private static object GetConvertValue(Type type, string value)
+        private static object GetConvertValue(string value)
         {
-            switch (Type.GetTypeCode(type))
+            switch (value)
             {
-                case TypeCode.Int32:
+                case "int":
                     return int.Parse(value);
-                case TypeCode.Single:
+                case "float":
                     return float.Parse(value);
-                case TypeCode.String:
+                case "string":
                     return value;
-                case TypeCode.Object when type.IsEnum:
-                    return Enum.Parse(type, value);
                 default:
                     Debug.LogError("Type È®ÀÎ");
                     return null;
