@@ -283,10 +283,8 @@ namespace Tools
                     return float.Parse(value);
                 case "string":
                     return value;
-                case string s when s.StartsWith("enum:"):
-                    return value;
                 default:
-                    return Type.GetType(columnType);
+                    return value;
             }
         }
     }

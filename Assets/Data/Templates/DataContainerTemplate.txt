@@ -9,7 +9,7 @@ public class Data#fileName#Container : IBaseDataContainer
     private Dictionary<int, Data#fileName#> dicById = new();
     private Dictionary<string, Data#fileName#> dicByNameId = new();
     public string FileName => "#fileName#";
-    public string LocalJsonPath => Path.Combine(PathDefine.JsonPath, $"{FileName}.json");
+    public string LocalJsonPath => PathDefine.JsonPath + $"/{FileName}.json";
     public void SerializeJson(string json)
     {
         try
