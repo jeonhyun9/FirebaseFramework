@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class DataContainerManager : BaseManager<DataContainerManager>
 {
@@ -13,8 +11,14 @@ public class DataContainerManager : BaseManager<DataContainerManager>
         containerDic[typeof(T)].SerializeJson(json);
     }
 
-    public IBaseDataContainer GetDateContainer(Type type)
+    public void AddDataContainerFromLocalJson<T>() where T : IBaseDataContainer, new()
     {
-        return containerDic.ContainsKey(type) ? containerDic[type] : default;
+        containerDic[typeof(T)] = new T();
+        containerDic[typeof(T)].SerializeJson(System.IO.File.ReadAllText(containerDic[typeof(T)].LocalJsonPath));
+    }
+
+    public T GetDataContainer<T>() where T : IBaseDataContainer
+    {
+        return containerDic.ContainsKey(typeof(T)) ? (T)containerDic[typeof(T)] : default;
     }
 }

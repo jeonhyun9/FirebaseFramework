@@ -128,7 +128,7 @@ namespace Tools
                         Array array = Array.CreateInstance(arrayType, values.Length);
                         for (int k = 0; k < values.Length; k++)
                         {
-                            object arrayValue = GetConvertValue(arrayType.ToString(),values[k]);
+                            object arrayValue = GetConvertValue(dataType.Replace("[]", ""), values[k]);
                             array.SetValue(arrayValue, k);
                         }
                         dataDic.Add(name, array);
@@ -151,7 +151,6 @@ namespace Tools
 
                 if (JToken.DeepEquals(newJson, oldJson))
                 {
-                    Debug.LogError($"Json 변경점이 없습니다. {saveJsonPath}");
                     return;
                 }
                 else
@@ -215,7 +214,6 @@ namespace Tools
             {
                 if (File.ReadAllText(saveDataStructPath).Equals(sb.ToString()))
                 {
-                    Debug.LogError($"Struct 변경점이 없습니다. {saveDataStructPath}");
                     return;
                 }
                 else
@@ -237,7 +235,7 @@ namespace Tools
 
             string dataContainerText = File.ReadAllText(PathDefine.DataContainerTemplatePath);
 
-            dataContainerText = dataContainerText.Replace("#structName#", structName);
+            dataContainerText = dataContainerText.Replace("#fileName#", Path.GetFileNameWithoutExtension(fileName));
 
             bool changed = false;
 
@@ -245,7 +243,6 @@ namespace Tools
             {
                 if (File.ReadAllText(saveDataContainerPath).Equals(dataContainerText))
                 {
-                    Debug.LogError($"Container 변경점이 없습니다. {saveDataContainerPath}");
                     return;
                 }
                 else

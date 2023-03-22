@@ -4,12 +4,12 @@ using Newtonsoft.Json;
 using UnityEngine;
 using System.IO;
 
-public class Data#fileName#Container : IBaseDataContainer
+public class DataHumanContainer : IBaseDataContainer
 {
-    private Dictionary<int, Data#fileName#> dicById = new();
-    private Dictionary<string, Data#fileName#> dicByNameId = new();
-    public string FileName => "#fileName#";
-    public string LocalJsonPath => Path.Combine(PathDefine.JsonPath, $"{FileName}.json");
+    private Dictionary<int, DataHuman> dicById = new();
+    private Dictionary<string, DataHuman> dicByNameId = new();
+    public string FileName => "Human";
+    public string LocalJsonPath => PathDefine.JsonPath + $"/{FileName}.json";
     public void SerializeJson(string json)
     {
         try
@@ -17,7 +17,7 @@ public class Data#fileName#Container : IBaseDataContainer
             JArray jArray = JArray.Parse(json);
             foreach(var jObj in jArray)
             {
-                Data#fileName# data = JsonConvert.DeserializeObject<Data#fileName#>(jObj.ToString());
+                DataHuman data = JsonConvert.DeserializeObject<DataHuman>(jObj.ToString());
                 if (!dicById.ContainsKey(data.Id))
                 {
                     dicById.Add(data.Id, data);
@@ -43,14 +43,14 @@ public class Data#fileName#Container : IBaseDataContainer
             Debug.LogError(e.StackTrace);
         }
     }
-    public Data#fileName# GetById(int id)
+    public DataHuman GetById(int id)
     {
         if (dicById.ContainsKey(id))
             return dicById[id];
 
         return default;
     }
-    public Data#fileName# GetByNameId(string nameId)
+    public DataHuman GetByNameId(string nameId)
     {
         if (dicByNameId.ContainsKey(nameId))
             return dicByNameId[nameId];
