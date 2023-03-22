@@ -52,9 +52,16 @@ namespace Tools
                 return;
             }
 
-            foreach (string excelPath in Directory.GetFiles(folderPath, "*.xlsx"))
-                GenerateDataFromExcel(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            int i = 0;
 
+            foreach (string excelPath in Directory.GetFiles(folderPath, "*.xlsx"))
+            {
+                EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", (float)i / Directory.GetFiles(folderPath, "*.xlsx").Length);
+                GenerateDataFromExcel(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                i++;
+            }
+
+            EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
         }
 
@@ -73,6 +80,7 @@ namespace Tools
 
                 GenerateJsonFromExcelSheet(fileName, sheet);
                 GenerateStructFromExcelSheet(fileName, sheet);
+                GenerateDataContainer(fileName);
             }
             catch (Exception e)
             {
@@ -120,14 +128,14 @@ namespace Tools
                         Array array = Array.CreateInstance(arrayType, values.Length);
                         for (int k = 0; k < values.Length; k++)
                         {
-                            object arrayValue = GetConvertValue(values[k]);
+                            object arrayValue = GetConvertValue(arrayType.ToString(),values[k]);
                             array.SetValue(arrayValue, k);
                         }
                         dataDic.Add(name, array);
                     }
                     else
                     {
-                        object convertValue = GetConvertValue(value);
+                        object convertValue = GetConvertValue(dataType, value);
                         dataDic.Add(name, convertValue);
                     }
                 }
@@ -159,8 +167,8 @@ namespace Tools
 
         private static void GenerateStructFromExcelSheet(string fileName, DataTable sheet)
         {
-            string className = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
-            string saveDataStructPath = Path.Combine(PathDefine.DataStructPath, $"{className}.cs");
+            string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
+            string saveDataStructPath = Path.Combine(PathDefine.DataStructPath, $"{structName}.cs");
 
             //시트에서 데이터 타입과 이름만 뽑아놓기
             List<string> columnNames = new();
@@ -171,7 +179,7 @@ namespace Tools
 
             for (int j = 0; j < sheet.Columns.Count; j++)
             {
-                string dataType = dataTypeRow[j].ToString();
+                string dataType = dataTypeRow[j].ToString().Replace("enum:", "");
                 string name = nameRow[j].ToString();
                 columnTypes.Add(dataType);
                 columnNames.Add(name);
@@ -184,7 +192,7 @@ namespace Tools
 
             sb.AppendLine("using Newtonsoft.Json;");
             sb.AppendLine();
-            sb.AppendLine($"public struct {className} : IBaseData");
+            sb.AppendLine($"public struct {structName} : IBaseData");
             sb.AppendLine("{");
 
             for (int i = 0; i < columnNames.Count; i++)
@@ -197,6 +205,8 @@ namespace Tools
                 sb.AppendLine($"    public readonly {type} {name};");
             }
 
+            sb.AppendLine();
+            sb.AppendLine("    public bool IsInit => Id == 0;");
             sb.AppendLine("}");
 
             bool changed = false;
@@ -216,7 +226,37 @@ namespace Tools
 
             File.WriteAllText(saveDataStructPath, sb.ToString());
 
-            Debug.Log($"{className}.cs {(changed ? "수정" : "생성")} 완료");
+            Debug.Log($"{structName}.cs {(changed ? "수정" : "생성")} 완료");
+        }
+
+        private static void GenerateDataContainer(string fileName)
+        {
+            string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
+            string containerName = $"{structName}Container";
+            string saveDataContainerPath = Path.Combine(PathDefine.DataContainerPath, $"{containerName}.cs");
+
+            string dataContainerText = File.ReadAllText(PathDefine.DataContainerTemplatePath);
+
+            dataContainerText = dataContainerText.Replace("#structName#", structName);
+
+            bool changed = false;
+
+            if (File.Exists(saveDataContainerPath))
+            {
+                if (File.ReadAllText(saveDataContainerPath).Equals(dataContainerText))
+                {
+                    Debug.LogError($"Container 변경점이 없습니다. {saveDataContainerPath}");
+                    return;
+                }
+                else
+                {
+                    changed = true;
+                }
+            }
+
+            File.WriteAllText(saveDataContainerPath, dataContainerText);
+
+            Debug.Log($"{containerName}.cs {(changed ? "수정" : "생성")} 완료");
         }
 
         private static Type GetDataType(string columnType)
@@ -229,23 +269,16 @@ namespace Tools
                     return typeof(float);
                 case "string":
                     return typeof(string);
-                case "int[]":
-                    return typeof(int[]);
-                case "float[]":
-                    return typeof(float[]);
-                case "string[]":
-                    return typeof(string[]);
                 case string s when s.StartsWith("enum:"):
                     return Type.GetType(s.Replace("enum:", ""));
                 default:
-                    Debug.LogError("Type 확인");
-                    return null;
+                    return Type.GetType(columnType);
             }
         }
 
-        private static object GetConvertValue(string value)
+        private static object GetConvertValue(string columnType, string value)
         {
-            switch (value)
+            switch (columnType)
             {
                 case "int":
                     return int.Parse(value);
@@ -253,9 +286,10 @@ namespace Tools
                     return float.Parse(value);
                 case "string":
                     return value;
+                case string s when s.StartsWith("enum:"):
+                    return value;
                 default:
-                    Debug.LogError("Type 확인");
-                    return null;
+                    return Type.GetType(columnType);
             }
         }
     }

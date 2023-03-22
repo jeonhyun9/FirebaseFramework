@@ -1,0 +1,60 @@
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using UnityEngine;
+
+namespace Data
+{
+    public class #structName#Container
+    {
+        private Dictionary<int, #structName#> dicById = new();
+        private Dictionary<string, #structName#> dicByNameId = new();
+        public void SerializeJson(string json)
+        {
+            try
+            {
+                JArray jArray = JArray.Parse(json);
+                foreach(var jObj in jArray)
+                {
+                    #structName# data = JsonConvert.DeserializeObject<#structName#>(jObj.ToString());
+                    if (!dicById.ContainsKey(data.Id))
+                    {
+                        dicById.Add(data.Id, data);
+                    }
+                    else
+                    {
+                        Debug.LogError($"ID 중복 {data.GetType()} / {data.Id}");
+                    }
+
+                    if (!dicByNameId.ContainsKey(data.NameId))
+                    {
+                        dicByNameId.Add(data.NameId, data);
+                    }
+                    else
+                    {
+                        Debug.LogError($"NameID 중복 {data.GetType()} / {data.NameId}");
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Json Parsing 실패 !!");
+                Debug.LogError(e.StackTrace);
+            }
+        }
+        public #structName# GetById(int id)
+        {
+            if (dicById.ContainsKey(id))
+                return dicById[id];
+
+            return default;
+        }
+        public #structName# GetByDataId(string nameId)
+        {
+            if (dicByNameId.ContainsKey(nameId))
+                return dicByNameId[nameId];
+
+            return default;
+        }
+    }
+}
