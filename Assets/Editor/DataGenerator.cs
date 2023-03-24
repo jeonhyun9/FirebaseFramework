@@ -30,18 +30,18 @@ namespace Tools
                 return NameIndex + 1;
             }
         }
-        private static FileStream fileStream = null;
-        private static IExcelDataReader excelReader = null;
+        private const string ExcelFileExtension = ".xlsx";
 
-        public static void GenerateDataFromExcel(string assetPath)
+        public static void GenerateDataFromExcelFileWithRefresh(string assetPath)
         {
-            if (!assetPath.Contains(".xlsx"))
+            if (!assetPath.Contains(ExcelFileExtension))
             {
                 Debug.LogError(".xlsx 파일을 변환해야 합니다.");
                 return;
             }
 
-            GenerateDataFromExcel(assetPath, true);
+            GenerateDataFromExcelFile(assetPath);
+            AssetDatabase.Refresh();
         }
 
         public static void GenerateDataFromExcelFoler(string folderPath)
@@ -57,7 +57,7 @@ namespace Tools
             foreach (string excelPath in Directory.GetFiles(folderPath, "*.xlsx"))
             {
                 EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", (float)i / Directory.GetFiles(folderPath, "*.xlsx").Length);
-                GenerateDataFromExcel(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                GenerateDataFromExcelFile(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
                 i++;
             }
 
@@ -65,40 +65,32 @@ namespace Tools
             AssetDatabase.Refresh();
         }
 
-        private static void GenerateDataFromExcel(string readExcelPath, bool refreshAssetDatabase = false)
+        private static void GenerateDataFromExcelFile(string readExcelPath)
         {
             try
             {
                 string fileName = Path.GetFileName(readExcelPath);
-                fileStream = File.Open(readExcelPath, FileMode.Open, FileAccess.Read);
-                excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream);
 
-                var dataSet = excelReader.AsDataSet();
+                using (FileStream fileStream = File.Open(readExcelPath, FileMode.Open, FileAccess.Read))
+                {
+                    using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
+                    {
+                        var dataSet = excelReader.AsDataSet();
 
-                //시트는 하나만 사용할 것
-                DataTable sheet = dataSet.Tables[0];
+                        //시트는 하나만 사용할 것
+                        DataTable sheet = dataSet.Tables[0];
 
-                GenerateJsonFromExcelSheet(fileName, sheet);
-                GenerateStructFromExcelSheet(fileName, sheet);
-                GenerateDataContainer(fileName);
+                        GenerateJsonFromExcelSheet(fileName, sheet);
+                        GenerateStructFromExcelSheet(fileName, sheet);
+                        GenerateDataContainer(fileName);
+                    }
+                }    
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
                 Debug.LogError(e.StackTrace);
             }
-            finally
-            {
-                //안하면 에러 계속 발생
-                if (excelReader != null)
-                    excelReader.Close();
-
-                if (fileStream != null)
-                    fileStream.Close();
-            }
-
-            if (refreshAssetDatabase)
-                AssetDatabase.Refresh();
         }
 
         private static void GenerateJsonFromExcelSheet(string fileName, DataTable sheet)
@@ -120,7 +112,7 @@ namespace Tools
                     string name = nameRow[j].ToString();
 
                     if (dataType.Contains("struct:"))
-                        name = name + "_" + dataType.Replace("struct:", "");
+                        name += $"_{dataType.Replace("struct:", "")}";
 
                     string value = sheet.Rows[i][j].ToString();
 

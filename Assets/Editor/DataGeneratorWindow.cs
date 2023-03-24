@@ -22,9 +22,9 @@ namespace Tools
         }
 
         [MenuItem("Assets/Generate Data From Excel")]
-        public static void GenerateDataFromExcel()
+        public static void GenerateDataFromExcelFile()
         {
-            DataGenerator.GenerateDataFromExcel(AssetDatabase.GetAssetPath(Selection.activeObject));
+            DataGenerator.GenerateDataFromExcelFileWithRefresh(AssetDatabase.GetAssetPath(Selection.activeObject));
         }
 
         public void OnGUI()
