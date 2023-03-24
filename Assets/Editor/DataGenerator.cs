@@ -104,7 +104,7 @@ namespace Tools
         private static void GenerateJsonFromExcelSheet(string fileName, DataTable sheet)
         {
             string jsonName = Path.GetFileNameWithoutExtension(fileName);
-            string saveJsonPath = Path.Combine(PathDefine.JsonPath, $"{jsonName}.json");
+            string saveJsonPath = Path.Combine(PathDefine.Json, $"{jsonName}.json");
 
             List<Dictionary<string, object>> dataDicList = new();
 
@@ -118,6 +118,10 @@ namespace Tools
                 {
                     string dataType = dataTypeRow[j].ToString();
                     string name = nameRow[j].ToString();
+
+                    if (dataType.Contains("struct:"))
+                        name = name + "_" + dataType.Replace("struct:", "");
+
                     string value = sheet.Rows[i][j].ToString();
 
                     if (dataType.Contains("[]"))
@@ -167,7 +171,7 @@ namespace Tools
         private static void GenerateStructFromExcelSheet(string fileName, DataTable sheet)
         {
             string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
-            string saveDataStructPath = Path.Combine(PathDefine.DataStructPath, $"{structName}.cs");
+            string saveDataStructPath = Path.Combine(PathDefine.DataStruct, $"{structName}.cs");
 
             //시트에서 데이터 타입과 이름만 뽑아놓기
             List<string> columnNames = new();
@@ -178,7 +182,7 @@ namespace Tools
 
             for (int j = 0; j < sheet.Columns.Count; j++)
             {
-                string dataType = dataTypeRow[j].ToString().Replace("enum:", "");
+                string dataType = dataTypeRow[j].ToString();
                 string name = nameRow[j].ToString();
                 columnTypes.Add(dataType);
                 columnNames.Add(name);
@@ -186,27 +190,25 @@ namespace Tools
 
             StringBuilder sb = new();
 
-            //할당안했다고 waring 뜨는 것 제거용
-            sb.AppendLine("#pragma warning disable 0649");
-
-            sb.AppendLine("using Newtonsoft.Json;");
-            sb.AppendLine();
-            sb.AppendLine($"public struct {structName} : IBaseData");
-            sb.AppendLine("{");
+            sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: structName));
 
             for (int i = 0; i < columnNames.Count; i++)
             {
-                string type = columnTypes[i];
-                string name = columnNames[i].Replace("enum:", "");
-                string propertyName = $"\"{name}\"";
+                string type = columnTypes[i].Replace("enum:", "");
+                string name = columnNames[i];
 
-                sb.AppendLine($"    [JsonProperty(PropertyName = {propertyName})]");
-                sb.AppendLine($"    public readonly {type} {name};");
+                if (type.Contains("struct:"))
+                {
+                    type = type.Replace("struct:", "");
+                    sb.AppendLine(GetDataTemplate(PathDefine.StructValueTemplate, type, name));
+                }
+                else
+                {
+                    sb.AppendLine(GetDataTemplate(PathDefine.DataValueTemplate, type, name));
+                }
             }
 
-            sb.AppendLine();
-            sb.AppendLine("    public bool IsInit => Id == 0;");
-            sb.AppendLine("}");
+            sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
 
             bool changed = false;
 
@@ -231,9 +233,9 @@ namespace Tools
         {
             string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
             string containerName = $"{structName}Container";
-            string saveDataContainerPath = Path.Combine(PathDefine.DataContainerPath, $"{containerName}.cs");
+            string saveDataContainerPath = Path.Combine(PathDefine.DataContainer, $"{containerName}.cs");
 
-            string dataContainerText = File.ReadAllText(PathDefine.DataContainerTemplatePath);
+            string dataContainerText = File.ReadAllText(PathDefine.DataContainerTemplate);
 
             dataContainerText = dataContainerText.Replace("#fileName#", Path.GetFileNameWithoutExtension(fileName));
 
@@ -265,6 +267,7 @@ namespace Tools
                 case "float":
                     return typeof(float);
                 case "string":
+                case string s when s.StartsWith("struct:"):
                     return typeof(string);
                 case string s when s.StartsWith("enum:"):
                     return Type.GetType(s.Replace("enum:", ""));
@@ -281,10 +284,23 @@ namespace Tools
                     return int.Parse(value);
                 case "float":
                     return float.Parse(value);
-                case "string":
+                case string s when s.StartsWith("struct:"):
                     return value;
                 default:
                     return value;
+            }
+        }
+
+        private static string GetDataTemplate(string path, string type = null, string name = null)
+        {
+            if (File.Exists(path))
+            {
+                return File.ReadAllText(path).Replace("#type#", type).Replace("#name#", name);
+            }
+            else
+            {
+                Debug.LogError($"{path}에 해당 템플릿이 없습니다.");
+                return null;
             }
         }
     }

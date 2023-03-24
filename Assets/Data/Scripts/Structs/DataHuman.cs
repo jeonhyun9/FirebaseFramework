@@ -9,6 +9,16 @@ public struct DataHuman : IBaseData
     public readonly string NameId;
     [JsonProperty(PropertyName = "Scores")]
     public readonly int[] Scores;
+	[JsonProperty(PropertyName = "Pet_DataAnimal")]
+    private readonly string Pet_DataAnimal;
+    public readonly DataAnimal Pet
+    {
+        get
+        {
+            return DataContainerManager.Instance.GetDataContainer<DataAnimalContainer>()
+                .GetByNameId(Pet_DataAnimal);
+        }
+    }
 
     public bool IsInit => Id == 0;
 }

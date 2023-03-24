@@ -42,7 +42,7 @@ namespace Tools
             excelPath = EditorPrefs.GetString("ExcelPath");
 
             if (string.IsNullOrEmpty(excelPath))
-                excelPath = PathDefine.ExcelPath;
+                excelPath = PathDefine.Excel;
         }
 
         private void OnDisable()

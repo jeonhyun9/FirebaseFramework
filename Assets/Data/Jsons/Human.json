@@ -1,1 +1,1 @@
-[{"Id":1,"NameId":"Karina","Scores":[1,2,3]},{"Id":2,"NameId":"Winter","Scores":[1,2,3]},{"Id":3,"NameId":"Chawon","Scores":[1,2,3]},{"Id":4,"NameId":"Kazuha","Scores":[1,2,3,4]}]
+[{"Id":1,"NameId":"HUMAN_KARINA","Scores":[1,2,3],"Pet_DataAnimal":"ANIMAL_JAMES"},{"Id":2,"NameId":"HUMAN_WINTER","Scores":[1,2,3],"Pet_DataAnimal":"ANIMAL_NINA"},{"Id":3,"NameId":"HUMAN_CHAWON","Scores":[1,2,3],"Pet_DataAnimal":"ANIMAL_DUKE"},{"Id":4,"NameId":"HUMAN_KAZUHA","Scores":[1,2,3,4],"Pet_DataAnimal":"ANIMAL_ANNA"}]

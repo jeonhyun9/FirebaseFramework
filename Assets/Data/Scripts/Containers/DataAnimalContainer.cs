@@ -2,14 +2,21 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
-using System.IO;
+using System.Linq;
+using System;
 
 public class DataAnimalContainer : IBaseDataContainer
 {
     private Dictionary<int, DataAnimal> dicById = new();
     private Dictionary<string, DataAnimal> dicByNameId = new();
+	private DataAnimal[] datas = null;
     public string FileName => "Animal";
-    public string LocalJsonPath => PathDefine.JsonPath + $"/{FileName}.json";
+	
+	#if UNITY_EDITOR
+    public string LocalJsonPath => PathDefine.Json + $"/{FileName}.json";
+	#endif
+	
+	public bool Serialized => dicById != null && dicByNameId != null && datas != null;
     public void SerializeJson(string json)
     {
         try
@@ -36,8 +43,9 @@ public class DataAnimalContainer : IBaseDataContainer
                     Debug.LogError($"NameID 중복 {data.GetType()} / {data.NameId}");
                 }
             }
+			datas = dicById.Values.ToArray();
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError("Json Parsing 실패 !!");
             Debug.LogError(e.StackTrace);
@@ -56,5 +64,14 @@ public class DataAnimalContainer : IBaseDataContainer
             return dicByNameId[nameId];
 
         return default;
+    }
+	public DataAnimal Find(Predicate<DataAnimal> predicate)
+    {
+        return Array.Find(datas, predicate);
+    }
+
+    public DataAnimal[] FindAll(Predicate<DataAnimal> predicate)
+    {
+        return Array.FindAll(datas, predicate);
     }
 }

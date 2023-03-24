@@ -1,0 +1,10 @@
+	[JsonProperty(PropertyName = "#name#_#type#")]
+    private readonly string #name#_#type#;
+    public readonly #type# #name#
+    {
+        get
+        {
+            return DataContainerManager.Instance.GetDataContainer<#type#Container>()
+                .GetByNameId(#name#_#type#);
+        }
+    }

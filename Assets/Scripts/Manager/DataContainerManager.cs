@@ -11,11 +11,13 @@ public class DataContainerManager : BaseManager<DataContainerManager>
         containerDic[typeof(T)].SerializeJson(json);
     }
 
+#if UNITY_EDITOR
     public void AddDataContainerFromLocalJson<T>() where T : IBaseDataContainer, new()
     {
         containerDic[typeof(T)] = new T();
         containerDic[typeof(T)].SerializeJson(System.IO.File.ReadAllText(containerDic[typeof(T)].LocalJsonPath));
     }
+#endif
 
     public T GetDataContainer<T>() where T : IBaseDataContainer
     {
