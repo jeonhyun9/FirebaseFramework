@@ -52,13 +52,14 @@ namespace Tools
                 return;
             }
 
-            int i = 0;
+            string[] excelFiles = Directory.GetFiles(folderPath, "*.xlsx");
+            float progress = 0f;
 
-            foreach (string excelPath in Directory.GetFiles(folderPath, "*.xlsx"))
+            foreach (string excelPath in excelFiles)
             {
-                EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", (float)i / Directory.GetFiles(folderPath, "*.xlsx").Length);
+                EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", progress);
                 GenerateDataFromExcelFile(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                i++;
+                progress += 1f / excelFiles.Length;
             }
 
             EditorUtility.ClearProgressBar();
@@ -88,15 +89,15 @@ namespace Tools
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
                 Debug.LogError(e.StackTrace);
             }
         }
 
-        private static void GenerateJsonFromExcelSheet(string fileName, DataTable sheet)
+        private static void GenerateJsonFromExcelSheet(string filePath, DataTable sheet)
         {
-            string jsonName = Path.GetFileNameWithoutExtension(fileName);
-            string saveJsonPath = Path.Combine(PathDefine.Json, $"{jsonName}.json");
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string jsonName = $"{fileName}.json";
+            string saveJsonPath = Path.Combine(PathDefine.Json, jsonName);
 
             List<Dictionary<string, object>> dataDicList = new();
 
@@ -160,9 +161,10 @@ namespace Tools
             Debug.Log($"{jsonName}.json {(changed ? "수정" : "생성")} 완료");
         }
 
-        private static void GenerateStructFromExcelSheet(string fileName, DataTable sheet)
+        private static void GenerateStructFromExcelSheet(string filePath, DataTable sheet)
         {
-            string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string structName = $"Data{fileName}";
             string saveDataStructPath = Path.Combine(PathDefine.DataStruct, $"{structName}.cs");
 
             //시트에서 데이터 타입과 이름만 뽑아놓기
@@ -221,9 +223,10 @@ namespace Tools
             Debug.Log($"{structName}.cs {(changed ? "수정" : "생성")} 완료");
         }
 
-        private static void GenerateDataContainer(string fileName)
+        private static void GenerateDataContainer(string filePath)
         {
-            string structName = $"Data{Path.GetFileNameWithoutExtension(fileName)}";
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string structName = $"Data{fileName}";
             string containerName = $"{structName}Container";
             string saveDataContainerPath = Path.Combine(PathDefine.DataContainer, $"{containerName}.cs");
 
@@ -285,15 +288,25 @@ namespace Tools
 
         private static string GetDataTemplate(string path, string type = null, string name = null)
         {
-            if (File.Exists(path))
-            {
-                return File.ReadAllText(path).Replace("#type#", type).Replace("#name#", name);
-            }
-            else
+            if (!File.Exists(path))
             {
                 Debug.LogError($"{path}에 해당 템플릿이 없습니다.");
                 return null;
             }
+
+            var template = File.ReadAllText(path);
+
+            if (type != null)
+            {
+                template = template.Replace("#type#", type);
+            }
+
+            if (name != null)
+            {
+                template = template.Replace("#name#", name);
+            }
+
+            return template;
         }
     }
 }
