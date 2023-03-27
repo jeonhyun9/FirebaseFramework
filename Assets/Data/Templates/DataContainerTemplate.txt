@@ -5,12 +5,12 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class Data#fileName#Container : IBaseDataContainer
+public class Data#name#Container : IBaseDataContainer
 {
-    private Dictionary<int, Data#fileName#> dicById = null;
-    private Dictionary<string, Data#fileName#> dicByNameId = null;
-	private Data#fileName#[] datas = null;
-    public string FileName => "#fileName#";
+    private Dictionary<int, Data#name#> dicById = null;
+    private Dictionary<string, Data#name#> dicByNameId = null;
+	private Data#name#[] datas = null;
+    public string FileName => "#name#";
 	
 	#if UNITY_EDITOR
     public string LocalJsonPath => PathDefine.Json + $"/{FileName}.json";
@@ -24,7 +24,7 @@ public class Data#fileName#Container : IBaseDataContainer
             JArray jArray = JArray.Parse(json);
             foreach(var jObj in jArray)
             {
-                Data#fileName# data = JsonConvert.DeserializeObject<Data#fileName#>(jObj.ToString());
+                Data#name# data = JsonConvert.DeserializeObject<Data#name#>(jObj.ToString());
                 if (!dicById.ContainsKey(data.Id))
                 {
 					if (dicById == null)
@@ -57,26 +57,26 @@ public class Data#fileName#Container : IBaseDataContainer
             Debug.LogError(e.StackTrace);
         }
     }
-    public Data#fileName# GetById(int id)
+    public Data#name# GetById(int id)
     {
         if (dicById.ContainsKey(id))
             return dicById[id];
 
         return default;
     }
-    public Data#fileName# GetByNameId(string nameId)
+    public Data#name# GetByNameId(string nameId)
     {
         if (dicByNameId.ContainsKey(nameId))
             return dicByNameId[nameId];
 
         return default;
     }
-	public Data#fileName# Find(Predicate<Data#fileName#> predicate)
+	public Data#name# Find(Predicate<Data#name#> predicate)
     {
         return Array.Find(datas, predicate);
     }
 
-    public Data#fileName#[] FindAll(Predicate<Data#fileName#> predicate)
+    public Data#name#[] FindAll(Predicate<Data#name#> predicate)
     {
         return Array.FindAll(datas, predicate);
     }
