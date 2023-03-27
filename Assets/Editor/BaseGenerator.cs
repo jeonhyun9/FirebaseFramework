@@ -10,8 +10,6 @@ public class BaseGenerator
         Container,
     }
 
-    public string ResultLog { get; protected set; }
-
     protected int DataTypeIndex
     {
         get
