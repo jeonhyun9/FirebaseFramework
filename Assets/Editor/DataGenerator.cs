@@ -13,6 +13,10 @@ namespace Tools
     {
         private const string ExcelFileExtension = ".xlsx";
 
+        private static StructGenerator structGenerator = new();
+        private static ContainerGenerator containerGenerator = new();
+        private static JsonGenerator jsonGenerator = new();
+
         public static void GenerateDataFromExcelFileWithRefresh(string assetPath)
         {
             if (!assetPath.Contains(ExcelFileExtension))
@@ -35,6 +39,12 @@ namespace Tools
 
             string[] excelFiles = Directory.GetFiles(folderPath, $"*{ExcelFileExtension}");
             float progress = 0f;
+
+            if (excelFiles.Length == 0)
+            {
+                Debug.LogError($"{folderPath} ¿¡ ¿¢¼¿ ÆÄÀÏÀÌ ¾ø½À´Ï´Ù.");
+                return;
+            }
 
             foreach (string excelPath in excelFiles)
             {
@@ -88,18 +98,18 @@ namespace Tools
 
         private static void GenerateStructFromExcelSheet(string filePath, DataTable sheet, ref StringBuilder log)
         {
-            StructGenerator structGenerator= new(filePath, sheet);
+            structGenerator.Init(filePath, sheet);
             structGenerator.Generate(ref log);
         }
         private static void GenerateDataContainer(string filePath, ref StringBuilder log)
         {
-            ContainerGenerator containerGenerator = new(filePath);
+            containerGenerator.Init(filePath);
             containerGenerator.Generate(ref log);
         }
 
         private static void GenerateJsonFromExcelSheet(string filePath, DataTable sheet, ref StringBuilder log)
         {
-            JsonGenerator jsonGenerator = new(filePath, sheet);
+            jsonGenerator.Init(filePath, sheet);
             jsonGenerator.Generate(ref log);
         }
     }

@@ -8,7 +8,7 @@ public class StructGenerator : BaseGenerator
 {
     private DataTable sheet;
 
-    public StructGenerator(string pathValue, DataTable sheetValue)
+    public void Init(string pathValue, DataTable sheetValue)
     {
         GeneratorType = Type.Struct;
         FilePath = pathValue;

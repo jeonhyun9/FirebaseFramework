@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ContainerGenerator : BaseGenerator
 {
-    public ContainerGenerator(string pathValue)
+    public void Init(string pathValue)
     {
         GeneratorType = Type.Container;
         FilePath = pathValue;

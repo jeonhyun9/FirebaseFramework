@@ -10,7 +10,8 @@ using System.Text;
 public class JsonGenerator : BaseGenerator
 {
     private DataTable sheet;
-    public JsonGenerator(string pathValue, DataTable sheetValue)
+
+    public void Init(string pathValue, DataTable sheetValue)
     {
         GeneratorType = Type.Json;
         FilePath = pathValue;
