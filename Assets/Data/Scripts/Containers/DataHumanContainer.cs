@@ -7,8 +7,8 @@ using System;
 
 public class DataHumanContainer : IBaseDataContainer
 {
-    private Dictionary<int, DataHuman> dicById = new();
-    private Dictionary<string, DataHuman> dicByNameId = new();
+    private Dictionary<int, DataHuman> dicById = null;
+    private Dictionary<string, DataHuman> dicByNameId = null;
 	private DataHuman[] datas = null;
     public string FileName => "Human";
 	
@@ -27,6 +27,9 @@ public class DataHumanContainer : IBaseDataContainer
                 DataHuman data = JsonConvert.DeserializeObject<DataHuman>(jObj.ToString());
                 if (!dicById.ContainsKey(data.Id))
                 {
+					if (dicById == null)
+                        dicById = new();
+						
                     dicById.Add(data.Id, data);
                 }
                 else
@@ -36,6 +39,9 @@ public class DataHumanContainer : IBaseDataContainer
 
                 if (!dicByNameId.ContainsKey(data.NameId))
                 {
+					if (dicByNameId == null)
+                        dicByNameId = new();
+						
                     dicByNameId.Add(data.NameId, data);
                 }
                 else

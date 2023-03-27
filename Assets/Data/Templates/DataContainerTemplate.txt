@@ -7,8 +7,8 @@ using System;
 
 public class Data#fileName#Container : IBaseDataContainer
 {
-    private Dictionary<int, Data#fileName#> dicById = new();
-    private Dictionary<string, Data#fileName#> dicByNameId = new();
+    private Dictionary<int, Data#fileName#> dicById = null;
+    private Dictionary<string, Data#fileName#> dicByNameId = null;
 	private Data#fileName#[] datas = null;
     public string FileName => "#fileName#";
 	
@@ -27,6 +27,9 @@ public class Data#fileName#Container : IBaseDataContainer
                 Data#fileName# data = JsonConvert.DeserializeObject<Data#fileName#>(jObj.ToString());
                 if (!dicById.ContainsKey(data.Id))
                 {
+					if (dicById == null)
+                        dicById = new();
+						
                     dicById.Add(data.Id, data);
                 }
                 else
@@ -36,6 +39,9 @@ public class Data#fileName#Container : IBaseDataContainer
 
                 if (!dicByNameId.ContainsKey(data.NameId))
                 {
+					if (dicByNameId == null)
+                        dicByNameId = new();
+						
                     dicByNameId.Add(data.NameId, data);
                 }
                 else
