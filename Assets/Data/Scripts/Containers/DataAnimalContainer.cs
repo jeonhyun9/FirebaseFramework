@@ -25,23 +25,24 @@ public class DataAnimalContainer : IBaseDataContainer
             foreach(var jObj in jArray)
             {
                 DataAnimal data = JsonConvert.DeserializeObject<DataAnimal>(jObj.ToString());
-                if (!dicById.ContainsKey(data.Id))
-                {
-					if (dicById == null)
+				
+				if (dicById == null)
                         dicById = new();
 						
+                if (!dicById.ContainsKey(data.Id))
+                {
                     dicById.Add(data.Id, data);
                 }
                 else
                 {
                     Debug.LogError($"ID 중복 {data.GetType()} / {data.Id}");
                 }
-
-                if (!dicByNameId.ContainsKey(data.NameId))
-                {
-					if (dicByNameId == null)
+				
+				if (dicByNameId == null)
                         dicByNameId = new();
 						
+                if (!dicByNameId.ContainsKey(data.NameId))
+                {
                     dicByNameId.Add(data.NameId, data);
                 }
                 else
