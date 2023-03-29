@@ -27,7 +27,7 @@ public class Data#name#Container : IBaseDataContainer
                 Data#name# data = JsonConvert.DeserializeObject<Data#name#>(jObj.ToString());
 				
 				if (dicById == null)
-                        dicById = new();
+					dicById = new();
 						
                 if (!dicById.ContainsKey(data.Id))
                 {
@@ -39,7 +39,7 @@ public class Data#name#Container : IBaseDataContainer
                 }
 				
 				if (dicByNameId == null)
-                        dicByNameId = new();
+					dicByNameId = new();
 						
                 if (!dicByNameId.ContainsKey(data.NameId))
                 {
