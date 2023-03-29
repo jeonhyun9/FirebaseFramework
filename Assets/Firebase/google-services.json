@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "394156476416",
+    "project_id": "jhgunity",
+    "storage_bucket": "jhgunity.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394156476416:android:c9be355808d77a5de3b0e5",
+        "android_client_info": {
+          "package_name": "com.jhg.DataGenerator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "394156476416-qe2ksahsfouo7egat6dq8fd5d4srmled.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdbdrFT1YMQIAqwPsZinMTJT956BPAt2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "394156476416-qe2ksahsfouo7egat6dq8fd5d4srmled.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
