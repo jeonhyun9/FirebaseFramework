@@ -76,7 +76,6 @@ public class DataHumanContainer : IBaseDataContainer
     {
         return Array.Find(datas, predicate);
     }
-
     public DataHuman[] FindAll(Predicate<DataHuman> predicate)
     {
         return Array.FindAll(datas, predicate);

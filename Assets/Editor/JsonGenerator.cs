@@ -6,6 +6,7 @@ using System.Data;
 using System.IO;
 using UnityEngine;
 using System.Text;
+using System.Linq;
 
 public class JsonGenerator : BaseGenerator
 {
@@ -84,7 +85,7 @@ public class JsonGenerator : BaseGenerator
         return true;
     }
 
-    private static System.Type GetDataType(string columnType)
+    private System.Type GetDataType(string columnType)
     {
         switch (columnType)
         {
@@ -102,7 +103,7 @@ public class JsonGenerator : BaseGenerator
         }
     }
 
-    private static object GetConvertValue(string columnType, string value)
+    private object GetConvertValue(string columnType, string value)
     {
         switch (columnType)
         {

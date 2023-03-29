@@ -15,6 +15,9 @@ public struct DataHuman : IBaseData
     {
         get
         {
+		    if (DataContainerManager.Instance.GetDataContainer<DataAnimalContainer>() == null)
+                return default;
+				
             return DataContainerManager.Instance.GetDataContainer<DataAnimalContainer>()
                 .GetByNameId(Pet_DataAnimal);
         }

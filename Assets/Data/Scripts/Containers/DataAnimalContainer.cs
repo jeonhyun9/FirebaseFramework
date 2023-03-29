@@ -76,7 +76,6 @@ public class DataAnimalContainer : IBaseDataContainer
     {
         return Array.Find(datas, predicate);
     }
-
     public DataAnimal[] FindAll(Predicate<DataAnimal> predicate)
     {
         return Array.FindAll(datas, predicate);
