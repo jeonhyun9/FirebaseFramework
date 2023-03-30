@@ -14,7 +14,7 @@ namespace Tools
         private string excelPath;
 
         [MenuItem("Tools/Generate Data From Excel Folder")]
-        public static void OpenGenerateDataWindow()
+        public static void OpenDataGeneratorWindow()
         {
             DataGeneratorWindow window = (DataGeneratorWindow)GetWindow(typeof(DataGeneratorWindow));
             window.minSize = new Vector2(windowWidth, windowHeight);
@@ -26,6 +26,7 @@ namespace Tools
         {
             DataGenerator.GenerateDataFromExcelFileWithRefresh(AssetDatabase.GetAssetPath(Selection.activeObject));
         }
+
         private void OnEnable()
         {
             excelPath = EditorPrefs.GetString("ExcelPath");

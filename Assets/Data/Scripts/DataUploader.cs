@@ -18,7 +18,7 @@ public class DataUploader : MonoBehaviour
     private string bucketName;
     private string version;
     private bool setCurrentVersion;
-    private string localJsonPath;
+    private string localJsonDataPath;
 
     private bool initialized = false;
 
@@ -46,12 +46,12 @@ public class DataUploader : MonoBehaviour
         }
     }
 
-    public void Initialize(string bucketNameValue, string versionValue, bool setCurrentVersionValue, string localJsonPathValue)
+    public void Initialize(string localJsonPathValue, string bucketNameValue, string versionValue, bool setCurrentVersionValue)
     {
+        localJsonDataPath = localJsonPathValue;
         bucketName = bucketNameValue;
         version = versionValue;
         setCurrentVersion = setCurrentVersionValue;
-        localJsonPath = localJsonPathValue;
 
         storage = FirebaseStorage.GetInstance(AppSpot);
 
@@ -81,7 +81,7 @@ public class DataUploader : MonoBehaviour
             ShowTaskLog("version.txt", ref task);
         }
 
-        string[] jsonFiles = Directory.GetFiles(localJsonPath, "*.json");
+        string[] jsonFiles = Directory.GetFiles(localJsonDataPath, "*.json");
 
         foreach (string filePath in jsonFiles)
         {
