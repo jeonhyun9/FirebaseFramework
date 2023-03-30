@@ -26,6 +26,13 @@ namespace Tools
         {
             DataGenerator.GenerateDataFromExcelFileWithRefresh(AssetDatabase.GetAssetPath(Selection.activeObject));
         }
+        private void OnEnable()
+        {
+            excelPath = EditorPrefs.GetString("ExcelPath");
+
+            if (string.IsNullOrEmpty(excelPath))
+                excelPath = PathDefine.Excel;
+        }
 
         public void OnGUI()
         {
@@ -35,14 +42,6 @@ namespace Tools
 
             if (GUILayout.Button("Generate", GUILayout.Height(50)))
                 DataGenerator.GenerateDataFromExcelFoler(excelPath);
-        }
-
-        private void OnEnable()
-        {
-            excelPath = EditorPrefs.GetString("ExcelPath");
-
-            if (string.IsNullOrEmpty(excelPath))
-                excelPath = PathDefine.Excel;
         }
 
         private void OnDisable()
