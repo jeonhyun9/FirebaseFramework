@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Firebase.Storage;
 using System.Collections;
 using System.IO;
@@ -117,3 +118,4 @@ public class DataUploader : MonoBehaviour
             EditorCoroutineUtility.StopCoroutine(editorCoroutine);
     }
 }
+#endif
