@@ -1,11 +1,17 @@
 public struct FireBaseDefine
 {
-    public FireBaseDefine(string bucketName)
+    public FireBaseDefine(string bucketName, string version)
     {
         BucketName = bucketName;
+        Version = version;
     }
 
     public string BucketName
+    {
+        get; private set;
+    }
+
+    public string Version
     {
         get; private set;
     }
@@ -22,7 +28,23 @@ public struct FireBaseDefine
     {
         get
         {
-            return AppSpot + "CurrentVersion/version.txt";
+            return "CurrentVersion/Version.txt";
+        }
+    }
+
+    public string JsonDatasPath
+    {
+        get
+        {
+            return $"JsonDatas/{Version}/";
+        }
+    }
+
+    public string JsonListPath
+    {
+        get
+        {
+            return $"JsonDatas/{Version}/JsonList.txt";
         }
     }
 

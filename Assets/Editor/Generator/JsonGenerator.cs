@@ -11,12 +11,14 @@ using System.Linq;
 public class JsonGenerator : BaseGenerator
 {
     private DataTable sheet;
+    private string jsonSavePath;
 
-    public void Init(string pathValue, DataTable sheetValue)
+    public void Init(string pathValue, DataTable sheetValue, string jsonSavePathValue)
     {
         GeneratorType = Type.Json;
         FilePath = pathValue;
         sheet = sheetValue;
+        jsonSavePath = Path.Combine(jsonSavePathValue, FileNameWithExtension);
     }
 
     public bool Generate(ref StringBuilder log)
@@ -64,9 +66,9 @@ public class JsonGenerator : BaseGenerator
         string newJson = JsonConvert.SerializeObject(dataDicList);
 
         bool changed = false;
-        if (File.Exists(SavePath))
+        if (File.Exists(jsonSavePath))
         {
-            string oldJson = File.ReadAllText(SavePath);
+            string oldJson = File.ReadAllText(jsonSavePath);
 
             if (JToken.DeepEquals(newJson, oldJson))
             {
@@ -78,7 +80,7 @@ public class JsonGenerator : BaseGenerator
             }
         }
 
-        File.WriteAllText(SavePath, newJson);
+        File.WriteAllText(jsonSavePath, newJson);
 
         log.AppendLine($"{FileNameWithExtension} {(changed ? "수정" : "생성")} 완료");
 

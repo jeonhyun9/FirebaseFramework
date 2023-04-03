@@ -9,5 +9,7 @@ public class PathDefine
     public const string EndDateTemplate = "Assets/Data/Templates/EndDataTemplate.txt";
     public const string DataValueTemplate = "Assets/Data/Templates/DataValueTemplate.txt";
     public const string StructValueTemplate = "Assets/Data/Templates/StructValueTemplate.txt";
+    public const string VersionText = "Assets/Data/Jsons/Version.txt";
+    public const string JsonListText = "Assets/Data/Jsons/JsonList.txt";
 }
 

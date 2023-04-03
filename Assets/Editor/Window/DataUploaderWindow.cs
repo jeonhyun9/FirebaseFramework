@@ -1,6 +1,6 @@
-#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 public class DataUploaderWindow : EditorWindow
 {
@@ -9,7 +9,7 @@ public class DataUploaderWindow : EditorWindow
 
     private string bucketName;
     private int version;
-    private string localJsonDataPath;
+    private string jsonPath;
     private bool setCurrentVersion;
 
     [MenuItem("Tools/Upload Data to FireBase Storage")]
@@ -38,30 +38,25 @@ public class DataUploaderWindow : EditorWindow
 
     private void GetParameter()
     {
-        localJsonDataPath = EditorPrefs.GetString("LocalJsonDataPath", PathDefine.Json);
+        jsonPath = EditorPrefs.GetString("jsonPath", PathDefine.Json);
         bucketName = EditorPrefs.GetString("BucketName", "jhgunity");
-        version = EditorPrefs.GetInt("Version", 0);
         setCurrentVersion = EditorPrefs.GetBool("SetCurrentVersion", false);
     }
 
     private void SetParameter()
     {
-        EditorPrefs.SetString("LocalJsonDataPath", localJsonDataPath);
+        EditorPrefs.SetString("jsonPath", jsonPath);
         EditorPrefs.SetString("BucketName", bucketName);
-        EditorPrefs.SetInt("Version", version);
         EditorPrefs.SetBool("SetCurrentVersion", setCurrentVersion);
     }
 
     private void DrawParameter()
     {
-        EditorGUILayout.LabelField("Local Json Data Path");
-        localJsonDataPath = EditorGUILayout.TextField(localJsonDataPath);
+        EditorGUILayout.LabelField("Local Json Path");
+        jsonPath = EditorGUILayout.TextField(jsonPath);
 
         EditorGUILayout.LabelField("FireBase Bucket Name");
         bucketName = EditorGUILayout.TextField(bucketName);
-
-        EditorGUILayout.LabelField("Version");
-        version = EditorGUILayout.IntField(version);
 
         GUILayout.Space(5);
         
@@ -75,12 +70,12 @@ public class DataUploaderWindow : EditorWindow
     {
         if (GUILayout.Button("Upload", GUILayout.Height(50)))
         {
-            DataUploader dataUploader = new GameObject().AddComponent<DataUploader>();
-            dataUploader.Initialize(localJsonDataPath, bucketName, version.ToString(), setCurrentVersion);
-            dataUploader.StartUpload();
+            DataUploader dataUploader = new GameObject("DataUploader").AddComponent<DataUploader>();
+
+            if (dataUploader.Initialize(jsonPath, bucketName, setCurrentVersion))
+                dataUploader.StartUpload();
 
             Close();
         }
     }
 }
-#endif
