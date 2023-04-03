@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Firebase.Storage;
 using System.Collections;
 using System.IO;
@@ -5,6 +6,9 @@ using UnityEngine;
 using Unity.EditorCoroutines.Editor;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
+
+//Editor 폴더에 넣으면 에러 발생!
 
 /// <summary>
 /// 현재 연결된 FireBaseStorage의 보안 규칙의 읽기/쓰기 권한이 모두에게 허용되어 있다.
@@ -23,6 +27,7 @@ public class DataUploader : MonoBehaviour
 
     private string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
     private string VersionTextName => Path.GetFileName(PathDefine.VersionText);
+    private float progress;
 
     public bool Initialize(string localJsonPathValue, string bucketNameValue, bool setCurrentVersionValue)
     {
@@ -54,7 +59,14 @@ public class DataUploader : MonoBehaviour
             return;
         }
 
-        editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadJsonDatas(), this);
+        try
+        {
+            editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadJsonDatas(), this);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"업로드 에러 : {e}");
+        }
     }
 
     private IEnumerator UploadJsonDatas()
@@ -71,14 +83,24 @@ public class DataUploader : MonoBehaviour
         {
             string jsonName = Path.GetFileName(jsonPath);
 
+            EditorUtility.DisplayProgressBar(jsonName, $"{jsonName} 업로드 중..", progress);
+
             //파이어베이스 경로는 Path.Combine X
             yield return UploadTask(jsonPath, fireBaseDef.JsonDatasPath + jsonName);
+            progress += 1f / jsonFiles.Length;
         }
+
+        EditorUtility.DisplayProgressBar("JsonList.txt", $"JsonList.txt 업로드 중..", progress);
 
         yield return UploadTask(Path.Combine(localJsonDataPath, JsonListTextName), fireBaseDef.JsonListPath);
 
         if (setCurrentVersion)
+        {
+            EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress);
             yield return UploadTask(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath);
+        }
+
+        EditorUtility.ClearProgressBar();
 
         if (storage?.App != null)
             storage.App.Dispose();
@@ -115,3 +137,4 @@ public class DataUploader : MonoBehaviour
             EditorCoroutineUtility.StopCoroutine(editorCoroutine);
     }
 }
+#endif

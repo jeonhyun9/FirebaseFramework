@@ -1,6 +1,6 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using System.IO;
 
 public class DataUploaderWindow : EditorWindow
 {
@@ -79,3 +79,4 @@ public class DataUploaderWindow : EditorWindow
         }
     }
 }
+#endif
