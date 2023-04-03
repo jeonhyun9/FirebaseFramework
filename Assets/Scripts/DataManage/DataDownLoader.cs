@@ -32,7 +32,7 @@ public class DataDownLoader : MonoBehaviour
         LoadDataFromJson().Forget();
     }
 
-    private async UniTaskVoid LoadDataFromJson()
+    private async UniTask<bool> LoadDataFromJson()
     {
         bool loadDataResult;
 
@@ -43,12 +43,14 @@ public class DataDownLoader : MonoBehaviour
                 break;
 
             default:
-                loadDataResult = LoadDataFromLocalJsonDataPath(localJsonDataPath);
+                loadDataResult = LoadDataFromLocalPath(localJsonDataPath);
                 break;
         }
 
         if (loadDataResult)
             ShowTestLog();
+
+        return loadDataResult;
     }
 
     private async UniTask<bool> LoadDataFromFireBase(string bucketNameValue)
@@ -62,15 +64,10 @@ public class DataDownLoader : MonoBehaviour
 
         foreach(string fileName in jsonDicByFileName.Keys)
         {
-            if (DataContainerManager.Instance.AddDataContainer(fileName, jsonDicByFileName[fileName]))
-            {
-                Debug.Log($"Data Load Success {fileName} ");
-            }
-            else
-            {
-                Debug.LogError($"Data Load Failed {fileName} ");
+            bool addContainerResult = AddDataContainerWithLog(fileName, jsonDicByFileName[fileName]);
+
+            if (!addContainerResult)
                 return false;
-            }
         }
 
         Debug.Log($"Data Version : {fireBaseDataDownloader.Version}");
@@ -78,7 +75,7 @@ public class DataDownLoader : MonoBehaviour
         return true;
     }
 
-    private bool LoadDataFromLocalJsonDataPath(string jsonPath)
+    private bool LoadDataFromLocalPath(string jsonPath)
     {
         if (!Directory.Exists(jsonPath))
             return false;
@@ -91,15 +88,25 @@ public class DataDownLoader : MonoBehaviour
         {
             string localJson = File.ReadAllText(Path.Combine(jsonPath, fileName));
 
-            if (DataContainerManager.Instance.AddDataContainer(fileName, localJson))
-            {
-                Debug.Log($"Data Load Success {fileName} ");
-            }
-            else
-            {
-                Debug.LogError($"Data Load Failed {fileName} ");
+            bool addContainerResult = AddDataContainerWithLog(fileName, localJson);
+
+            if (!addContainerResult)
                 return false;
-            }
+        }
+
+        return true;
+    }
+
+    private bool AddDataContainerWithLog(string fileName, string json)
+    {
+        if (DataContainerManager.Instance.AddDataContainer(fileName, json))
+        {
+            Debug.Log($"Data Load Success {fileName} ");
+        }
+        else
+        {
+            Debug.LogError($"Data Load Failed {fileName} ");
+            return false;
         }
 
         return true;
