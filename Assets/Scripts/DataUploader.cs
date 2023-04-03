@@ -65,7 +65,7 @@ public class DataUploader : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"업로드 에러 : {e}");
+            Debug.LogError($"Upload Error : {e}");
         }
     }
 
@@ -86,7 +86,7 @@ public class DataUploader : MonoBehaviour
             EditorUtility.DisplayProgressBar(jsonName, $"{jsonName} 업로드 중..", progress);
 
             //파이어베이스 경로는 Path.Combine X
-            yield return UploadTask(jsonPath, fireBaseDef.JsonDatasPath + jsonName);
+            yield return UploadTask(jsonPath, fireBaseDef.GetJsonPath(jsonName));
             progress += 1f / jsonFiles.Length;
         }
 
@@ -98,6 +98,8 @@ public class DataUploader : MonoBehaviour
         {
             EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress);
             yield return UploadTask(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath);
+
+            Debug.Log($"Upload Current Version {fireBaseDef.Version}");
         }
 
         EditorUtility.ClearProgressBar();
@@ -123,11 +125,11 @@ public class DataUploader : MonoBehaviour
     {
         if (task.IsFaulted)
         {
-            Debug.LogError("업로드 실패 : " + fileName + " - " + task.Exception);
+            Debug.LogError("Upload Fail : " + fileName + " - " + task.Exception);
         }
         else if (task.IsCompleted)
         {
-            Debug.Log("업로드 완료 : " + fileName);
+            Debug.Log("Upload Success : " + fileName);
         }
     }
 

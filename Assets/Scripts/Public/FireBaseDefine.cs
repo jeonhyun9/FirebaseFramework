@@ -1,8 +1,15 @@
+using UnityEngine;
+
 public struct FireBaseDefine
 {
-    public FireBaseDefine(string bucketName, string version)
+    public FireBaseDefine(string bucketName, string version = null)
     {
         BucketName = bucketName;
+        Version = version;
+    }
+
+    public void SetVersion(string version)
+    {
         Version = version;
     }
 
@@ -16,26 +23,19 @@ public struct FireBaseDefine
         get; private set;
     }
 
-    public string AppSpot
-    {
-        get
-        {
-            return $"gs://{BucketName}.appspot.com/";
-        }
-    }
+    public string AppSpot => $"gs://{BucketName}.appspot.com/";
 
-    public string CurrentVersionPath
-    {
-        get
-        {
-            return "CurrentVersion/Version.txt";
-        }
-    }
+    public string CurrentVersionPath => "CurrentVersion/Version.txt";
 
     public string JsonDatasPath
     {
         get
         {
+            if (string.IsNullOrEmpty(Version))
+            {
+                Debug.LogError("Version ÃÊ±âÈ­ ¾ÈµÊ");
+                return null;
+            }
             return $"JsonDatas/{Version}/";
         }
     }
@@ -44,9 +44,24 @@ public struct FireBaseDefine
     {
         get
         {
+            if (string.IsNullOrEmpty(Version))
+            {
+                Debug.LogError("Version ÃÊ±âÈ­ ¾ÈµÊ");
+                return null;
+            }
             return $"JsonDatas/{Version}/JsonList.txt";
         }
     }
 
-    public const int MaxJsonSizeBytes = 10000;
+    public string GetJsonPath(string jsonNameWithExtension)
+    {
+        if (string.IsNullOrEmpty(Version))
+        {
+            Debug.LogError("Version ÃÊ±âÈ­ ¾ÈµÊ");
+            return null;
+        }
+        return $"JsonDatas/{Version}/{jsonNameWithExtension}";
+    }
+
+    public int MaxJsonSizeBytes => 10000;
 }
