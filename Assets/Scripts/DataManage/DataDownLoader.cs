@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 using System.IO;
 using System.Linq;
 
-public class DataLoader : MonoBehaviour
+public class DataDownLoader : MonoBehaviour
 {
     private enum LoadDataType
     {
@@ -80,6 +80,9 @@ public class DataLoader : MonoBehaviour
 
     private bool LoadDataFromLocalJsonDataPath(string jsonPath)
     {
+        if (!Directory.Exists(jsonPath))
+            return false;
+
         string[] localJsonFileNames = Directory.GetFiles(jsonPath, $"*.json")
             .Select(Path.GetFileName)
             .ToArray();

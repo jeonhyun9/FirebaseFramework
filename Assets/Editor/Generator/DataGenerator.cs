@@ -22,19 +22,6 @@ namespace Tools
         private static string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
         private static string VersionTextName => Path.GetFileName(PathDefine.VersionText);
 
-
-        //public static void GenerateDataFromExcelFileWithRefresh(string assetPath)
-        //{
-        //    if (!assetPath.Contains(ExcelFileExtension))
-        //    {
-        //        Debug.LogError(".xlsx 파일을 변환해야 합니다.");
-        //        return;
-        //    }
-        //
-        //    GenerateDataFromExcelFile(assetPath);
-        //    AssetDatabase.Refresh();
-        //}
-
         public static void GenerateDataFromExcelFoler(string folderPath, string jsonPath, int version)
         {
             if (!AssetDatabase.IsValidFolder(folderPath))

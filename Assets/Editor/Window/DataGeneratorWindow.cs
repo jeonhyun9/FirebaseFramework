@@ -22,12 +22,6 @@ namespace Tools
             window.maxSize = new Vector2(windowWidth * 2, windowHeight);
         }
 
-        //[MenuItem("Assets/Generate Data From Excel")]
-        //public static void GenerateDataFromExcelFile()
-        //{
-        //    DataGenerator.GenerateDataFromExcelFileWithRefresh(AssetDatabase.GetAssetPath(Selection.activeObject));
-        //}
-
         private void OnEnable()
         {
             GetParameter();
