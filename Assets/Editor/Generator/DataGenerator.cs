@@ -138,7 +138,6 @@ namespace Tools
             if (jsonFiles.Length > 0)
             {
                 EditorUtility.DisplayProgressBar(folderPath, $"JsonList.txt ¿€º∫¡ﬂ..", progress);
-                string versionTextName = Path.GetFileName(PathDefine.VersionText);
                 jsonListDesc = string.Join(",", jsonFiles);
 
                 if (File.Exists(jsonListPath))
