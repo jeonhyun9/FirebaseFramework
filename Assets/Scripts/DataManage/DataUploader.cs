@@ -73,38 +73,46 @@ public class DataUploader : MonoBehaviour
             yield break;
         }
 
+        yield return UploadJson(jsonFiles, progress);
+
+        yield return UploadJsonList(Path.Combine(localJsonDataPath, JsonListTextName), fireBaseDef.JsonListPath, progress);
+
+        if (setCurrentVersion)
+            yield return UploadVersionText(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath, progress);
+
+        OnEndUpload();
+    }
+
+    private IEnumerator UploadJson(string[] jsonFiles, float progress)
+    {
         foreach (string jsonPath in jsonFiles)
         {
             string jsonName = Path.GetFileName(jsonPath);
 
             EditorUtility.DisplayProgressBar(jsonName, $"{jsonName} 업로드 중..", progress);
 
-            yield return UploadTask(jsonPath, fireBaseDef.GetJsonPath(jsonName));
+            yield return FireBaseUploadTask(jsonPath, fireBaseDef.GetJsonPath(jsonName));
             progress += 1f / jsonFiles.Length;
         }
+    }
 
+    private IEnumerator UploadJsonList(string localPath, string storagePath, float progress)
+    {
         EditorUtility.DisplayProgressBar("JsonList.txt", $"JsonList.txt 업로드 중..", progress);
 
-        yield return UploadTask(Path.Combine(localJsonDataPath, JsonListTextName), fireBaseDef.JsonListPath);
+        yield return FireBaseUploadTask(localPath, storagePath);
+    }
+    
+    private IEnumerator UploadVersionText(string localPath, string storagePath, float progress)
+    {
+        EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress);
+        yield return FireBaseUploadTask(localPath, storagePath);
 
-        if (setCurrentVersion)
-        {
-            EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress);
-            yield return UploadTask(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath);
-
-            Debug.Log($"Upload Current Version {fireBaseDef.Version}");
-        }
-
-        EditorUtility.ClearProgressBar();
-
-        if (storage?.App != null)
-            storage.App.Dispose();
-
-        DestroyImmediate(gameObject);
+        Debug.Log($"Upload Current Version {fireBaseDef.Version}");
     }
 
     //storagePath는 Path.Combine 사용하면 안됨
-    private IEnumerator UploadTask(string localPath, string storagePath)
+    private IEnumerator FireBaseUploadTask(string localPath, string storagePath)
     {
         byte[] bytes = File.ReadAllBytes(localPath);
         StorageReference storageRef = storage.RootReference.Child(storagePath);
@@ -120,6 +128,16 @@ public class DataUploader : MonoBehaviour
         {
             Debug.Log($"Upload Success : {Path.GetFileName(localPath)}");
         }
+    }
+
+    private void OnEndUpload()
+    {
+        EditorUtility.ClearProgressBar();
+
+        if (storage?.App != null)
+            storage.App.Dispose();
+
+        DestroyImmediate(gameObject);
     }
 
     private void OnDestroy()

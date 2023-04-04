@@ -67,32 +67,6 @@ public class FireBaseDataDownloader
 
         return false;
     }
-
-    private async UniTask<string> LoadString(StorageReference storageRef)
-    {
-        string stringValue;
-
-        try
-        {
-            byte[] versionBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            stringValue = Encoding.UTF8.GetString(versionBytes);
-
-            if (string.IsNullOrEmpty(stringValue))
-            {
-                Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
-                return null;
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
-            Debug.LogError(e.StackTrace);
-            return null;
-        }
-
-        return stringValue;
-    }
-
     private async UniTask<string[]> LoadJsonList(string refPath)
     {
         StorageReference storageRef = storage.RootReference.Child(refPath);
@@ -118,5 +92,29 @@ public class FireBaseDataDownloader
         }
 
         return jsonListArray;
+    }
+    private async UniTask<string> LoadString(StorageReference storageRef)
+    {
+        string stringValue;
+
+        try
+        {
+            byte[] versionBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
+            stringValue = Encoding.UTF8.GetString(versionBytes);
+
+            if (string.IsNullOrEmpty(stringValue))
+            {
+                Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
+                return null;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
+            Debug.LogError(e.StackTrace);
+            return null;
+        }
+
+        return stringValue;
     }
 }

@@ -64,32 +64,28 @@ namespace Tools
             try
             {
                 using (FileStream fileStream = File.Open(readExcelPath, FileMode.Open, FileAccess.Read))
+                using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
                 {
-                    using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
+                    var dataSet = excelReader.AsDataSet();
+                    //시트는 하나만 사용할 것
+                    DataTable sheet = dataSet.Tables[0];
+
+                    string excelFileName = Path.GetFileNameWithoutExtension(readExcelPath);
+                    StringBuilder log = new();
+
+                    GenerateStructFromExcelSheet(readExcelPath, sheet, ref log);
+                    GenerateJsonFromExcelSheet(readExcelPath, sheet, ref log, saveJsonPath);
+
+                    if (log.Length > 0)
                     {
-                        var dataSet = excelReader.AsDataSet();
-
-                        //시트는 하나만 사용할 것
-                        DataTable sheet = dataSet.Tables[0];
-
-                        string excelFileName = Path.GetFileNameWithoutExtension(readExcelPath);
-
-                        StringBuilder log = new();
-
-                        GenerateStructFromExcelSheet(readExcelPath, sheet, ref log);
-                        GenerateJsonFromExcelSheet(readExcelPath, sheet, ref log, saveJsonPath);
-
-                        if (log.Length > 0)
-                        {
-                            Debug.Log($"======== {excelFileName} 갱신 ========");
-                            Debug.Log(log.ToString());
-                        }
-                        else
-                        {
-                            Debug.Log($"======== {excelFileName} 변경점 없음 ========");
-                        }
+                        Debug.Log($"======== {excelFileName} 갱신 ========");
+                        Debug.Log(log.ToString());
                     }
-                }    
+                    else
+                    {
+                        Debug.Log($"======== {excelFileName} 변경점 없음 ========");
+                    }
+                }
             }
             catch (Exception e)
             {

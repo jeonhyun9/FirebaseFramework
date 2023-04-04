@@ -138,32 +138,6 @@ namespace Tools
 
             return "public";
         }
-
-        protected bool WriteTextToSavePath(string value, ref System.Text.StringBuilder log)
-        {
-            bool edited = false;
-            bool created = false;
-
-            if (File.Exists(SavePath))
-            {
-                if (!File.ReadAllText(SavePath).Equals(value))
-                {
-                    File.WriteAllText(SavePath, value);
-                    edited = true;
-                }
-            }
-            else
-            {
-                File.WriteAllText(SavePath, value);
-                created = true;
-            }
-
-            if (!edited && !created)
-                return false;
-
-            log.AppendLine($"{FileNameWithExtension} {(created ? "create" : "edit")} success");
-            return true;
-        }
     }
 }
 #endif
