@@ -4,72 +4,35 @@ using UnityEngine;
 
 namespace Tools
 {
-    public class DataGeneratorWindow : EditorWindow
+    public class DataGeneratorWindow : BaseEdtiorWindow
     {
-        private const float windowWidth = 400.0f;
-        private const float windowHeight = 200.0f;
+        private const float width = 400f;
+        private const float height = 200f;
+        private const float spacing = 5f;
 
-        private string excelPath;
-        private string jsonPath;
-        private int version;
+        private string ExcelPath => GetParameter<string>("ExcelPath");
+        private string JsonPath => GetParameter<string>("JsonPath");
+        private int Version => GetParameter<int>("Version");
         
 
         [MenuItem("Tools/Generate Data From Excel Folder")]
         public static void OpenDataGeneratorWindow()
         {
             DataGeneratorWindow window = (DataGeneratorWindow)GetWindow(typeof(DataGeneratorWindow));
-            window.minSize = new Vector2(windowWidth, windowHeight);
-            window.maxSize = new Vector2(windowWidth * 2, windowHeight);
+            window.InitializeWindow(window, width, height, spacing);
         }
 
-        private void OnEnable()
+        protected override void InitializeParameters()
         {
-            GetParameter();
+            AddParameter("ExcelPath", PathDefine.Excel);
+            AddParameter("JsonPath", PathDefine.Json);
+            AddParameter("Version", 0);
         }
 
-        public void OnGUI()
-        {
-            DrawParameter();
-            DrawButton();
-        }
-
-        private void OnDisable()
-        {
-            SetParameter();
-        }
-
-        private void GetParameter()
-        {
-            excelPath = EditorPrefs.GetString("ExcelPath", PathDefine.Excel);
-            jsonPath = EditorPrefs.GetString("JsonPath", PathDefine.Json);
-            version = EditorPrefs.GetInt("Version", 0);
-        }
-
-        private void SetParameter()
-        {
-            EditorPrefs.SetString("ExcelPath", excelPath);
-            EditorPrefs.SetString("jsonPath", jsonPath);
-            EditorPrefs.SetInt("Version", version);
-        }
-
-        private void DrawParameter()
-        {
-            EditorGUILayout.LabelField("Local Excel Path");
-            excelPath = EditorGUILayout.TextField(excelPath);
-
-            EditorGUILayout.LabelField("Local Json Path");
-            jsonPath = EditorGUILayout.TextField(jsonPath);
-
-            EditorGUILayout.LabelField("Set Version");
-            version = EditorGUILayout.IntField(version);
-
-            GUILayout.Space(5);
-        }
-
-        private void DrawButton()
+        protected override void DrawActionButton()
         {
             if (GUILayout.Button("Generate", GUILayout.Height(50)))
-                DataGenerator.GenerateDataFromExcelFoler(excelPath, jsonPath, version);
+                DataGenerator.GenerateDataFromExcelFoler(ExcelPath, JsonPath, Version);
         }
     }
 }

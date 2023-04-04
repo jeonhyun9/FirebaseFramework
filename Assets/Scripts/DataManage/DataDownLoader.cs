@@ -29,10 +29,10 @@ public class DataDownLoader : MonoBehaviour
 
     private void Awake()
     {
-        LoadDataFromJson().Forget();
+        LoadData().Forget();
     }
 
-    private async UniTask<bool> LoadDataFromJson()
+    private async UniTask<bool> LoadData()
     {
         bool loadDataResult;
 

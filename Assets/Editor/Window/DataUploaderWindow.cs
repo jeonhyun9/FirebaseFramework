@@ -2,80 +2,46 @@
 using UnityEngine;
 using UnityEditor;
 
-public class DataUploaderWindow : EditorWindow
+namespace Tools
 {
-    private const float windowWidth = 400.0f;
-    private const float windowHeight = 300.0f;
-
-    private string bucketName;
-    private int version;
-    private string jsonPath;
-    private bool setCurrentVersion;
-
-    [MenuItem("Tools/Upload Data to FireBase Storage")]
-    public static void OpenDataUploaderWindow()
+    public class DataUploaderWindow : BaseEdtiorWindow
     {
-        DataUploaderWindow window = (DataUploaderWindow)GetWindow(typeof(DataUploaderWindow));
-        window.minSize = new Vector2(windowWidth, windowHeight);
-        window.maxSize = new Vector2(windowWidth * 2, windowHeight);
-    }
+        private const float windowWidth = 400f;
+        private const float windowHeight = 300f;
+        private const float spacing = 5f;
 
-    private void OnEnable()
-    {
-        GetParameter();
-    }
+        private string BucketName => GetParameter<string>("BucketName");
+        private string JsonPath => GetParameter<string>("JsonPath");
+        private bool SetCurrentVersion => GetParameter<bool>("SetCurrentVersion");
 
-    public void OnGUI()
-    {
-        DrawParameter();
-        DrawButton(); 
-    }
-
-    private void OnDisable()
-    {
-        SetParameter();
-    }
-
-    private void GetParameter()
-    {
-        jsonPath = EditorPrefs.GetString("jsonPath", PathDefine.Json);
-        bucketName = EditorPrefs.GetString("BucketName", "jhgunity");
-        setCurrentVersion = EditorPrefs.GetBool("SetCurrentVersion", false);
-    }
-
-    private void SetParameter()
-    {
-        EditorPrefs.SetString("jsonPath", jsonPath);
-        EditorPrefs.SetString("BucketName", bucketName);
-        EditorPrefs.SetBool("SetCurrentVersion", setCurrentVersion);
-    }
-
-    private void DrawParameter()
-    {
-        EditorGUILayout.LabelField("Local Json Path");
-        jsonPath = EditorGUILayout.TextField(jsonPath);
-
-        EditorGUILayout.LabelField("FireBase Bucket Name");
-        bucketName = EditorGUILayout.TextField(bucketName);
-
-        GUILayout.Space(5);
-        
-        EditorGUILayout.LabelField("Set Current Version");
-        setCurrentVersion = EditorGUILayout.Toggle(setCurrentVersion);
-
-        GUILayout.Space(5);
-    }
-
-    private void DrawButton()
-    {
-        if (GUILayout.Button("Upload", GUILayout.Height(50)))
+        [MenuItem("Tools/Upload Data to FireBase Storage")]
+        public static void OpenDataUploaderWindow()
         {
-            DataUploader dataUploader = new GameObject("DataUploader").AddComponent<DataUploader>();
+            DataUploaderWindow window = (DataUploaderWindow)GetWindow(typeof(DataUploaderWindow));
+            window.InitializeWindow(window, windowWidth, windowHeight, spacing);
+        }
 
-            if (dataUploader.Initialize(jsonPath, bucketName, setCurrentVersion))
-                dataUploader.StartUpload();
+        protected override void InitializeParameters()
+        {
+            AddParameter("JsonPath", PathDefine.Json);
+            AddParameter("BucketName", "jhgunity");
+            AddParameter("SetCurrentVersion", false);
+        }
 
-            Close();
+        protected override void DrawActionButton()
+        {
+            if (GUILayout.Button("Upload", GUILayout.Height(50)))
+            {
+                DataUploader dataUploader = new GameObject("DataUploader").AddComponent<DataUploader>();
+
+                if (dataUploader == null)
+                    return;
+
+                if (dataUploader.Initialize(JsonPath, BucketName, SetCurrentVersion))
+                    dataUploader.StartUpload();
+
+                Close();
+            }
         }
     }
 }
