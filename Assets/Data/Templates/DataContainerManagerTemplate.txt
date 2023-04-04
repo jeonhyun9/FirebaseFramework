@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DataContainerManager : BaseManager<DataContainerManager>
 {
-    private Dictionary<Type, object> containerDic = new();
+    private readonly Dictionary<Type, object> containerDic = new();
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
     {

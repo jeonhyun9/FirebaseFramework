@@ -8,10 +8,10 @@ using UnityEngine;
 
 public class FireBaseDataDownloader
 {
-    private Dictionary<string, string> dicJsonByFileName = new ();
+    private readonly Dictionary<string, string> dicJsonByFileName = new ();
 
     private FireBaseDefine fireBaseDef;
-    private FirebaseStorage storage;
+    private readonly FirebaseStorage storage;
 
     public string Version => fireBaseDef.Version;
 
