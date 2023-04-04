@@ -13,41 +13,13 @@ namespace Tools
             Container,
         }
 
-        protected int DataTypeIndex
-        {
-            get
-            {
-                return 1;
-            }
-        }
-
-        protected int NameIndex
-        {
-            get
-            {
-                return DataTypeIndex + 1;
-            }
-        }
-        protected int ValueIndex
-        {
-            get
-            {
-                return NameIndex + 1;
-            }
-        }
-
+        protected int DataTypeIndex => 1;
+        protected int NameIndex => DataTypeIndex + 1;
+        protected int ValueIndex => NameIndex + 1;
         protected Type GeneratorType { get; set; }
-
         protected string FilePath { get; set; }
-
-        protected string FileName
-        {
-            get
-            {
-                return Path.GetFileNameWithoutExtension(FilePath);
-            }
-        }
-
+        protected string FileName => Path.GetFileNameWithoutExtension(FilePath);
+        protected string FileNameWithoutExtension => Path.GetFileNameWithoutExtension(FileNameWithExtension);
         protected string FileNameWithExtension
         {
             get
@@ -63,14 +35,6 @@ namespace Tools
                     default:
                         return null;
                 }
-            }
-        }
-
-        protected string FileNameWithoutExtension
-        {
-            get
-            {
-                return Path.GetFileNameWithoutExtension(FileNameWithExtension);
             }
         }
 
