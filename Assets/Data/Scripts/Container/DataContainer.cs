@@ -7,24 +7,25 @@ using UnityEngine;
 
 public class DataContainer<T> where T : IBaseData
 {
-    private Dictionary<int, T> dicById = null;
-    private Dictionary<string, T> dicByNameId = null;
+    private readonly Dictionary<int, T> dicById = new();
+    private readonly Dictionary<string, T> dicByNameId = new();
     private T[] datas = null;
 
     public bool Deserialized => dicById != null && dicByNameId != null && datas != null;
     public bool DeserializeJson(string json)
     {
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogError("json is null!!");
+            return false;
+        }
+
         try
         {
-            Debug.Log(json);
-
             JArray jArray = JArray.Parse(json);
             foreach (var jObj in jArray)
             {
                 T data = JsonConvert.DeserializeObject<T>(jObj.ToString());
-
-                if (dicById == null)
-                    dicById = new();
 
                 if (!dicById.ContainsKey(data.Id))
                 {
@@ -36,12 +37,9 @@ public class DataContainer<T> where T : IBaseData
                     return false;
                 }
 
-                if (dicByNameId == null)
-                    dicByNameId = new();
-
                 if (data.NameId == null)
                 {
-                    Debug.LogError($"NameID null");
+                    Debug.LogError($"NameID is null");
                     return false;
                 }
                     
@@ -76,6 +74,9 @@ public class DataContainer<T> where T : IBaseData
     }
     public T GetByNameId(string nameId)
     {
+        if (string.IsNullOrEmpty(nameId))
+            return default;
+
         if (dicByNameId.ContainsKey(nameId))
             return dicByNameId[nameId];
 

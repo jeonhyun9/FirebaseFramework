@@ -1,5 +1,5 @@
-	[JsonProperty(PropertyName = "#name#_#type#")]
-    private readonly string #name#_#type#;
+	[JsonProperty(PropertyName = "#name#NameId")]
+    private readonly string #name#NameId;
     public readonly #type# #name#
     {
         get
@@ -7,6 +7,6 @@
 		    if (DataContainerManager.Instance.GetDataContainer<#type#>() == null)
                 return default;
 				
-            return DataContainerManager.Instance.GetDataByNameId<#type#>(#name#_#type#);
+            return DataContainerManager.Instance.GetDataByNameId<#type#>(#name#NameId);
         }
     }

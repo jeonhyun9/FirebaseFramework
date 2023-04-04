@@ -32,7 +32,8 @@ namespace Tools
         {
             if (GUILayout.Button("Upload", GUILayout.Height(50)))
             {
-                DataUploader dataUploader = new GameObject("DataUploader").AddComponent<DataUploader>();
+                GameObject uploaderGo = new("DataUploader");
+                DataUploader dataUploader = uploaderGo.AddComponent<DataUploader>();
 
                 if (dataUploader == null)
                     return;

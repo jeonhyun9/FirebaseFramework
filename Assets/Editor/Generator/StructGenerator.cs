@@ -1,82 +1,73 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
-using UnityEngine;
 
-public class StructGenerator : BaseGenerator
+namespace Tools
 {
-    private DataTable sheet;
-
-    public void Init(string pathValue, DataTable sheetValue)
+    public class StructGenerator : BaseGenerator
     {
-        GeneratorType = Type.Struct;
-        FilePath = pathValue;
-        sheet = sheetValue;
-    }
+        private DataTable sheet;
 
-    public bool Generate(ref StringBuilder log)
-    {
-        //시트에서 데이터 타입과 이름만 뽑아놓기
-        List<string> columnNames = new();
-        List<string> columnTypes = new();
-
-        DataRow dataTypeRow = sheet.Rows[DataTypeIndex];
-        DataRow nameRow = sheet.Rows[NameIndex];
-
-        for (int j = 0; j < sheet.Columns.Count; j++)
+        public void Init(string pathValue, DataTable sheetValue)
         {
-            string dataType = dataTypeRow[j].ToString();
-            string name = nameRow[j].ToString();
-            columnTypes.Add(dataType);
-            columnNames.Add(name);
+            GeneratorType = Type.Struct;
+            FilePath = pathValue;
+            sheet = sheetValue;
         }
 
-        StringBuilder sb = new();
-
-        sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: FileNameWithoutExtension));
-
-        for (int i = 0; i < columnNames.Count; i++)
+        public bool Generate(ref StringBuilder log)
         {
-            string type = columnTypes[i].Replace("enum:", "");
-            string name = columnNames[i];
+            //시트에서 데이터 타입과 이름만 뽑아놓기
+            List<string> columnNames = new();
+            List<string> columnTypes = new();
 
-            if (name.Contains("Id") || name.Contains("NameId"))
-                name = $"_{name}";
+            DataRow dataTypeRow = sheet.Rows[DataTypeIndex];
+            DataRow nameRow = sheet.Rows[NameIndex];
 
-            if (type.Contains("struct:"))
+            for (int j = 0; j < sheet.Columns.Count; j++)
             {
-                type = type.Replace("struct:", "");
-                sb.AppendLine(GetDataTemplate(PathDefine.StructValueTemplate, type, name));
+                string dataType = dataTypeRow[j].ToString();
+                string name = nameRow[j].ToString();
+                columnTypes.Add(dataType);
+                columnNames.Add(name);
             }
-            else
+
+            StringBuilder sb = new();
+
+            sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: FileNameWithoutExtension));
+
+            for (int i = 0; i < columnNames.Count; i++)
             {
-                sb.AppendLine(GetDataTemplate(PathDefine.DataValueTemplate, type, name));
+                string type = columnTypes[i].Replace("enum:", "");
+                string name = GetNaming(columnNames[i]);
+                string modifier = GetAccessModifier(name);
+
+                if (type.Contains("struct:"))
+                {
+                    type = type.Replace("struct:", "");
+                    sb.AppendLine(GetDataTemplate(PathDefine.StructValueTemplate, type, name, modifier));
+                }
+                else
+                {
+                    sb.AppendLine(GetDataTemplate(PathDefine.DataValueTemplate, type, name, modifier));
+                }
             }
-        }
 
-        sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
+            sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
 
-        string newStruct = sb.ToString();
+            string newStruct = sb.ToString();
 
-        bool changed = false;
-
-        if (File.Exists(SavePath))
-        {
-            if (File.ReadAllText(SavePath).Equals(newStruct))
-            {
+            if (File.Exists(SavePath) && File.ReadAllText(SavePath) == newStruct)
                 return false;
-            }
-            else
-            {
-                changed = true;
-            }
+
+            log.AppendLine($"{FileNameWithExtension} {(File.Exists(SavePath) ? "수정" : "생성")} 완료");
+            
+            File.WriteAllText(SavePath, newStruct);
+
+            return true;
         }
-
-        File.WriteAllText(SavePath, newStruct);
-
-        log.AppendLine($"{FileNameWithExtension} {(changed ? "create" : "edit")} success");
-
-        return true;
     }
 }
+#endif

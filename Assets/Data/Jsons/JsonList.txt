@@ -1,1 +1,1 @@
-.json,Animal.json,Human.json
+Animal.json,Human.json

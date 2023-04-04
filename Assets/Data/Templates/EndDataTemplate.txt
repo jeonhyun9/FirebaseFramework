@@ -1,5 +1,5 @@
 	
-	public int Id => _Id;
-    public string NameId => _NameId;
-    public bool IsInit => _Id == 0;
+	public int Id => id;
+    public string NameId => nameId;
+    public bool IsInit => id == 0;
 }

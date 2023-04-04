@@ -3,7 +3,6 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.IO;
 using System.Linq;
-using System;
 
 public class DataDownLoader : MonoBehaviour
 {
@@ -26,6 +25,7 @@ public class DataDownLoader : MonoBehaviour
 
     private void Awake()
     {
+        //테스트
         LoadData().Forget();
     }
 
@@ -111,7 +111,7 @@ public class DataDownLoader : MonoBehaviour
         return true;
     }
 
-
+    //테스트
     private void ShowTestLog()
     {
         DataHuman human = DataContainerManager.Instance.GetDataById<DataHuman>(1);

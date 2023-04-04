@@ -8,7 +8,7 @@ namespace Tools
 {
     public abstract class BaseEdtiorWindow : EditorWindow
     {
-        private Dictionary<string, object> Parameters = new();
+        private Dictionary<string, object> parameters = new();
         private Dictionary<string, object> defaultParameters = new();
         private float spacing;
 
@@ -44,6 +44,8 @@ namespace Tools
         /// <summary> AddParameter로 사용할 변수들을 추가하도록 구현 </summary>
         protected abstract void InitializeParameters();
 
+        protected abstract void DrawActionButton();
+
         protected void AddParameter(string name, object defaultValue)
         {
             defaultParameters[name] = defaultValue;
@@ -58,15 +60,15 @@ namespace Tools
                 switch (type)
                 {
                     case Type t when t == typeof(string):
-                        Parameters[name] = EditorPrefs.GetString(name, (string)defaultParameters[name]);
+                        parameters[name] = EditorPrefs.GetString(name, (string)defaultParameters[name]);
                         break;
 
                     case Type t when t == typeof(int):
-                        Parameters[name] = EditorPrefs.GetInt(name, (int)defaultParameters[name]);
+                        parameters[name] = EditorPrefs.GetInt(name, (int)defaultParameters[name]);
                         break;
 
                     case Type t when t == typeof(bool):
-                        Parameters[name] = EditorPrefs.GetBool(name, (bool)defaultParameters[name]);
+                        parameters[name] = EditorPrefs.GetBool(name, (bool)defaultParameters[name]);
                         break;
                 }
             }
@@ -81,15 +83,15 @@ namespace Tools
                 switch (type)
                 {
                     case Type t when t == typeof(string):
-                        EditorPrefs.SetString(name, (string)Parameters[name]);
+                        EditorPrefs.SetString(name, (string)parameters[name]);
                         break;
 
                     case Type t when t == typeof(int):
-                        EditorPrefs.SetInt(name, (int)Parameters[name]);
+                        EditorPrefs.SetInt(name, (int)parameters[name]);
                         break;
 
                     case Type t when t == typeof(bool):
-                        EditorPrefs.SetBool(name, (bool)Parameters[name]);
+                        EditorPrefs.SetBool(name, (bool)parameters[name]);
                         break;
                 }
             }
@@ -106,23 +108,21 @@ namespace Tools
                 switch (type)
                 {
                     case Type t when t == typeof(string):
-                        Parameters[name] = EditorGUILayout.TextField((string)Parameters[name]);
+                        parameters[name] = EditorGUILayout.TextField((string)parameters[name]);
                         break;
 
                     case Type t when t == typeof(int):
-                        Parameters[name] = EditorGUILayout.IntField((int)Parameters[name]);
+                        parameters[name] = EditorGUILayout.IntField((int)parameters[name]);
                         break;
 
                     case Type t when t == typeof(bool):
-                        Parameters[name] = EditorGUILayout.Toggle((bool)Parameters[name]);
+                        parameters[name] = EditorGUILayout.Toggle((bool)parameters[name]);
                         break;
                 }
 
                 EditorGUILayout.Space(spacing);
             }
         }
-
-        protected abstract void DrawActionButton();
 
         private string GetParameterLabel(string name)
         {
@@ -134,10 +134,10 @@ namespace Tools
         /// <summary> name은 AddParameter에서 추가한 것과 동일해야함 </summary>
         public T GetParameter<T>(string name)
         {
-            if (!Parameters.ContainsKey(name))
+            if (!parameters.ContainsKey(name))
                 return default;
 
-            return Parameters[name] is T ? (T)Parameters[name] : default;
+            return parameters[name] is T ? (T)parameters[name] : default;
         }
     }
 }

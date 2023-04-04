@@ -1,119 +1,169 @@
+#if UNITY_EDITOR
 using System.IO;
 using UnityEngine;
 
-public class BaseGenerator
+namespace Tools
 {
-    protected enum Type
+    public class BaseGenerator
     {
-        Json,
-        Struct,
-        Container,
-    }
-
-    protected int DataTypeIndex
-    {
-        get
+        protected enum Type
         {
-            return 1;
+            Json,
+            Struct,
+            Container,
         }
-    }
 
-    protected int NameIndex
-    {
-        get
+        protected int DataTypeIndex
         {
-            return DataTypeIndex + 1;
-        }
-    }
-    protected int ValueIndex
-    {
-        get
-        {
-            return NameIndex + 1;
-        }
-    }
-
-    protected Type GeneratorType { get; set; }
-
-    protected string FilePath { get; set; }
-
-    protected string FileName
-    {
-        get
-        {
-            return Path.GetFileNameWithoutExtension(FilePath);
-        }
-    }
-
-    protected string FileNameWithExtension
-    {
-        get
-        {
-            switch (GeneratorType)
+            get
             {
-                case Type.Json:
-                    return $"{FileName}.json";
-                case Type.Struct:
-                    return $"Data{FileName}.cs";
-                case Type.Container:
-                    return $"DataContainerManager.cs";
-                default:
-                    return null;
+                return 1;
             }
         }
-    }
 
-    protected string FileNameWithoutExtension
-    {
-        get
+        protected int NameIndex
         {
-            return Path.GetFileNameWithoutExtension(FileNameWithExtension);
-        }
-    }
-
-    protected string SavePath
-    {
-        get
-        {
-            string savePath = null;
-
-            switch (GeneratorType)
+            get
             {
-                case Type.Json:
-                    savePath = PathDefine.Json;
-                    break;
-                case Type.Struct:
-                    savePath = PathDefine.DataStruct;
-                    break;
-                case Type.Container:
-                    savePath = PathDefine.Manager;
-                    break;
+                return DataTypeIndex + 1;
+            }
+        }
+        protected int ValueIndex
+        {
+            get
+            {
+                return NameIndex + 1;
+            }
+        }
+
+        protected Type GeneratorType { get; set; }
+
+        protected string FilePath { get; set; }
+
+        protected string FileName
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(FilePath);
+            }
+        }
+
+        protected string FileNameWithExtension
+        {
+            get
+            {
+                switch (GeneratorType)
+                {
+                    case Type.Json:
+                        return $"{FileName}.json";
+                    case Type.Struct:
+                        return $"Data{FileName}.cs";
+                    case Type.Container:
+                        return $"DataContainerManager.cs";
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        protected string FileNameWithoutExtension
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(FileNameWithExtension);
+            }
+        }
+
+        protected string SavePath
+        {
+            get
+            {
+                string savePath = null;
+
+                switch (GeneratorType)
+                {
+                    case Type.Json:
+                        savePath = PathDefine.Json;
+                        break;
+                    case Type.Struct:
+                        savePath = PathDefine.DataStruct;
+                        break;
+                    case Type.Container:
+                        savePath = PathDefine.Manager;
+                        break;
+                }
+
+                return Path.Combine(savePath, FileNameWithExtension);
+            }
+        }
+
+        protected string GetDataTemplate(string path, string type = null, string name = null, string modifier = null)
+        {
+            if (!File.Exists(path))
+            {
+                Debug.LogError($"{path}에 해당 템플릿이 없습니다.");
+                return null;
             }
 
-            return Path.Combine(savePath, FileNameWithExtension);
-        }
-    }
+            var template = File.ReadAllText(path);
 
-    protected string GetDataTemplate(string path, string type = null, string name = null)
-    {
-        if (!File.Exists(path))
+            if (!string.IsNullOrEmpty(type))
+                template = template.Replace("#type#", type);
+
+            if (!string.IsNullOrEmpty(name))
+                template = template.Replace("#name#", name);
+
+            if (!string.IsNullOrEmpty(modifier))
+                template = template.Replace("#modifier#", modifier);
+
+            return template;
+        }
+
+        protected string GetNaming(string name, string dataType = null)
         {
-            Debug.LogError($"{path}에 해당 템플릿이 없습니다.");
-            return null;
+            //Id, NameId => id => nameId 카멜로 변경
+            if (name.Contains("Id") || name.Contains("NameId"))
+                name = char.ToLower(name[0]) + name[1..];
+
+            if (!string.IsNullOrEmpty(dataType) && dataType.Contains("struct:"))
+                name += "NameId";
+
+            return name;
         }
 
-        var template = File.ReadAllText(path);
-
-        if (type != null)
+        protected string GetAccessModifier(string name)
         {
-            template = template.Replace("#type#", type);
+            if (name.Contains("Id") || name.Contains("NameId") || name.Contains("id") || name.Contains("nameid"))
+                return "private";
+
+            return "public";
         }
 
-        if (name != null)
+        protected bool WriteTextToSavePath(string value, ref System.Text.StringBuilder log)
         {
-            template = template.Replace("#name#", name);
-        }
+            bool edited = false;
+            bool created = false;
 
-        return template;
+            if (File.Exists(SavePath))
+            {
+                if (!File.ReadAllText(SavePath).Equals(value))
+                {
+                    File.WriteAllText(SavePath, value);
+                    edited = true;
+                }
+            }
+            else
+            {
+                File.WriteAllText(SavePath, value);
+                created = true;
+            }
+
+            if (!edited && !created)
+                return false;
+
+            log.AppendLine($"{FileNameWithExtension} {(created ? "create" : "edit")} success");
+            return true;
+        }
     }
 }
+#endif

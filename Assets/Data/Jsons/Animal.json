@@ -1,1 +1,1 @@
-[{"_Id":1,"_NameId":"ANIMAL_DUKE","AnimalType":"Lion"},{"_Id":2,"_NameId":"ANIMAL_ANNA","AnimalType":"Rabbit"},{"_Id":3,"_NameId":"ANIMAL_JAMES","AnimalType":"Dog"},{"_Id":4,"_NameId":"ANIMAL_NINA","AnimalType":"Cat"}]
+[{"id":1,"nameId":"ANIMAL_DUKE","AnimalType":"Lion"},{"id":2,"nameId":"ANIMAL_ANNA","AnimalType":"Rabbit"},{"id":3,"nameId":"ANIMAL_JAMES","AnimalType":"Dog"},{"id":4,"nameId":"ANIMAL_NINA","AnimalType":"Cat"}]

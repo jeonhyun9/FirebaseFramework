@@ -27,7 +27,6 @@ public class DataUploader : MonoBehaviour
 
     private string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
     private string VersionTextName => Path.GetFileName(PathDefine.VersionText);
-    private float progress;
 
     public bool Initialize(string localJsonPathValue, string bucketNameValue, bool setCurrentVersionValue)
     {
@@ -59,18 +58,13 @@ public class DataUploader : MonoBehaviour
             return;
         }
 
-        try
-        {
-            editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadJsonDatas(), this);
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Upload Error : {e}");
-        }
+        editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadJsonDatas(), this);
     }
 
     private IEnumerator UploadJsonDatas()
     {
+        float progress = 0f;
+
         string[] jsonFiles = Directory.GetFiles(localJsonDataPath, "*.json");
 
         if (jsonFiles.Length == 0)
@@ -85,7 +79,6 @@ public class DataUploader : MonoBehaviour
 
             EditorUtility.DisplayProgressBar(jsonName, $"{jsonName} 업로드 중..", progress);
 
-            //파이어베이스 경로는 Path.Combine X
             yield return UploadTask(jsonPath, fireBaseDef.GetJsonPath(jsonName));
             progress += 1f / jsonFiles.Length;
         }
@@ -110,6 +103,7 @@ public class DataUploader : MonoBehaviour
         DestroyImmediate(gameObject);
     }
 
+    //storagePath는 Path.Combine 사용하면 안됨
     private IEnumerator UploadTask(string localPath, string storagePath)
     {
         byte[] bytes = File.ReadAllBytes(localPath);
@@ -118,18 +112,13 @@ public class DataUploader : MonoBehaviour
 
         yield return new WaitUntil(() => task.IsCompleted);
 
-        ShowTaskLog(Path.GetFileName(localPath), task);
-    }
-
-    private void ShowTaskLog(string fileName, Task<StorageMetadata> task)
-    {
         if (task.IsFaulted)
         {
-            Debug.LogError("Upload Fail : " + fileName + " - " + task.Exception);
+            Debug.LogError($"Upload Fail : {Path.GetFileName(localPath)} - {task.Exception}");
         }
         else if (task.IsCompleted)
         {
-            Debug.Log("Upload Success : " + fileName);
+            Debug.Log($"Upload Success : {Path.GetFileName(localPath)}");
         }
     }
 

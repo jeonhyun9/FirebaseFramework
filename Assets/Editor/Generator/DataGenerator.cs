@@ -7,7 +7,6 @@ using ExcelDataReader;
 using System.Data;
 using System.Text;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace Tools
 {
@@ -15,13 +14,12 @@ namespace Tools
     {
         private const string ExcelFileExtension = ".xlsx";
 
-        private static StructGenerator structGenerator = new();
-        private static JsonGenerator jsonGenerator = new();
-        private static ContainerManagerGenerator containerManagerGenerator = new();
+        private static readonly StructGenerator structGenerator = new();
+        private static readonly JsonGenerator jsonGenerator = new();
+        private static readonly ContainerManagerGenerator containerManagerGenerator = new();
 
         private static string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
         private static string VersionTextName => Path.GetFileName(PathDefine.VersionText);
-        private static List<string> dataNameList;
 
         public static void GenerateDataFromExcelFoler(string folderPath, string jsonPath, int version)
         {
@@ -46,19 +44,16 @@ namespace Tools
                 return;
             }
 
-            dataNameList = new(excelFiles.Length);
-
             foreach (string excelPath in excelFiles)
             {
                 EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", progress);
-                dataNameList.Add($"Data{Path.GetFileNameWithoutExtension(excelPath)}");
                 GenerateDataFromExcelFile(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), jsonPath);
                 progress += 1f / excelFiles.Length;
             }
 
-            GenerateContainerManager(dataNameList, progress);
-            GenerateJsonList(folderPath, jsonPath, progress);
-            GenerateVersion(folderPath, jsonPath, version, progress);
+            GenerateContainerManager(jsonPath, progress);
+            GenerateJsonList(jsonPath, progress);
+            GenerateVersion(jsonPath, version, progress);
 
             EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
@@ -114,46 +109,49 @@ namespace Tools
             jsonGenerator.Generate(ref log);
         }
 
-        private static void GenerateContainerManager(List<string> dataNameList, float progress)
+        private static void GenerateContainerManager(string jsonPath, float progress)
         {
             EditorUtility.DisplayProgressBar(PathDefine.Manager, $"DataContainerManager 작성중..", progress);
+
+            string[] dataNames = Directory.GetFiles(jsonPath, $"*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
+
             containerManagerGenerator.Init();
-            containerManagerGenerator.Generate(dataNameList);
+            containerManagerGenerator.Generate(dataNames);
         }
 
-        private static void GenerateJsonList(string folderPath, string jsonPath, float progress)
+        private static void GenerateJsonList(string jsonPath, float progress)
         {
+            EditorUtility.DisplayProgressBar("Finisihing", $"JsonList.txt 작성중..", progress);
+
             string jsonListPath = Path.Combine(jsonPath, JsonListTextName);
             string[] jsonFiles = Directory.GetFiles(jsonPath, $"*.json").Select(Path.GetFileName).ToArray();
             string jsonListDesc = string.Empty;
 
-            if (jsonFiles.Length > 0)
-            {
-                EditorUtility.DisplayProgressBar(folderPath, $"JsonList.txt 작성중..", progress);
-                jsonListDesc = string.Join(",", jsonFiles);
-
-                if (File.Exists(jsonListPath))
-                {
-                    if (File.ReadAllText(jsonListPath) == jsonListDesc)
-                    {
-                        Debug.Log("JsonList 변경 없음");
-                        return;
-                    }
-                }
-            }
-            else
+            if (jsonFiles.Length == 0)
             {
                 Debug.LogError("경로에 json이 없음!");
                 return;
+            }
+
+            jsonListDesc = string.Join(",", jsonFiles);
+
+            if (File.Exists(jsonListPath))
+            {
+                if (File.ReadAllText(jsonListPath) == jsonListDesc)
+                {
+                    Debug.Log("JsonList 변경 없음");
+                    return;
+                }
             }
 
             File.WriteAllText(jsonListPath, jsonListDesc);
             Debug.Log("JsonList 생성 완료");
         }
 
-        private static void GenerateVersion(string folderPath, string jsonPath, int version, float progress)
+        private static void GenerateVersion(string jsonPath, int version, float progress)
         {
-            EditorUtility.DisplayProgressBar(folderPath, $"Version.txt 작성중..", progress);
+            EditorUtility.DisplayProgressBar("Finisihing", $"Version.txt 작성중..", progress);
+
             File.WriteAllText(Path.Combine(jsonPath, VersionTextName), version.ToString());
             Debug.Log($"Version : {version}");
         }

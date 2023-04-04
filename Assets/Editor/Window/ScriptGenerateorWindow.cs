@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -23,13 +24,10 @@ namespace Tools
             throw new System.NotImplementedException();
         }
 
-
         protected override void DrawActionButton()
         {
             throw new System.NotImplementedException();
         }
-
-        
     }
 }
-
+#endif

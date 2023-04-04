@@ -64,6 +64,8 @@ public class DataContainerManager : BaseManager<DataContainerManager>
                 return AddDataContainer<DataHuman>(json);
 
         }
+        
+        Debug.LogError($"Invalid Type : {fileName}");
 
         return false;
     }
