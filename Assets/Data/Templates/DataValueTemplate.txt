@@ -1,2 +1,2 @@
     [JsonProperty(PropertyName = "#name#")]
-    public readonly #type# #name#;
+    public #type# #name#;

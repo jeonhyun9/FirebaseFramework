@@ -1,3 +1,5 @@
-
-    public bool IsInit => Id == 0;
+	
+	public int Id => _Id;
+    public string NameId => _NameId;
+    public bool IsInit => _Id == 0;
 }

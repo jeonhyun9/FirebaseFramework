@@ -32,7 +32,10 @@ namespace Tools
         protected override void DrawActionButton()
         {
             if (GUILayout.Button("Generate", GUILayout.Height(50)))
+            { 
                 DataGenerator.GenerateDataFromExcelFoler(ExcelPath, JsonPath, Version);
+                Close();
+            }
         }
     }
 }

@@ -3,25 +3,26 @@ using Newtonsoft.Json;
 
 public struct DataHuman : IBaseData
 {
-    [JsonProperty(PropertyName = "Id")]
-    public readonly int Id;
-    [JsonProperty(PropertyName = "NameId")]
-    public readonly string NameId;
+    [JsonProperty(PropertyName = "_Id")]
+    public int _Id;
+    [JsonProperty(PropertyName = "_NameId")]
+    public string _NameId;
     [JsonProperty(PropertyName = "Scores")]
-    public readonly int[] Scores;
+    public int[] Scores;
 	[JsonProperty(PropertyName = "Pet_DataAnimal")]
     private readonly string Pet_DataAnimal;
     public readonly DataAnimal Pet
     {
         get
         {
-		    if (DataContainerManager.Instance.GetDataContainer<DataAnimalContainer>() == null)
+		    if (DataContainerManager.Instance.GetDataContainer<DataAnimal>() == null)
                 return default;
 				
-            return DataContainerManager.Instance.GetDataContainer<DataAnimalContainer>()
-                .GetByNameId(Pet_DataAnimal);
+            return DataContainerManager.Instance.GetDataByNameId<DataAnimal>(Pet_DataAnimal);
         }
     }
-
-    public bool IsInit => Id == 0;
+	
+	public int Id => _Id;
+    public string NameId => _NameId;
+    public bool IsInit => _Id == 0;
 }

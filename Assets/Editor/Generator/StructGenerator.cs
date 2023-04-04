@@ -41,6 +41,9 @@ public class StructGenerator : BaseGenerator
             string type = columnTypes[i].Replace("enum:", "");
             string name = columnNames[i];
 
+            if (name.Contains("Id") || name.Contains("NameId"))
+                name = $"_{name}";
+
             if (type.Contains("struct:"))
             {
                 type = type.Replace("struct:", "");
@@ -72,7 +75,7 @@ public class StructGenerator : BaseGenerator
 
         File.WriteAllText(SavePath, newStruct);
 
-        log.AppendLine($"{FileNameWithExtension} {(changed ? "수정" : "생성")} 완료");
+        log.AppendLine($"{FileNameWithExtension} {(changed ? "create" : "edit")} success");
 
         return true;
     }

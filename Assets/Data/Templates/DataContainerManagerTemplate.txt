@@ -49,22 +49,3 @@ public class DataContainerManager : BaseManager<DataContainerManager>
 
         return false;
     }
-	
-	public bool AddDataContainer(string fileName, string json)
-    {
-        Type type = Type.GetType($"Data{fileName}");
-
-        switch (type)
-        {
-             
-			case Type t when t == typeof(DataAnimal):
-                return AddDataContainer<DataAnimal>(json);
- 
-			case Type t when t == typeof(DataHuman):
-                return AddDataContainer<DataHuman>(json);
-
-        }
-
-        return false;
-    }
-}

@@ -1,0 +1,13 @@
+	
+	public bool AddDataContainer(string fileName, string json)
+    {
+        Type type = Type.GetType($"Data{fileName}");
+
+        switch (type)
+        {
+            #type#
+        }
+
+        return false;
+    }
+}

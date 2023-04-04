@@ -5,19 +5,15 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class Data#name#Container : IBaseDataContainer
+public class Data#name#Container : IBaseDataContainer<Data#name#>
 {
     private Dictionary<int, Data#name#> dicById = null;
     private Dictionary<string, Data#name#> dicByNameId = null;
 	private Data#name#[] datas = null;
     public string FileName => "#name#";
+	public bool Deserialized => dicById != null && dicByNameId != null && datas != null;
 	
-	#if UNITY_EDITOR
-    public string LocalJsonPath => PathDefine.Json + $"/{FileName}.json";
-	#endif
-	
-	public bool Serialized => dicById != null && dicByNameId != null && datas != null;
-    public void SerializeJson(string json)
+    public void DeserializeJson(string json)
     {
         try
         {

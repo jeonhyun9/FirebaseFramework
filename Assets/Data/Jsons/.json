@@ -5,26 +5,22 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class DataAnimalContainer : IBaseDataContainer
+public class Data#name#Container : IBaseDataContainer<Data#name#>
 {
-    private Dictionary<int, DataAnimal> dicById = null;
-    private Dictionary<string, DataAnimal> dicByNameId = null;
-	private DataAnimal[] datas = null;
-    public string FileName => "Animal";
+    private Dictionary<int, Data#name#> dicById = null;
+    private Dictionary<string, Data#name#> dicByNameId = null;
+	private Data#name#[] datas = null;
+    public string FileName => "#name#";
+	public bool Deserialized => dicById != null && dicByNameId != null && datas != null;
 	
-	#if UNITY_EDITOR
-    public string LocalJsonPath => PathDefine.Json + $"/{FileName}.json";
-	#endif
-	
-	public bool Serialized => dicById != null && dicByNameId != null && datas != null;
-    public void SerializeJson(string json)
+    public void DeserializeJson(string json)
     {
         try
         {
             JArray jArray = JArray.Parse(json);
             foreach(var jObj in jArray)
             {
-                DataAnimal data = JsonConvert.DeserializeObject<DataAnimal>(jObj.ToString());
+                Data#name# data = JsonConvert.DeserializeObject<Data#name#>(jObj.ToString());
 				
 				if (dicById == null)
 					dicById = new();
@@ -58,26 +54,41 @@ public class DataAnimalContainer : IBaseDataContainer
             Debug.LogError(e.StackTrace);
         }
     }
-    public DataAnimal GetById(int id)
+    public Data#name# GetById(int id)
     {
         if (dicById.ContainsKey(id))
             return dicById[id];
 
         return default;
     }
-    public DataAnimal GetByNameId(string nameId)
+    public Data#name# GetByNameId(string nameId)
     {
         if (dicByNameId.ContainsKey(nameId))
             return dicByNameId[nameId];
 
         return default;
     }
-	public DataAnimal Find(Predicate<DataAnimal> predicate)
+	public Data#name# Find(Predicate<Data#name#> predicate)
     {
         return Array.Find(datas, predicate);
     }
-    public DataAnimal[] FindAll(Predicate<DataAnimal> predicate)
+    public Data#name#[] FindAll(Predicate<Data#name#> predicate)
     {
         return Array.FindAll(datas, predicate);
+    }
+}	public bool AddDataContainer(string fileName, string json)
+    {
+        Type type = Type.GetType($"Data{fileName}");
+
+        switch (type)
+        {
+                        case Type t when t == typeof(DataDataAnimal):
+                return AddDataContainer<DataDataAnimal>(json);
+            case Type t when t == typeof(DataDataHuman):
+                return AddDataContainer<DataDataHuman>(json);
+
+        }
+
+        return false;
     }
 }

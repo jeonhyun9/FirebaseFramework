@@ -56,7 +56,7 @@ public class BaseGenerator
                 case Type.Struct:
                     return $"Data{FileName}.cs";
                 case Type.Container:
-                    return $"Data{FileName}Container.cs";
+                    return $"DataContainerManager.cs";
                 default:
                     return null;
             }
@@ -86,7 +86,7 @@ public class BaseGenerator
                     savePath = PathDefine.DataStruct;
                     break;
                 case Type.Container:
-                    savePath = PathDefine.DataContainer;
+                    savePath = PathDefine.Manager;
                     break;
             }
 

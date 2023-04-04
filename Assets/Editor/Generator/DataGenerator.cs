@@ -16,11 +16,12 @@ namespace Tools
         private const string ExcelFileExtension = ".xlsx";
 
         private static StructGenerator structGenerator = new();
-        private static ContainerGenerator containerGenerator = new();
         private static JsonGenerator jsonGenerator = new();
+        private static ContainerManagerGenerator containerManagerGenerator = new();
 
         private static string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
         private static string VersionTextName => Path.GetFileName(PathDefine.VersionText);
+        private static List<string> dataNameList;
 
         public static void GenerateDataFromExcelFoler(string folderPath, string jsonPath, int version)
         {
@@ -45,15 +46,18 @@ namespace Tools
                 return;
             }
 
+            dataNameList = new(excelFiles.Length);
+
             foreach (string excelPath in excelFiles)
             {
                 EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", progress);
+                dataNameList.Add($"Data{Path.GetFileNameWithoutExtension(excelPath)}");
                 GenerateDataFromExcelFile(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), jsonPath);
                 progress += 1f / excelFiles.Length;
             }
 
+            GenerateContainerManager(dataNameList, progress);
             GenerateJsonList(folderPath, jsonPath, progress);
-
             GenerateVersion(folderPath, jsonPath, version, progress);
 
             EditorUtility.ClearProgressBar();
@@ -78,7 +82,6 @@ namespace Tools
                         StringBuilder log = new();
 
                         GenerateStructFromExcelSheet(readExcelPath, sheet, ref log);
-                        GenerateDataContainer(readExcelPath, ref log);
                         GenerateJsonFromExcelSheet(readExcelPath, sheet, ref log, saveJsonPath);
 
                         if (log.Length > 0)
@@ -104,16 +107,18 @@ namespace Tools
             structGenerator.Init(filePath, sheet);
             structGenerator.Generate(ref log);
         }
-        private static void GenerateDataContainer(string filePath, ref StringBuilder log)
-        {
-            containerGenerator.Init(filePath);
-            containerGenerator.Generate(ref log);
-        }
 
         private static void GenerateJsonFromExcelSheet(string filePath, DataTable sheet, ref StringBuilder log, string jsonSavePath)
         {
             jsonGenerator.Init(filePath, sheet, jsonSavePath);
             jsonGenerator.Generate(ref log);
+        }
+
+        private static void GenerateContainerManager(List<string> dataNameList, float progress)
+        {
+            EditorUtility.DisplayProgressBar(PathDefine.Manager, $"DataContainerManager 작성중..", progress);
+            containerManagerGenerator.Init();
+            containerManagerGenerator.Generate(dataNameList);
         }
 
         private static void GenerateJsonList(string folderPath, string jsonPath, float progress)

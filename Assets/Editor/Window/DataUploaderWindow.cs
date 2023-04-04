@@ -6,8 +6,8 @@ namespace Tools
 {
     public class DataUploaderWindow : BaseEdtiorWindow
     {
-        private const float windowWidth = 400f;
-        private const float windowHeight = 300f;
+        private const float width = 400f;
+        private const float height = 300f;
         private const float spacing = 5f;
 
         private string BucketName => GetParameter<string>("BucketName");
@@ -18,7 +18,7 @@ namespace Tools
         public static void OpenDataUploaderWindow()
         {
             DataUploaderWindow window = (DataUploaderWindow)GetWindow(typeof(DataUploaderWindow));
-            window.InitializeWindow(window, windowWidth, windowHeight, spacing);
+            window.InitializeWindow(window, width, height, spacing);
         }
 
         protected override void InitializeParameters()

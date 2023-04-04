@@ -36,6 +36,9 @@ public class JsonGenerator : BaseGenerator
                 string dataType = dataTypeRow[j].ToString();
                 string name = nameRow[j].ToString();
 
+                if (name.Contains("Id") || name.Contains("NameId"))
+                    name = $"_{name}";
+
                 if (dataType.Contains("struct:"))
                     name += $"_{dataType.Replace("struct:", "")}";
 

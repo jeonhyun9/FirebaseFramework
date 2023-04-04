@@ -1,0 +1,3 @@
+ 
+			case Type t when t == typeof(#name#):
+                return AddDataContainer<#name#>(json);
