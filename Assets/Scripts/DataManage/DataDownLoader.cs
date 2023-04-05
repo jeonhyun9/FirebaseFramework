@@ -61,13 +61,13 @@ public class DataDownLoader : MonoBehaviour
 
         foreach(string fileName in jsonDicByFileName.Keys)
         {
-            bool addContainerResult = AddDataContainerWithLog(fileName, jsonDicByFileName[fileName]);
+            bool addContainerResult = AddDataContainerToManager(fileName, jsonDicByFileName[fileName]);
 
             if (!addContainerResult)
                 return false;
         }
 
-        Debug.Log($"Data Version : {fireBaseDataDownloader.Version}");
+        Logger.Success($"Load Data Version : {fireBaseDataDownloader.Version}");
 
         return true;
     }
@@ -85,7 +85,7 @@ public class DataDownLoader : MonoBehaviour
         {
             string localJson = File.ReadAllText(Path.Combine(jsonPath, fileName));
 
-            bool addContainerResult = AddDataContainerWithLog(fileName, localJson);
+            bool addContainerResult = AddDataContainerToManager(fileName, localJson);
 
             if (!addContainerResult)
                 return false;
@@ -94,36 +94,26 @@ public class DataDownLoader : MonoBehaviour
         return true;
     }
 
-    private bool AddDataContainerWithLog(string fileName, string json)
+    private bool AddDataContainerToManager(string fileName, string json)
     {
         fileName = Path.GetFileNameWithoutExtension(fileName);
 
-        if (DataContainerManager.Instance.AddDataContainer(fileName, json))
-        {
-            Debug.Log($"Data Load Success {fileName} ");
-        }
-        else
-        {
-            Debug.LogError($"Data Load Failed {fileName} ");
-            return false;
-        }
-
-        return true;
+        return DataContainerManager.Instance.AddDataContainer(fileName, json);
     }
 
     //테스트
     private void ShowTestLog()
     {
         DataHuman human = DataContainerManager.Instance.GetDataById<DataHuman>(1);
-        Debug.Log($"Id가 1인 DataHuman : {human.NameId}");
-
+        Logger.Log($"Id가 1인 DataHuman : {human.NameId}");
+        
         DataHuman winter = DataContainerManager.Instance.GetDataById<DataHuman>(2);
-        Debug.Log($"Id가 2인 DataHuman {human.NameId}의 펫 : {winter.Pet.NameId}");
-
+        Logger.Log($"Id가 2인 DataHuman {human.NameId}의 펫 : {winter.Pet.NameId}");
+        
         DataAnimal animal = DataContainerManager.Instance.GetDataById<DataAnimal>(3);
-        Debug.Log($"Id가 3인 DataAnimal : {animal.NameId}");
-
+        Logger.Log($"Id가 3인 DataAnimal : {animal.NameId}");
+        
         DataAnimal Lion = DataContainerManager.Instance.FindData<DataAnimal>(x => x.AnimalType == AnimalType.Lion);
-        Debug.Log($"AnimalType이 Lion인 DataAnimal {animal.NameId}");
+        Logger.Log($"AnimalType이 Lion인 DataAnimal {animal.NameId}");
     }
 }

@@ -43,7 +43,7 @@ public class FireBaseDataDownloader
                 continue;
 
             dicJsonByFileName.Add(fileName, jsonData);
-            Debug.Log($"Load Json From FireBase : {fileName}");
+            Logger.Success($"Load Json From FireBase : {fileName}");
         }
 
 
@@ -80,14 +80,14 @@ public class FireBaseDataDownloader
 
             if (jsonListArray.Length == 0)
             {
-                Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
+                Logger.Error($"Failed to load file : {storageRef.Name}");
                 return null;
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
-            Debug.LogError(e.StackTrace);
+            Logger.Error($"Failed to load file : {storageRef.Name}");
+            Logger.Exception(e);
             return null;
         }
 
@@ -104,14 +104,14 @@ public class FireBaseDataDownloader
 
             if (string.IsNullOrEmpty(stringValue))
             {
-                Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
+                Logger.Error($"Failed to load file : {storageRef.Name}");
                 return null;
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"파일을 가져오지 못했습니다. {storageRef.Name}");
-            Debug.LogError(e.StackTrace);
+            Logger.Error($"Failed to load file : {storageRef.Name}");
+            Logger.Exception(e);
             return null;
         }
 

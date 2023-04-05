@@ -10,18 +10,16 @@ namespace Tools
 {
     public class JsonGenerator : BaseGenerator
     {
-        private DataTable sheet;
-        private string jsonSavePath;
-
-        public void Init(string pathValue, DataTable sheetValue, string jsonSavePathValue)
+        public void Init(string pathValue, string jsonSavePathValue)
         {
-            GeneratorType = Type.Json;
-            FilePath = pathValue;
-            sheet = sheetValue;
-            jsonSavePath = Path.Combine(jsonSavePathValue, FileNameWithExtension);
+            InitType(Type.Json);
+            SetFolderPath(jsonSavePathValue);
+            SetFileNameWithoutExtension(pathValue);
+
+            Log = string.Empty;
         }
 
-        public bool Generate(ref StringBuilder log)
+        public void Generate(DataTable sheet)
         {
             List<Dictionary<string, object>> dataDicList = new();
 
@@ -61,14 +59,7 @@ namespace Tools
 
             string newJson = JsonConvert.SerializeObject(dataDicList);
 
-            if (File.Exists(jsonSavePath) && JToken.DeepEquals(newJson, File.ReadAllText(jsonSavePath)))
-                return false;
-
-            log.AppendLine($"{FileNameWithExtension} {(File.Exists(jsonSavePath) ? "수정" : "생성")} 완료");
-
-            File.WriteAllText(jsonSavePath, newJson);
-
-            return true;
+            OnEndGenerate(SavePath, newJson);
         }
 
         private System.Type GetDataType(string columnType)
@@ -85,7 +76,7 @@ namespace Tools
                 case string s when s.StartsWith("enum:"):
                     System.Type type = System.Type.GetType(s.Replace("enum:", ""));
                     if (type == null)
-                        UnityEngine.Debug.LogError($"Warning! 정의되지 않은 {columnType}");
+                        Logger.Warning($"Undefined enum : {columnType}");
                     return type;
                 default:
                     return System.Type.GetType(columnType);

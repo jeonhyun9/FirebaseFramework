@@ -8,16 +8,16 @@ namespace Tools
 {
     public class StructGenerator : BaseGenerator
     {
-        private DataTable sheet;
-
-        public void Init(string pathValue, DataTable sheetValue)
+        public void Init(string pathValue)
         {
-            GeneratorType = Type.Struct;
-            FilePath = pathValue;
-            sheet = sheetValue;
+            InitType(Type.Struct);
+            SetFileNameWithoutExtension($"Data{Path.GetFileNameWithoutExtension(pathValue)}");
+            SetFolderPath(PathDefine.DataStruct);
+
+            Log = string.Empty;
         }
 
-        public bool Generate(ref StringBuilder log)
+        public void Generate(DataTable sheet)
         {
             //시트에서 데이터 타입과 이름만 뽑아놓기
             List<string> columnNames = new();
@@ -57,16 +57,7 @@ namespace Tools
 
             sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
 
-            string newStruct = sb.ToString();
-
-            if (File.Exists(SavePath) && File.ReadAllText(SavePath) == newStruct)
-                return false;
-
-            log.AppendLine($"{FileNameWithExtension} {(File.Exists(SavePath) ? "수정" : "생성")} 완료");
-            
-            File.WriteAllText(SavePath, newStruct);
-
-            return true;
+            OnEndGenerate(SavePath, sb.ToString());
         }
     }
 }

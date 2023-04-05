@@ -10,16 +10,17 @@ namespace Tools
         {
             Json,
             Struct,
-            Container,
+            ContainerManager,
+            JsonList,
+            VersionText,
         }
-
+        public string Log { get; set; }
         protected int DataTypeIndex => 1;
         protected int NameIndex => DataTypeIndex + 1;
         protected int ValueIndex => NameIndex + 1;
-        protected Type GeneratorType { get; set; }
-        protected string FilePath { get; set; }
-        protected string FileName => Path.GetFileNameWithoutExtension(FilePath);
-        protected string FileNameWithoutExtension => Path.GetFileNameWithoutExtension(FileNameWithExtension);
+        protected Type GeneratorType { get; private set; }
+        private string folderPath;
+        protected string FileNameWithoutExtension { get; private set; }
         protected string FileNameWithExtension
         {
             get
@@ -27,11 +28,17 @@ namespace Tools
                 switch (GeneratorType)
                 {
                     case Type.Json:
-                        return $"{FileName}.json";
+                        return $"{FileNameWithoutExtension}.json";
                     case Type.Struct:
-                        return $"Data{FileName}.cs";
-                    case Type.Container:
-                        return $"DataContainerManager.cs";
+                        return $"{FileNameWithoutExtension}.cs";
+
+                    //이름이 고정된 것들
+                    case Type.ContainerManager:
+                        return Path.GetFileName(PathDefine.DataContainerManager);
+                    case Type.JsonList:
+                        return Path.GetFileName(PathDefine.JsonListText);
+                    case Type.VersionText:
+                        return Path.GetFileName(PathDefine.VersionText);
                     default:
                         return null;
                 }
@@ -42,22 +49,18 @@ namespace Tools
         {
             get
             {
-                string savePath = null;
-
                 switch (GeneratorType)
                 {
                     case Type.Json:
-                        savePath = PathDefine.Json;
-                        break;
+                    case Type.VersionText:
                     case Type.Struct:
-                        savePath = PathDefine.DataStruct;
-                        break;
-                    case Type.Container:
-                        savePath = PathDefine.Manager;
-                        break;
+                    case Type.JsonList:
+                        return Path.Combine(folderPath, FileNameWithExtension);
+                    case Type.ContainerManager:
+                        return PathDefine.DataContainerManager;
+                    default:
+                        return null;
                 }
-
-                return Path.Combine(savePath, FileNameWithExtension);
             }
         }
 
@@ -65,7 +68,7 @@ namespace Tools
         {
             if (!File.Exists(path))
             {
-                Debug.LogError($"{path}에 해당 템플릿이 없습니다.");
+                Logger.Warning($"There is no template at {path}");
                 return null;
             }
 
@@ -101,6 +104,45 @@ namespace Tools
                 return "private";
 
             return "public";
+        }
+
+        protected bool CheckExist(string savePath, string contents, bool isJson)
+        {
+            if (isJson)
+                return File.Exists(savePath) && Newtonsoft.Json.Linq.JToken.DeepEquals(contents, File.ReadAllText(savePath));
+
+            return File.Exists(savePath) && File.ReadAllText(savePath) == contents;
+        }
+
+        protected void WriteLog(string savePath)
+        {
+            Log = $"{FileNameWithExtension} {(File.Exists(savePath) ? "Edited" : "Created")}";
+        }
+
+        protected void OnEndGenerate(string savePath, string generatedValue, bool isJson = false)
+        {
+            if (CheckExist(savePath, generatedValue, isJson))
+            {
+                Logger.Log($"{FileNameWithExtension} No changed");
+                return;
+            }
+
+            Logger.Log($"{FileNameWithExtension} {(File.Exists(savePath) ? "Edited" : "Created")}");
+            File.WriteAllText(SavePath, generatedValue);
+        }
+
+        protected void SetFolderPath(string path)
+        {
+            folderPath = path;
+        }
+        protected void SetFileNameWithoutExtension(string path)
+        {
+            FileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
+        }
+
+        protected void InitType(Type type)
+        {
+            GeneratorType = type;
         }
     }
 }

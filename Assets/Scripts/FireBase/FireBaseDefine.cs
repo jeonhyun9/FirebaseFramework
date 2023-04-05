@@ -33,7 +33,7 @@ public struct FireBaseDefine
         {
             if (string.IsNullOrEmpty(Version))
             {
-                Debug.LogError("Version √ ±‚»≠ æ»µ ");
+                Logger.Warning("Version not initialized");
                 return null;
             }
             return $"JsonDatas/{Version}/";
@@ -46,7 +46,7 @@ public struct FireBaseDefine
         {
             if (string.IsNullOrEmpty(Version))
             {
-                Debug.LogError("Version √ ±‚»≠ æ»µ ");
+                Logger.Warning("Version not initialized");
                 return null;
             }
             return $"JsonDatas/{Version}/JsonList.txt";
@@ -57,7 +57,7 @@ public struct FireBaseDefine
     {
         if (string.IsNullOrEmpty(Version))
         {
-            Debug.LogError("Version √ ±‚»≠ æ»µ ");
+            Logger.Warning("Version not initialized");
             return null;
         }
         return $"JsonDatas/{Version}/{jsonNameWithExtension}";

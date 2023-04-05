@@ -22,8 +22,11 @@ public class DataUploader : MonoBehaviour
     private bool setCurrentVersion;
     private string localJsonDataPath;
 
-    private bool initialized = false;
+    private bool initialized;
     private FireBaseDefine fireBaseDef;
+
+    private float progress;
+    private float progressIncrementValue;
 
     private string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
     private string VersionTextName => Path.GetFileName(PathDefine.VersionText);
@@ -35,15 +38,14 @@ public class DataUploader : MonoBehaviour
 
         if (string.IsNullOrEmpty(versionValue))
         {
-            Debug.LogError("Version 정보를 가져올 수 없습니다.");
+            Logger.Error("Failed to load Version.txt");
             return false;
         }
 
         fireBaseDef = new FireBaseDefine(bucketNameValue, versionValue);
-
         setCurrentVersion = setCurrentVersionValue;
-
         storage = FirebaseStorage.GetInstance(fireBaseDef.AppSpot);
+        progress = 0f;
 
         initialized = true;
 
@@ -54,7 +56,7 @@ public class DataUploader : MonoBehaviour
     {
         if (!initialized)
         {
-            Debug.LogError("DataUploader가 초기화 되지 않음.");
+            Logger.Error("DataUploader not initialized");
             return;
         }
 
@@ -63,27 +65,27 @@ public class DataUploader : MonoBehaviour
 
     private IEnumerator UploadJsonDatas()
     {
-        float progress = 0f;
-
         string[] jsonFiles = Directory.GetFiles(localJsonDataPath, "*.json");
 
         if (jsonFiles.Length == 0)
         {
-            Debug.LogError("Json파일이 없습니다.");
+            Logger.Warning($"There is no json files : {localJsonDataPath}");
             yield break;
         }
 
-        yield return UploadJson(jsonFiles, progress);
+        progressIncrementValue = 1f / (setCurrentVersion ? jsonFiles.Length + 2 : jsonFiles.Length + 1);
 
-        yield return UploadJsonList(Path.Combine(localJsonDataPath, JsonListTextName), fireBaseDef.JsonListPath, progress);
+        yield return UploadJson(jsonFiles);
+
+        yield return UploadJsonList(Path.Combine(localJsonDataPath, JsonListTextName), fireBaseDef.JsonListPath);
 
         if (setCurrentVersion)
-            yield return UploadVersionText(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath, progress);
+            yield return UploadVersionText(Path.Combine(localJsonDataPath, VersionTextName), fireBaseDef.CurrentVersionPath);
 
         OnEndUpload();
     }
 
-    private IEnumerator UploadJson(string[] jsonFiles, float progress)
+    private IEnumerator UploadJson(string[] jsonFiles)
     {
         foreach (string jsonPath in jsonFiles)
         {
@@ -92,23 +94,25 @@ public class DataUploader : MonoBehaviour
             EditorUtility.DisplayProgressBar(jsonName, $"{jsonName} 업로드 중..", progress);
 
             yield return FireBaseUploadTask(jsonPath, fireBaseDef.GetJsonPath(jsonName));
-            progress += 1f / jsonFiles.Length;
+
+            progress += progressIncrementValue;
         }
     }
 
-    private IEnumerator UploadJsonList(string localPath, string storagePath, float progress)
+    private IEnumerator UploadJsonList(string localPath, string storagePath)
     {
-        EditorUtility.DisplayProgressBar("JsonList.txt", $"JsonList.txt 업로드 중..", progress);
+        EditorUtility.DisplayProgressBar("JsonList.txt", $"JsonList.txt 업로드 중..", progress += progressIncrementValue);
 
         yield return FireBaseUploadTask(localPath, storagePath);
     }
     
-    private IEnumerator UploadVersionText(string localPath, string storagePath, float progress)
+    private IEnumerator UploadVersionText(string localPath, string storagePath)
     {
-        EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress);
+        EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress += progressIncrementValue);
+
         yield return FireBaseUploadTask(localPath, storagePath);
 
-        Debug.Log($"Upload Current Version {fireBaseDef.Version}");
+        Logger.Success($"Upload Current Version {fireBaseDef.Version}");
     }
 
     //storagePath는 Path.Combine 사용하면 안됨
@@ -122,11 +126,11 @@ public class DataUploader : MonoBehaviour
 
         if (task.IsFaulted)
         {
-            Debug.LogError($"Upload Fail : {Path.GetFileName(localPath)} - {task.Exception}");
+            Logger.Error($"Upload Fail : {Path.GetFileName(localPath)} - {task.Exception}");
         }
         else if (task.IsCompleted)
         {
-            Debug.Log($"Upload Success : {Path.GetFileName(localPath)}");
+            Logger.Success($"Upload Success : {Path.GetFileName(localPath)}");
         }
     }
 

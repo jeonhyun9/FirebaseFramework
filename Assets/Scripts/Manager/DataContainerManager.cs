@@ -35,7 +35,7 @@ public class DataContainerManager : BaseManager<DataContainerManager>
     {
         if (containerDic.ContainsKey(typeof(T)))
         {
-            Debug.LogError($"이미 추가된 DataContainer : {typeof(T)}");
+            Logger.Error($"Duplicated DataContainer type : {typeof(T)}");
             return false;
         }
 
@@ -44,6 +44,7 @@ public class DataContainerManager : BaseManager<DataContainerManager>
         if (dataContainer.DeserializeJson(json))
         {
             containerDic[typeof(T)] = dataContainer;
+			Logger.Success($"Add DataContainer type : {typeof(T)}");
             return true;
         }
 
@@ -62,10 +63,9 @@ public class DataContainerManager : BaseManager<DataContainerManager>
  
 			case Type t when t == typeof(DataHuman):
                 return AddDataContainer<DataHuman>(json);
-
         }
         
-        Debug.LogError($"Invalid Type : {fileName}");
+        Logger.Error($"Invalid Type : {fileName}");
 
         return false;
     }

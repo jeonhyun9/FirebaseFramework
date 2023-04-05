@@ -14,52 +14,83 @@ namespace Tools
     {
         private const string ExcelFileExtension = ".xlsx";
 
+        //반복사용하는 generator만 빼놓음
         private static readonly StructGenerator structGenerator = new();
         private static readonly JsonGenerator jsonGenerator = new();
-        private static readonly ContainerManagerGenerator containerManagerGenerator = new();
+        
+        private static float progress;
+        private static string excelFolderPath;
+        private static string jsonFolderPath;
+        private static int version;
 
-        private static string JsonListTextName => Path.GetFileName(PathDefine.JsonListText);
-        private static string VersionTextName => Path.GetFileName(PathDefine.VersionText);
-
-        public static void GenerateDataFromExcelFoler(string folderPath, string jsonPath, int version)
+        public static void GenerateDataFromExcelFoler(string excelFolderPathValue, string jsonFolderPathValue, int versionValue)
         {
-            if (!AssetDatabase.IsValidFolder(folderPath))
+            if (!AssetDatabase.IsValidFolder(excelFolderPathValue))
             {
-                Debug.LogError("유효한 폴더 경로가 아닙니다.");
+                Logger.Error("Invalid folder path");
                 return;
             }
 
-            if (string.IsNullOrEmpty(jsonPath))
+            if (string.IsNullOrEmpty(jsonFolderPathValue))
             {
-                Debug.LogError("Json 저장 경로가 없습니다.");
+                Logger.Null("Json save path");
                 return;
             }
 
-            string[] excelFiles = Directory.GetFiles(folderPath, $"*{ExcelFileExtension}");
-            float progress = 0f;
+            Initialize(excelFolderPathValue, jsonFolderPathValue, versionValue);
+
+            string[] excelFiles = Directory.GetFiles(excelFolderPath, $"*{ExcelFileExtension}");
 
             if (excelFiles.Length == 0)
             {
-                Debug.LogError($"{folderPath} 에 엑셀 파일이 없습니다.");
+                Logger.Error($"There is no excel file in {excelFolderPath}.");
                 return;
             }
 
-            foreach (string excelPath in excelFiles)
+            if (GeneratedDataFromExcelFilePaths(excelFiles))
             {
-                EditorUtility.DisplayProgressBar(folderPath, $"{excelPath} 변환중..", progress);
-                GenerateDataFromExcelFile(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), jsonPath);
-                progress += 1f / excelFiles.Length;
+                GenerateContainerManager();
+                GenerateJsonList();
+                GenerateVersion();
             }
-
-            GenerateContainerManager(jsonPath, progress);
-            GenerateJsonList(jsonPath, progress);
-            GenerateVersion(jsonPath, version, progress);
-
+            else
+            {
+                Logger.Error("Error occured while generated data.");
+            }
+            
             EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
         }
 
-        private static void GenerateDataFromExcelFile(string readExcelPath, string saveJsonPath)
+        private static void Initialize(string folderPathValue, string jsonPathValue, int versionValue)
+        {
+            excelFolderPath = folderPathValue;
+            jsonFolderPath = jsonPathValue;
+            version = versionValue;
+
+            progress = 0f;
+        }
+
+        /// <summary> 엑셀파일이 열려있으면 에러 발생 </summary>
+        public static bool GeneratedDataFromExcelFilePaths(string[] excelFiles)
+        {
+            Logger.Log("----------------Check Excel Start-----------------");
+            for (int i = 0; i < excelFiles.Length; i++)
+            {
+                string excelPath = excelFiles[i];
+                EditorUtility.DisplayProgressBar(excelFolderPath, $"Converting {excelPath}..", progress);
+
+                if (!GenerateDataFromExcelPath(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))
+                    return false;
+
+                progress += 1f / excelFiles.Length;
+            }
+            Logger.Log("----------------Check Excel End------------------");
+
+            return true;
+        }
+
+        private static bool GenerateDataFromExcelPath(string readExcelPath)
         {
             try
             {
@@ -67,89 +98,61 @@ namespace Tools
                 using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
                 {
                     var dataSet = excelReader.AsDataSet();
+
                     //시트는 하나만 사용할 것
                     DataTable sheet = dataSet.Tables[0];
 
-                    string excelFileName = Path.GetFileNameWithoutExtension(readExcelPath);
-                    StringBuilder log = new();
+                    string excelFileName = Path.GetFileName(readExcelPath);
 
-                    GenerateStructFromExcelSheet(readExcelPath, sheet, ref log);
-                    GenerateJsonFromExcelSheet(readExcelPath, sheet, ref log, saveJsonPath);
+                    GenerateStructFromExcelSheet(readExcelPath, sheet);
+                    GenerateJsonFromExcelSheet(readExcelPath, sheet);
 
-                    if (log.Length > 0)
-                    {
-                        Debug.Log($"======== {excelFileName} 갱신 ========");
-                        Debug.Log(log.ToString());
-                    }
-                    else
-                    {
-                        Debug.Log($"======== {excelFileName} 변경점 없음 ========");
-                    }
+                    return true;
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError(e.StackTrace);
+                Logger.Exception(e);
+                return false;
             }
         }
 
-        private static void GenerateStructFromExcelSheet(string filePath, DataTable sheet, ref StringBuilder log)
+        private static void GenerateStructFromExcelSheet(string readExcelPath, DataTable sheet)
         {
-            structGenerator.Init(filePath, sheet);
-            structGenerator.Generate(ref log);
+            structGenerator.Init(readExcelPath);
+            structGenerator.Generate(sheet);
         }
 
-        private static void GenerateJsonFromExcelSheet(string filePath, DataTable sheet, ref StringBuilder log, string jsonSavePath)
+        private static void GenerateJsonFromExcelSheet(string readExcelPath, DataTable sheet)
         {
-            jsonGenerator.Init(filePath, sheet, jsonSavePath);
-            jsonGenerator.Generate(ref log);
+            jsonGenerator.Init(readExcelPath, jsonFolderPath);
+            jsonGenerator.Generate(sheet);
         }
 
-        private static void GenerateContainerManager(string jsonPath, float progress)
+        private static void GenerateContainerManager()
         {
-            EditorUtility.DisplayProgressBar(PathDefine.Manager, $"DataContainerManager 작성중..", progress);
+            EditorUtility.DisplayProgressBar(PathDefine.Manager, $"Writing DataContainerManager.cs..", progress);
 
-            string[] dataNames = Directory.GetFiles(jsonPath, $"*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
+            string[] dataNames = Directory.GetFiles(jsonFolderPath, $"*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
 
-            containerManagerGenerator.Init();
+            ContainerManagerGenerator containerManagerGenerator = new();
             containerManagerGenerator.Generate(dataNames);
         }
 
-        private static void GenerateJsonList(string jsonPath, float progress)
+        private static void GenerateJsonList()
         {
-            EditorUtility.DisplayProgressBar("Finisihing", $"JsonList.txt 작성중..", progress);
+            EditorUtility.DisplayProgressBar("Finisihing", $"Writing JsonList.txt..", progress);
 
-            string jsonListPath = Path.Combine(jsonPath, JsonListTextName);
-            string[] jsonFiles = Directory.GetFiles(jsonPath, $"*.json").Select(Path.GetFileName).ToArray();
-            string jsonListDesc = string.Empty;
-
-            if (jsonFiles.Length == 0)
-            {
-                Debug.LogError("경로에 json이 없음!");
-                return;
-            }
-
-            jsonListDesc = string.Join(",", jsonFiles);
-
-            if (File.Exists(jsonListPath))
-            {
-                if (File.ReadAllText(jsonListPath) == jsonListDesc)
-                {
-                    Debug.Log("JsonList 변경 없음");
-                    return;
-                }
-            }
-
-            File.WriteAllText(jsonListPath, jsonListDesc);
-            Debug.Log("JsonList 생성 완료");
+            JsonListGenerator jsonListGenerator = new ();
+            jsonListGenerator.Generate(jsonFolderPath);
         }
 
-        private static void GenerateVersion(string jsonPath, int version, float progress)
+        private static void GenerateVersion()
         {
             EditorUtility.DisplayProgressBar("Finisihing", $"Version.txt 작성중..", progress);
 
-            File.WriteAllText(Path.Combine(jsonPath, VersionTextName), version.ToString());
-            Debug.Log($"Version : {version}");
+            VersionTextGenerator versionTextGenerator = new ();
+            versionTextGenerator.Generate(jsonFolderPath, version.ToString());
         }
     }
 }
