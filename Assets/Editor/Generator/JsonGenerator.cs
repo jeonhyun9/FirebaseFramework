@@ -15,8 +15,6 @@ namespace Tools
             InitType(Type.Json);
             SetFolderPath(jsonSavePathValue);
             SetFileNameWithoutExtension(pathValue);
-
-            Log = string.Empty;
         }
 
         public void Generate(DataTable sheet)

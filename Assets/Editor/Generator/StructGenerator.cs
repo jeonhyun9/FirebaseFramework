@@ -13,8 +13,6 @@ namespace Tools
             InitType(Type.Struct);
             SetFileNameWithoutExtension($"Data{Path.GetFileNameWithoutExtension(pathValue)}");
             SetFolderPath(PathDefine.DataStruct);
-
-            Log = string.Empty;
         }
 
         public void Generate(DataTable sheet)

@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System.IO;
-using UnityEngine;
 
 namespace Tools
 {
@@ -14,18 +13,19 @@ namespace Tools
             JsonList,
             VersionText,
         }
-        public string Log { get; set; }
+
+        private Type generatorType;
+        private string folderPath;
+
         protected int DataTypeIndex => 1;
         protected int NameIndex => DataTypeIndex + 1;
         protected int ValueIndex => NameIndex + 1;
-        protected Type GeneratorType { get; private set; }
-        private string folderPath;
         protected string FileNameWithoutExtension { get; private set; }
         protected string FileNameWithExtension
         {
             get
             {
-                switch (GeneratorType)
+                switch (generatorType)
                 {
                     case Type.Json:
                         return $"{FileNameWithoutExtension}.json";
@@ -44,12 +44,11 @@ namespace Tools
                 }
             }
         }
-
         protected string SavePath
         {
             get
             {
-                switch (GeneratorType)
+                switch (generatorType)
                 {
                     case Type.Json:
                     case Type.VersionText:
@@ -63,7 +62,6 @@ namespace Tools
                 }
             }
         }
-
         protected string GetDataTemplate(string path, string type = null, string name = null, string modifier = null)
         {
             if (!File.Exists(path))
@@ -85,7 +83,6 @@ namespace Tools
 
             return template;
         }
-
         protected string GetNaming(string name, string dataType = null)
         {
             //Id, NameId => id => nameId Ä«¸á·Î º¯°æ
@@ -97,7 +94,6 @@ namespace Tools
 
             return name;
         }
-
         protected string GetAccessModifier(string name)
         {
             if (name.Contains("Id") || name.Contains("NameId") || name.Contains("id") || name.Contains("nameid"))
@@ -105,7 +101,6 @@ namespace Tools
 
             return "public";
         }
-
         protected bool CheckExist(string savePath, string contents, bool isJson)
         {
             if (isJson)
@@ -113,12 +108,6 @@ namespace Tools
 
             return File.Exists(savePath) && File.ReadAllText(savePath) == contents;
         }
-
-        protected void WriteLog(string savePath)
-        {
-            Log = $"{FileNameWithExtension} {(File.Exists(savePath) ? "Edited" : "Created")}";
-        }
-
         protected void OnEndGenerate(string savePath, string generatedValue, bool isJson = false)
         {
             if (CheckExist(savePath, generatedValue, isJson))
@@ -130,7 +119,6 @@ namespace Tools
             Logger.Log($"{FileNameWithExtension} {(File.Exists(savePath) ? "Edited" : "Created")}");
             File.WriteAllText(SavePath, generatedValue);
         }
-
         protected void SetFolderPath(string path)
         {
             folderPath = path;
@@ -139,10 +127,9 @@ namespace Tools
         {
             FileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
         }
-
         protected void InitType(Type type)
         {
-            GeneratorType = type;
+            generatorType = type;
         }
     }
 }
