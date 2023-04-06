@@ -3,8 +3,10 @@ using Firebase.Storage;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
+using System.Security.Cryptography;
 
 public class FireBaseDataDownloader
 {
@@ -14,6 +16,8 @@ public class FireBaseDataDownloader
     private readonly FirebaseStorage storage;
 
     public string Version => fireBaseDef.Version;
+
+    private string JsonSavePath => Application.persistentDataPath;
 
     public FireBaseDataDownloader(string bucketName)
     {
@@ -36,16 +40,26 @@ public class FireBaseDataDownloader
         foreach (string jsonName in jsonList)
         {
             string fileName = Path.GetFileName(jsonName);
-            StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
-            string jsonData = await LoadString(jsonDataRef);
+            string localPath = Path.Combine(JsonSavePath, fileName);
 
-            if (string.IsNullOrEmpty(jsonData))
+            StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
+
+            byte[] jsonData = await LoadBytes(jsonDataRef);
+
+            //불러온 데이터 예외처리
+            if (!IsValidByteArray(jsonData))
                 continue;
 
-            dicJsonByFileName.Add(fileName, jsonData);
+            byte[] localJsonData = await LoadLocalBytes(localPath);
+
+            //로컬 데이터와 무결성 검사하고, 다르면 불러온 데이터로 덮어씌움
+            if (!IntegrityCheck(localJsonData, jsonData))
+                await SaveDataToLocalPath(localPath, jsonData);
+            
+            //컨테이너에 담길 데이터 추가
+            dicJsonByFileName.Add(fileName, Encoding.UTF8.GetString(jsonData));
             Logger.Success($"Load Json From FireBase : {fileName}");
         }
-
 
         if (storage?.App != null)
             storage.App.Dispose();
@@ -67,6 +81,7 @@ public class FireBaseDataDownloader
 
         return false;
     }
+
     private async UniTask<string[]> LoadJsonList(string refPath)
     {
         StorageReference storageRef = storage.RootReference.Child(refPath);
@@ -99,8 +114,8 @@ public class FireBaseDataDownloader
 
         try
         {
-            byte[] versionBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            stringValue = Encoding.UTF8.GetString(versionBytes);
+            byte[] loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
+            stringValue = Encoding.UTF8.GetString(loadedBytes);
 
             if (string.IsNullOrEmpty(stringValue))
             {
@@ -116,5 +131,71 @@ public class FireBaseDataDownloader
         }
 
         return stringValue;
+    }
+
+    private async UniTask<byte[]> LoadBytes(StorageReference storageRef)
+    {
+        byte[] loadedBytes;
+
+        try
+        {
+            loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
+
+            if (loadedBytes.Length == 0)
+            {
+                Logger.Error($"Failed to load file : {storageRef.Name}");
+                return null;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Logger.Error($"Failed to load file : {storageRef.Name}");
+            Logger.Exception(e);
+            return null;
+        }
+
+        return loadedBytes;
+    }
+
+    private async UniTask<byte[]> LoadLocalBytes(string localPath)
+    {
+        if (File.Exists(localPath))
+        {
+            byte[] localBytes = await UniTask.RunOnThreadPool(() => File.ReadAllBytes(localPath));
+            return localBytes;
+        }
+        return null;
+    }
+
+    private async UniTask<bool> SaveDataToLocalPath(string localPath, byte[] loadedBytes)
+    {
+        try
+        {
+            await UniTask.RunOnThreadPool(() => File.WriteAllBytes(localPath, loadedBytes));
+        }
+        catch (System.Exception e)
+        {
+            Logger.Error($"Failed to save file : {localPath}");
+            Logger.Exception(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool IntegrityCheck(byte[] localBytes, byte[] loadedBytes)
+    {
+        return MD5.Create().ComputeHash(localBytes).SequenceEqual(MD5.Create().ComputeHash(loadedBytes));
+    }
+
+    private bool IsValidByteArray(byte[] bytes)
+    {
+        if (bytes == null)
+            return false;
+
+        if (bytes.Length == 0)
+            return false;
+
+        return true;
     }
 }
