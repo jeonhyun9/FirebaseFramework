@@ -4,15 +4,10 @@ using UnityEngine;
 
 public class DataBoardView : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public readonly DataBoardViewModel Model;
 
-    // Update is called once per frame
-    void Update()
+    public DataBoardView(DataBoardViewModel model)
     {
-        
+        Model = model;
     }
 }
