@@ -99,8 +99,8 @@ public class FireBaseDataDownloader
 
         try
         {
-            byte[] versionBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            stringValue = Encoding.UTF8.GetString(versionBytes);
+            byte[] loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
+            stringValue = Encoding.UTF8.GetString(loadedBytes);
 
             if (string.IsNullOrEmpty(stringValue))
             {
