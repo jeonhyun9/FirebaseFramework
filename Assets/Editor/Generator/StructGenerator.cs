@@ -8,11 +8,16 @@ namespace Tools
 {
     public class StructGenerator : BaseGenerator
     {
-        public void Init(string pathValue)
+        private string structRootName;
+        private string structFileName;
+        
+        public void Init(string readExcelPath)
         {
             InitType(Type.Struct);
-            SetFileNameWithoutExtension($"Data{Path.GetFileNameWithoutExtension(pathValue)}");
-            SetFolderPath(PathDefine.DataStruct);
+
+            structRootName = $"Data{Path.GetFileNameWithoutExtension(readExcelPath)}";
+            structFileName = structRootName + ".cs";
+            folderPath = PathDefine.DataStruct;
         }
 
         public void Generate(DataTable sheet)
@@ -34,7 +39,7 @@ namespace Tools
 
             StringBuilder sb = new();
 
-            sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: FileNameWithoutExtension));
+            sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: structRootName));
 
             for (int i = 0; i < columnNames.Count; i++)
             {
@@ -55,7 +60,15 @@ namespace Tools
 
             sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
 
-            OnEndGenerate(SavePath, sb.ToString());
+            OnEndGenerate(folderPath, structFileName, sb.ToString());
+        }
+
+        private string GetAccessModifier(string name)
+        {
+            if (name.Contains("Id") || name.Contains("NameId") || name.Contains("id") || name.Contains("nameid"))
+                return "private";
+
+            return "public";
         }
     }
 }

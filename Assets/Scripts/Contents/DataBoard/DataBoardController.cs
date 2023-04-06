@@ -2,17 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataBoardController : MonoBehaviour
+public class DataBoardController
 {
-    // Start is called before the first frame update
-    void Start()
+    private string PrefabName => typeof(DataBoardController).Name.Replace("Controller", "View");
+
+    private readonly DataBoardView View;
+
+    private DataBoardViewModel Model;
+
+    public DataBoardController(DataBoardViewModel model)
     {
-        
+        Model = model;
+        View = new(Model);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Init()
     {
-        
+        Logger.Log(View.Model.GetType().Name);
     }
 }

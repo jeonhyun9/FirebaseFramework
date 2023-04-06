@@ -112,7 +112,7 @@ public class DataUploader : MonoBehaviour
 
         yield return FireBaseUploadTask(localPath, storagePath);
 
-        Logger.Success($"Upload Current Version {fireBaseDef.Version}");
+        Logger.Success($"Upload Current Version : {fireBaseDef.Version}");
     }
 
     //storagePath는 Path.Combine 사용하면 안됨

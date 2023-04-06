@@ -6,6 +6,7 @@ namespace Tools
 {
     public class JsonListGenerator : BaseGenerator
     {
+        private string JsonListName => Path.GetFileName(PathDefine.JsonListText);
         public JsonListGenerator()
         {
             InitType(Type.JsonList);
@@ -13,8 +14,6 @@ namespace Tools
 
         public void Generate(string jsonFolderPathValue)
         {
-            SetFolderPath(jsonFolderPathValue);
-
             string[] jsonFiles = Directory.GetFiles(jsonFolderPathValue, $"*.json").Select(Path.GetFileName).ToArray();
             string jsonListDesc;
 
@@ -26,7 +25,7 @@ namespace Tools
 
             jsonListDesc = string.Join(",", jsonFiles);
 
-            OnEndGenerate(SavePath, jsonListDesc);
+            OnEndGenerate(jsonFolderPathValue, JsonListName, jsonListDesc);
         }
     }
 }

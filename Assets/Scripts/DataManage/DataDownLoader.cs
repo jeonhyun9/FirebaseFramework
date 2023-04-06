@@ -3,6 +3,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using System;
 
 public class DataDownLoader : MonoBehaviour
 {
@@ -26,10 +27,10 @@ public class DataDownLoader : MonoBehaviour
     private void Awake()
     {
         //Å×½ºÆ®
-        LoadData().Forget();
+        LoadData(()=> { ShowTestLog(); }).Forget();
     }
 
-    private async UniTask<bool> LoadData()
+    private async UniTask<bool> LoadData(Action sucessCallback)
     {
         bool loadDataResult;
 
@@ -38,14 +39,14 @@ public class DataDownLoader : MonoBehaviour
             case LoadDataType.FireBase:
                 loadDataResult = await LoadDataFromFireBase(bucketName);
                 break;
-
+            case LoadDataType.LocalPath:
             default:
                 loadDataResult = LoadDataFromLocalPath(localJsonDataPath);
                 break;
         }
 
-        if (loadDataResult)
-            ShowTestLog();
+        if (loadDataResult && sucessCallback != null)
+            sucessCallback.Invoke();
 
         return loadDataResult;
     }

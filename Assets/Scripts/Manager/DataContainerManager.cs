@@ -8,27 +8,27 @@ public class DataContainerManager : BaseManager<DataContainerManager>
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
     {
-        return containerDic.ContainsKey(typeof(T)) ? (DataContainer<T>)containerDic[typeof(T)] : default;
+        return containerDic.ContainsKey(typeof(T)) ? (DataContainer<T>)containerDic[typeof(T)] : null;
     }
 
     public T GetDataById<T>(int id) where T : IBaseData
     {
-        return GetDataContainer<T>() != default ? GetDataContainer<T>().GetById(id) : default;
+        return GetDataContainer<T>() != null ? GetDataContainer<T>().GetById(id) : default;
     }
 
     public T GetDataByNameId<T>(string nameId) where T : IBaseData
     {
-        return GetDataContainer<T>() != default ? GetDataContainer<T>().GetByNameId(nameId) : default;
+        return GetDataContainer<T>() != null ? GetDataContainer<T>().GetByNameId(nameId) : default;
     }
 
     public T FindData<T>(Predicate<T> predicate) where T : IBaseData
     {
-        return GetDataContainer<T>() != default ? GetDataContainer<T>().Find(predicate) : default;
+        return GetDataContainer<T>() != null ? GetDataContainer<T>().Find(predicate) : default;
     }
 
     public T[] FindAllData<T>(Predicate<T> predicate) where T : IBaseData
     {
-        return GetDataContainer<T>() != default ? GetDataContainer<T>().FindAll(predicate) : default;
+        return GetDataContainer<T>() != null ? GetDataContainer<T>().FindAll(predicate) : default;
     }
 
     public bool AddDataContainer<T>(string json) where T : IBaseData
