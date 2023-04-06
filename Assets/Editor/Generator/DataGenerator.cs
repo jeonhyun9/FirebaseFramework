@@ -1,11 +1,9 @@
 #if UNITY_EDITOR
 using System;
 using System.IO;
-using UnityEngine;
 using UnityEditor;
 using ExcelDataReader;
 using System.Data;
-using System.Text;
 using System.Linq;
 
 namespace Tools
@@ -143,7 +141,7 @@ namespace Tools
 
         private static void GenerateVersion()
         {
-            EditorUtility.DisplayProgressBar("Finishing", $"Version.txt ¿€º∫¡ﬂ..", progress);
+            EditorUtility.DisplayProgressBar("Finishing", $"Writing Version.txt..", progress);
 
             VersionTextGenerator versionTextGenerator = new ();
             versionTextGenerator.Generate(jsonFolderPath, version.ToString());
