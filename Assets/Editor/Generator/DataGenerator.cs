@@ -49,21 +49,21 @@ namespace Tools
 
             try
             {
-                if (GeneratedDataFromExcelFilePaths(excelFiles))
-                {
-                    GenerateContainerManager();
-                    GenerateJsonList();
-                    GenerateVersion();
-                }
+                GeneratedDataFromExcelFilePaths(excelFiles);
+                GenerateContainerManager();
+                GenerateJsonList();
+                GenerateVersion();
             }
             catch (Exception e)
             {
                 Logger.Error("Error occured while generated data.");
                 Logger.Exception(e);
             }
-            
-            EditorUtility.ClearProgressBar();
-            AssetDatabase.Refresh();
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+                AssetDatabase.Refresh();
+            }
         }
 
         private static void Initialize(string folderPathValue, string jsonPathValue, int versionValue)
@@ -82,11 +82,9 @@ namespace Tools
             for (int i = 0; i < excelFiles.Length; i++)
             {
                 string excelPath = excelFiles[i];
+
                 EditorUtility.DisplayProgressBar(excelFolderPath, $"Converting {excelPath}..", progress);
-
-                if (!GenerateDataFromExcelPath(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))
-                    return false;
-
+                GenerateDataFromExcelPath(excelPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
                 progress += 1f / excelFiles.Length;
             }
             Logger.Log("----------------Check Excel End------------------");
@@ -96,28 +94,20 @@ namespace Tools
 
         private static bool GenerateDataFromExcelPath(string readExcelPath)
         {
-            try
+            using (FileStream fileStream = File.Open(readExcelPath, FileMode.Open, FileAccess.Read))
+            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
             {
-                using (FileStream fileStream = File.Open(readExcelPath, FileMode.Open, FileAccess.Read))
-                using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream))
-                {
-                    var dataSet = excelReader.AsDataSet();
+                var dataSet = excelReader.AsDataSet();
 
-                    //시트는 하나만 사용할 것
-                    DataTable sheet = dataSet.Tables[0];
+                //시트는 하나만 사용할 것
+                DataTable sheet = dataSet.Tables[0];
 
-                    string excelFileName = Path.GetFileName(readExcelPath);
+                string excelFileName = Path.GetFileName(readExcelPath);
 
-                    GenerateStructFromExcelSheet(readExcelPath, sheet);
-                    GenerateJsonFromExcelSheet(readExcelPath, sheet);
+                GenerateStructFromExcelSheet(readExcelPath, sheet);
+                GenerateJsonFromExcelSheet(readExcelPath, sheet);
 
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Exception(e);
-                return false;
+                return true;
             }
         }
 
