@@ -8,7 +8,7 @@ public class DataContainerManager : BaseManager<DataContainerManager>
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
     {
-        return containerDic.ContainsKey(typeof(T)) ? (DataContainer<T>)containerDic[typeof(T)] : default;
+        return containerDic.ContainsKey(typeof(T)) ? (DataContainer<T>)containerDic[typeof(T)] : null;
     }
 
     public T GetDataById<T>(int id) where T : IBaseData
