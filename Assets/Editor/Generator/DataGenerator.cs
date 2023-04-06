@@ -47,15 +47,19 @@ namespace Tools
                 return;
             }
 
-            if (GeneratedDataFromExcelFilePaths(excelFiles))
+            try
             {
-                GenerateContainerManager();
-                GenerateJsonList();
-                GenerateVersion();
+                if (GeneratedDataFromExcelFilePaths(excelFiles))
+                {
+                    GenerateContainerManager();
+                    GenerateJsonList();
+                    GenerateVersion();
+                }
             }
-            else
+            catch (Exception e)
             {
                 Logger.Error("Error occured while generated data.");
+                Logger.Exception(e);
             }
             
             EditorUtility.ClearProgressBar();
@@ -133,8 +137,8 @@ namespace Tools
         {
             EditorUtility.DisplayProgressBar(PathDefine.Manager, $"Writing DataContainerManager.cs..", progress);
 
-            string[] dataNames = Directory.GetFiles(jsonFolderPath, $"*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
-
+            string[] dataNames = Directory.GetFiles(jsonFolderPath, "*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
+            
             ContainerManagerGenerator containerManagerGenerator = new();
             containerManagerGenerator.Generate(dataNames);
         }

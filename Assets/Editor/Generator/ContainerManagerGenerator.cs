@@ -8,9 +8,11 @@ namespace Tools
 {
     public class ContainerManagerGenerator : BaseGenerator
     {
+        private string ContainerManagerName => Path.GetFileName(PathDefine.DataContainerManager);
         public ContainerManagerGenerator()
         {
             InitType(Type.ContainerManager);
+            folderPath = PathDefine.Manager;
         }
         
         public void Generate(string[] dataTypeList)
@@ -22,7 +24,7 @@ namespace Tools
 
             string containerManager = GetDataTemplate(PathDefine.DataContainerManagerTemplate, type: types);
 
-            OnEndGenerate(SavePath, containerManager);
+            OnEndGenerate(folderPath, ContainerManagerName, containerManager);
         }
     }
 }

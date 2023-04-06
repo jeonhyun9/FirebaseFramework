@@ -10,11 +10,12 @@ namespace Tools
 {
     public class JsonGenerator : BaseGenerator
     {
-        public void Init(string pathValue, string jsonSavePathValue)
+        private string jsonFileName;
+        public void Init(string readExcelPath, string jsonSavePathValue)
         {
             InitType(Type.Json);
-            SetFolderPath(jsonSavePathValue);
-            SetFileNameWithoutExtension(pathValue);
+            folderPath = jsonSavePathValue;
+            jsonFileName = Path.GetFileNameWithoutExtension(readExcelPath) + ".json";
         }
 
         public void Generate(DataTable sheet)
@@ -57,7 +58,7 @@ namespace Tools
 
             string newJson = JsonConvert.SerializeObject(dataDicList);
 
-            OnEndGenerate(SavePath, newJson);
+            OnEndGenerate(folderPath, jsonFileName, newJson);
         }
 
         private System.Type GetDataType(string columnType)
