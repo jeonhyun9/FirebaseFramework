@@ -49,7 +49,7 @@ namespace Tools
 
             try
             {
-                GeneratedDataFromExcelFilePaths(excelFiles);
+                GenerateDataFromExcelFilePaths(excelFiles);
                 GenerateContainerManager();
                 GenerateJsonList();
                 GenerateVersion();
@@ -76,7 +76,7 @@ namespace Tools
         }
 
         /// <summary> 엑셀파일이 열려있으면 에러 발생 </summary>
-        public static bool GeneratedDataFromExcelFilePaths(string[] excelFiles)
+        public static bool GenerateDataFromExcelFilePaths(string[] excelFiles)
         {
             Logger.Log("----------------Check Excel Start-----------------");
             for (int i = 0; i < excelFiles.Length; i++)
@@ -135,7 +135,7 @@ namespace Tools
 
         private static void GenerateJsonList()
         {
-            EditorUtility.DisplayProgressBar("Finisihing", $"Writing JsonList.txt..", progress);
+            EditorUtility.DisplayProgressBar("Finishing", $"Writing JsonList.txt..", progress);
 
             JsonListGenerator jsonListGenerator = new ();
             jsonListGenerator.Generate(jsonFolderPath);
@@ -143,7 +143,7 @@ namespace Tools
 
         private static void GenerateVersion()
         {
-            EditorUtility.DisplayProgressBar("Finisihing", $"Version.txt 작성중..", progress);
+            EditorUtility.DisplayProgressBar("Finishing", $"Version.txt 작성중..", progress);
 
             VersionTextGenerator versionTextGenerator = new ();
             versionTextGenerator.Generate(jsonFolderPath, version.ToString());
