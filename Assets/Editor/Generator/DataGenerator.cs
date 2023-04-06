@@ -74,7 +74,7 @@ namespace Tools
         }
 
         /// <summary> 엑셀파일이 열려있으면 에러 발생 </summary>
-        public static bool GenerateDataFromExcelFilePaths(string[] excelFiles)
+        public static void GenerateDataFromExcelFilePaths(string[] excelFiles)
         {
             Logger.Log("----------------Check Excel Start-----------------");
             for (int i = 0; i < excelFiles.Length; i++)
@@ -86,8 +86,6 @@ namespace Tools
                 progress += 1f / excelFiles.Length;
             }
             Logger.Log("----------------Check Excel End------------------");
-
-            return true;
         }
 
         private static bool GenerateDataFromExcelPath(string readExcelPath)
