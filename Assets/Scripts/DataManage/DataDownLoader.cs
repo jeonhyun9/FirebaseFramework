@@ -27,7 +27,7 @@ public class DataDownLoader : MonoBehaviour
     private void Awake()
     {
         //Å×½ºÆ®
-        LoadData(()=> { ShowTestLog(); }).Forget();
+        LoadData(() => { ShowTestLog(); }).Forget();
     }
 
     private async UniTask<bool> LoadData(Action sucessCallback)
@@ -57,7 +57,7 @@ public class DataDownLoader : MonoBehaviour
 
         Dictionary<string, string> jsonDicByFileName = await fireBaseDataDownloader.LoadDataDicFromFireBase();
 
-        if (jsonDicByFileName == null)
+        if (jsonDicByFileName == null || jsonDicByFileName.Count == 0)
             return false;
 
         foreach(string fileName in jsonDicByFileName.Keys)
@@ -81,6 +81,9 @@ public class DataDownLoader : MonoBehaviour
         string[] localJsonFileNames = Directory.GetFiles(jsonPath, $"*.json")
             .Select(Path.GetFileName)
             .ToArray();
+
+        if (!localJsonFileNames.IsValidArray())
+            return false;
 
         foreach (string fileName in localJsonFileNames)
         {

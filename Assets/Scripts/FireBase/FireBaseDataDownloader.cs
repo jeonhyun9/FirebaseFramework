@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using System.Security.Cryptography;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class FireBaseDataDownloader
 {
@@ -18,6 +19,8 @@ public class FireBaseDataDownloader
     public string Version => fireBaseDef.Version;
 
     private string JsonSavePath => Application.persistentDataPath;
+
+    private readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
 
     public FireBaseDataDownloader(string bucketName)
     {
@@ -34,32 +37,40 @@ public class FireBaseDataDownloader
         
         string[] jsonList = await LoadJsonList(fireBaseDef.JsonListPath);
 
-        if (jsonList.Length == 0)
+        if (!jsonList.IsValidArray())
+        {
+            Logger.Error("jsonList is null or empty");
             return null;
+        }
 
-        foreach (string jsonName in jsonList)
+        UniTask[] tasks = jsonList.Select(async jsonName =>
         {
             string fileName = Path.GetFileName(jsonName);
             string localPath = Path.Combine(JsonSavePath, fileName);
 
             StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
 
-            byte[] jsonData = await LoadBytes(jsonDataRef);
+            byte[] loadedBytes = await LoadBytes(jsonDataRef);
 
             //불러온 데이터 예외처리
-            if (!IsValidByteArray(jsonData))
-                continue;
+            if (loadedBytes.IsValidArray())
+            {
+                string loadedString = loadedBytes.GetStringUTF8();
 
-            byte[] localJsonData = await LoadLocalBytes(localPath);
+                if (!string.IsNullOrEmpty(loadedString))
+                {
+                    // 컨테이너에 담길 데이터 추가
+                    dicJsonByFileName.Add(fileName, loadedString);
+                    Logger.Success($"Load Json From FireBase : {fileName}");
+                }
+            }
+            else
+            {
+                Logger.Error($"Invalid load json {fileName}");
+            }
+        }).ToArray();
 
-            //로컬 데이터와 무결성 검사하고, 다르면 불러온 데이터로 덮어씌움
-            if (!IntegrityCheck(localJsonData, jsonData))
-                await SaveDataToLocalPath(localPath, jsonData);
-            
-            //컨테이너에 담길 데이터 추가
-            dicJsonByFileName.Add(fileName, Encoding.UTF8.GetString(jsonData));
-            Logger.Success($"Load Json From FireBase : {fileName}");
-        }
+        await UniTask.WhenAll(tasks);
 
         if (storage?.App != null)
             storage.App.Dispose();
@@ -91,9 +102,9 @@ public class FireBaseDataDownloader
         try
         {
             byte[] jsonListBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            jsonListArray = Encoding.UTF8.GetString(jsonListBytes).Split(",");
+            jsonListArray = jsonListBytes.GetStringUTF8()?.Split(",");
 
-            if (jsonListArray.Length == 0)
+            if (!jsonListArray.IsValidArray())
             {
                 Logger.Error($"Failed to load file : {storageRef.Name}");
                 return null;
@@ -101,8 +112,7 @@ public class FireBaseDataDownloader
         }
         catch (System.Exception e)
         {
-            Logger.Error($"Failed to load file : {storageRef.Name}");
-            Logger.Exception(e);
+            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
             return null;
         }
 
@@ -115,7 +125,7 @@ public class FireBaseDataDownloader
         try
         {
             byte[] loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            stringValue = Encoding.UTF8.GetString(loadedBytes);
+            stringValue = loadedBytes.GetStringUTF8();
 
             if (string.IsNullOrEmpty(stringValue))
             {
@@ -125,8 +135,7 @@ public class FireBaseDataDownloader
         }
         catch (System.Exception e)
         {
-            Logger.Error($"Failed to load file : {storageRef.Name}");
-            Logger.Exception(e);
+            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
             return null;
         }
 
@@ -141,7 +150,7 @@ public class FireBaseDataDownloader
         {
             loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
 
-            if (loadedBytes.Length == 0)
+            if (!loadedBytes.IsValidArray())
             {
                 Logger.Error($"Failed to load file : {storageRef.Name}");
                 return null;
@@ -149,53 +158,10 @@ public class FireBaseDataDownloader
         }
         catch (System.Exception e)
         {
-            Logger.Error($"Failed to load file : {storageRef.Name}");
-            Logger.Exception(e);
+            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
             return null;
         }
 
         return loadedBytes;
-    }
-
-    private async UniTask<byte[]> LoadLocalBytes(string localPath)
-    {
-        if (File.Exists(localPath))
-        {
-            byte[] localBytes = await UniTask.RunOnThreadPool(() => File.ReadAllBytes(localPath));
-            return localBytes;
-        }
-        return null;
-    }
-
-    private async UniTask<bool> SaveDataToLocalPath(string localPath, byte[] loadedBytes)
-    {
-        try
-        {
-            await UniTask.RunOnThreadPool(() => File.WriteAllBytes(localPath, loadedBytes));
-        }
-        catch (System.Exception e)
-        {
-            Logger.Error($"Failed to save file : {localPath}");
-            Logger.Exception(e);
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool IntegrityCheck(byte[] localBytes, byte[] loadedBytes)
-    {
-        return MD5.Create().ComputeHash(localBytes).SequenceEqual(MD5.Create().ComputeHash(loadedBytes));
-    }
-
-    private bool IsValidByteArray(byte[] bytes)
-    {
-        if (bytes == null)
-            return false;
-
-        if (bytes.Length == 0)
-            return false;
-
-        return true;
     }
 }

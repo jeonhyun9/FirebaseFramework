@@ -18,8 +18,9 @@ public static class Logger
         Debug.Log($"<color=yellow>[Warning] {message}</color>");
     }
 
-    public static void Exception(System.Exception e)
+    public static void Exception(string message, System.Exception e)
     {
+        Error(message);
         Debug.LogError($"[Exception] {e}");
     }
 

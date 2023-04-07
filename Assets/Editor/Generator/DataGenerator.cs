@@ -54,8 +54,7 @@ namespace Tools
             }
             catch (Exception e)
             {
-                Logger.Error("Error occured while generate data.");
-                Logger.Exception(e);
+                Logger.Exception("Error occured while generate data.", e);
             }
             finally
             {
