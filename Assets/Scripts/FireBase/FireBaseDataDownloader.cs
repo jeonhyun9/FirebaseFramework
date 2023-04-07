@@ -1,13 +1,9 @@
 using Cysharp.Threading.Tasks;
 using Firebase.Storage;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using UnityEngine;
-using System.Security.Cryptography;
-using System.Runtime.Serialization.Formatters.Binary;
 
 public class FireBaseDataDownloader
 {
@@ -19,8 +15,6 @@ public class FireBaseDataDownloader
     public string Version => fireBaseDef.Version;
 
     private string JsonSavePath => Application.persistentDataPath;
-
-    private readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
 
     public FireBaseDataDownloader(string bucketName)
     {
