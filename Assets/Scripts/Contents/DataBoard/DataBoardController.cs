@@ -16,7 +16,7 @@ public class DataBoardController : MonoBehaviour
         Model = new();
     }
 
-    public void AddModelList<T>(T[] datas) where T : IBaseData
+    public void SetModelList<T>(T[] datas) where T : IBaseData
     {
         List<DataUnitModel> dataUnitModelList = new (datas.Length);
 

@@ -7,15 +7,44 @@ using UnityEngine;
 
 public class FireBaseDataDownloader
 {
-    private readonly Dictionary<string, string> dicJsonByFileName = new ();
+    public enum State
+    {
+        LoadVersion,
+        LoadJsonList,
+        LoadJson,
+        Done,
+        Fail,
+    }
 
-    private FireBaseDefine fireBaseDef;
-    private readonly FirebaseStorage storage;
+    public string ProgressString
+    {
+        get
+        {
+            switch (currentState)
+            {
+                case State.LoadVersion:
+                    return "Loading version...";
+                case State.LoadJsonList:
+                    return "Loading JsonList...";
+                case State.LoadJson:
+                    return $"Loading {currentLoadingJsonName}";
+                case State.Done:
+                    return $"Done!";
+                default:
+                    return null;
+            }
+        }
+    }
 
     public string Version => fireBaseDef.Version;
+    public string JsonSavePath => Application.persistentDataPath;
 
-    private string JsonSavePath => Application.persistentDataPath;
-
+    private readonly Dictionary<string, string> dicJsonByFileName = new ();
+    private FireBaseDefine fireBaseDef;
+    private readonly FirebaseStorage storage;
+    private State currentState;
+    private string currentLoadingJsonName;
+    
     public FireBaseDataDownloader(string bucketName)
     {
         fireBaseDef = new FireBaseDefine(bucketName);
@@ -37,32 +66,7 @@ public class FireBaseDataDownloader
             return null;
         }
 
-        UniTask[] tasks = jsonList.Select(async jsonName =>
-        {
-            string fileName = Path.GetFileName(jsonName);
-            string localPath = Path.Combine(JsonSavePath, fileName);
-
-            StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
-
-            byte[] loadedBytes = await LoadBytes(jsonDataRef);
-
-            //불러온 데이터 예외처리
-            if (loadedBytes.IsValidArray())
-            {
-                string loadedString = loadedBytes.GetStringUTF8();
-
-                if (!string.IsNullOrEmpty(loadedString))
-                {
-                    // 컨테이너에 담길 데이터 추가
-                    dicJsonByFileName.Add(fileName, loadedString);
-                    Logger.Success($"Load Json From FireBase : {fileName}");
-                }
-            }
-            else
-            {
-                Logger.Error($"Invalid load json {fileName}");
-            }
-        }).ToArray();
+        UniTask[] tasks = jsonList.Select(json => AddJsonToDic(json)).ToArray();
 
         await UniTask.WhenAll(tasks);
 
@@ -74,6 +78,8 @@ public class FireBaseDataDownloader
 
     private async UniTask<bool> LoadFireBaseDefVersion()
     {
+        ChangeState(State.LoadVersion);
+
         StorageReference versionRef = storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
 
         string currentVersion = await LoadString(versionRef);
@@ -89,6 +95,8 @@ public class FireBaseDataDownloader
 
     private async UniTask<string[]> LoadJsonList(string refPath)
     {
+        ChangeState(State.LoadJsonList);
+
         StorageReference storageRef = storage.RootReference.Child(refPath);
 
         string[] jsonListArray;
@@ -112,6 +120,7 @@ public class FireBaseDataDownloader
 
         return jsonListArray;
     }
+
     private async UniTask<string> LoadString(StorageReference storageRef)
     {
         string stringValue;
@@ -157,5 +166,39 @@ public class FireBaseDataDownloader
         }
 
         return loadedBytes;
+    }
+
+    private async UniTask AddJsonToDic(string jsonName)
+    {
+        currentLoadingJsonName = jsonName;
+        ChangeState(State.LoadJson);
+
+        string fileName = Path.GetFileName(jsonName);
+
+        StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
+
+        byte[] loadedBytes = await LoadBytes(jsonDataRef);
+
+        //불러온 데이터 예외처리
+        if (loadedBytes.IsValidArray())
+        {
+            string loadedString = loadedBytes.GetStringUTF8();
+
+            if (!string.IsNullOrEmpty(loadedString))
+            {
+                // 컨테이너에 담길 데이터 추가
+                dicJsonByFileName.Add(fileName, loadedString);
+                Logger.Success($"Load Json From FireBase : {fileName}");
+            }
+        }
+        else
+        {
+            Logger.Error($"Invalid load json {fileName}");
+        }
+    }
+
+    private void ChangeState(State state)
+    {
+        currentState = state;
     }
 }

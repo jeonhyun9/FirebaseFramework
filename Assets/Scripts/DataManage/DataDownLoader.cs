@@ -24,13 +24,9 @@ public class DataDownLoader : MonoBehaviour
     [SerializeField]
     private string bucketName = "jhgunity";
 
-    private void Awake()
-    {
-        //테스트
-        LoadData(() => { ShowTestLog(); }).Forget();
-    }
+    public FireBaseDataDownloader FireBaseDataDownloader { get; private set; }
 
-    private async UniTask<bool> LoadData(Action sucessCallback)
+    public async UniTask<bool> LoadData(Action sucessCallback)
     {
         bool loadDataResult;
 
@@ -53,9 +49,9 @@ public class DataDownLoader : MonoBehaviour
 
     private async UniTask<bool> LoadDataFromFireBase(string bucketNameValue)
     {
-        FireBaseDataDownloader fireBaseDataDownloader = new(bucketNameValue);
+        FireBaseDataDownloader = new(bucketNameValue);
 
-        Dictionary<string, string> jsonDicByFileName = await fireBaseDataDownloader.LoadDataDicFromFireBase();
+        Dictionary<string, string> jsonDicByFileName = await FireBaseDataDownloader.LoadDataDicFromFireBase();
 
         if (jsonDicByFileName == null || jsonDicByFileName.Count == 0)
             return false;
@@ -68,7 +64,7 @@ public class DataDownLoader : MonoBehaviour
                 return false;
         }
 
-        Logger.Success($"Load Data Version : {fireBaseDataDownloader.Version}");
+        Logger.Success($"Load Data Version : {FireBaseDataDownloader.Version}");
 
         return true;
     }
@@ -103,21 +99,5 @@ public class DataDownLoader : MonoBehaviour
         fileName = Path.GetFileNameWithoutExtension(fileName);
 
         return DataContainerManager.Instance.AddDataContainer(fileName, json);
-    }
-
-    //테스트
-    private void ShowTestLog()
-    {
-        DataHuman human = DataContainerManager.Instance.GetDataById<DataHuman>(1);
-        Logger.Log($"Id가 1인 DataHuman : {human.NameId}");
-        
-        DataHuman winter = DataContainerManager.Instance.GetDataById<DataHuman>(2);
-        Logger.Log($"Id가 2인 DataHuman {human.NameId}의 펫 : {winter.Pet.NameId}");
-        
-        DataAnimal animal = DataContainerManager.Instance.GetDataById<DataAnimal>(3);
-        Logger.Log($"Id가 3인 DataAnimal : {animal.NameId}");
-        
-        DataAnimal Lion = DataContainerManager.Instance.FindData<DataAnimal>(x => x.AnimalType == AnimalType.Lion);
-        Logger.Log($"AnimalType이 Lion인 DataAnimal {animal.NameId}");
     }
 }

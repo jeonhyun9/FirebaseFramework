@@ -1,3 +1,9 @@
+public enum SceneType
+{
+    Loading,
+    Main,
+}
+
 public enum AnimalType
 {
     Lion,
