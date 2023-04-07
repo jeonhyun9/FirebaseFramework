@@ -14,5 +14,5 @@ public struct DataAnimal : IBaseData
 	
 	public int Id => id;
     public string NameId => nameId;
-    public bool IsInit => id == 0;
+    public bool IsInit => id != 0 && !string.IsNullOrEmpty(nameId);
 }

@@ -1,6 +1,6 @@
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
+using System;
 
 public static class ExtensionUtils
 {
@@ -14,7 +14,9 @@ public static class ExtensionUtils
         if (!bytes.IsValidArray() || !compareBytes.IsValidArray())
             return false;
 
-        return MD5.Create().ComputeHash(bytes).SequenceEqual(MD5.Create().ComputeHash(compareBytes));
+        return System.Security.Cryptography.MD5.Create().ComputeHash(bytes)
+            .SequenceEqual(System.Security.Cryptography
+            .MD5.Create().ComputeHash(compareBytes));
     }
 
     public static string GetStringUTF8(this byte[] bytes)
@@ -26,10 +28,24 @@ public static class ExtensionUtils
 
             return Encoding.UTF8.GetString(bytes);
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Logger.Exception("Failed to UTF8 Encoding", e);
             return null;
         }
+    }
+
+    public static void SafeSetText(this TMPro.TextMeshProUGUI text, string value)
+    {
+        if (text != null)
+            text.text = value;
+    }
+
+    public static void SafeSetActive(this UnityEngine.GameObject gameObject, bool active)
+    {
+        if (gameObject == null || gameObject.activeSelf == active)
+            return;
+
+        gameObject.SetActive(active);
     }
 }

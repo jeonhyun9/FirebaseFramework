@@ -2,22 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataBoardController
+public class DataBoardController : MonoBehaviour
 {
     private string PrefabName => typeof(DataBoardController).Name.Replace("Controller", "View");
 
-    private readonly DataBoardView View;
+    [SerializeField]
+    private DataBoardView View;
 
-    private DataBoardViewModel Model;
+    protected DataBoardViewModel Model { get; private set; }
 
-    public DataBoardController(DataBoardViewModel model)
+    private void Awake()
     {
-        Model = model;
-        View = new(Model);
+        Model = new();
     }
 
-    private void Init()
+    public void AddModelList<T>(T[] datas) where T : IBaseData
     {
-        Logger.Log(View.Model.GetType().Name);
+        List<DataUnitModel> dataUnitModelList = new (datas.Length);
+
+        foreach(T data in datas)
+        {
+            DataUnitModel model = new(data);
+            dataUnitModelList.Add(model);
+        }
+
+        Model.SetDataBoardUnitList(typeof(T), dataUnitModelList);
     }
 }

@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataUnitModel : MonoBehaviour
+public class DataUnitModel
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public IBaseData Data { get; private set; }
 
-    // Update is called once per frame
-    void Update()
+    public DataUnitModel(IBaseData data)
     {
-        
+        Data = data;
     }
 }
