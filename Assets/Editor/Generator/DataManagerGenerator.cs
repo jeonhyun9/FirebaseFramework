@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace Tools
 {
-    public class ContainerManagerGenerator : BaseGenerator
+    public class DataManagerGenerator : BaseGenerator
     {
-        private string ContainerManagerName => Path.GetFileName(PathDefine.DataContainerManager);
-        public ContainerManagerGenerator()
+        private string ContainerManagerName => Path.GetFileName(PathDefine.DataManager);
+        public DataManagerGenerator()
         {
             InitType(Type.ContainerManager);
             folderPath = PathDefine.Manager;
@@ -22,7 +22,7 @@ namespace Tools
             string types = string.Join(Environment.NewLine, dataTypeList.Select(dataType =>
                 GetDataTemplate(PathDefine.AddContainerTypeTemplate, name: dataType)));
 
-            string containerManager = GetDataTemplate(PathDefine.DataContainerManagerTemplate, type: types);
+            string containerManager = GetDataTemplate(PathDefine.DataManagerTemplate, type: types);
 
             OnEndGenerate(folderPath, ContainerManagerName, containerManager);
         }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LoadingScene : MonoBehaviour
+public class LoadingView : MonoBehaviour
 {
     private enum LoadDataType
     {
@@ -61,7 +61,7 @@ public class LoadingScene : MonoBehaviour
 
     private void MoveToMainScene()
     {
-        SceneManager.LoadScene((int)SceneType.Main, LoadSceneMode.Single);
+        //SceneManager.LoadScene((int)SceneType.Main, LoadSceneMode.Single);
     }
 
     private async UniTaskVoid ShowLoadProgress()

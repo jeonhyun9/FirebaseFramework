@@ -8,15 +8,22 @@ public class DataBoardView : MonoBehaviour
     [SerializeField]
     UIUnitList unitItemList;
 
-    public readonly DataBoardViewModel Model;
+    public DataBoardViewModel Model { get; private set; }
 
-    public DataBoardView(DataBoardViewModel model)
+    public void Initialize(DataBoardViewModel model)
     {
         Model = model;
+        CreateUIUnitList();
     }
 
-    public void ShowDataBoard()
+    public void CreateUIUnitList()
     {
-        unitItemList.AddUnits(Model.CurrentModelList.ToArray());
+        if (unitItemList != null)
+            unitItemList.AddUnits(Model.CurrentModelList.ToArray());
+    }
+
+    public void Show()
+    {
+        unitItemList.gameObject.SetActive(true);
     }
 }

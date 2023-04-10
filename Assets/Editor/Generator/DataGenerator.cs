@@ -124,7 +124,7 @@ namespace Tools
 
             string[] dataNames = Directory.GetFiles(jsonFolderPath, "*.json").Select(x => $"Data{Path.GetFileNameWithoutExtension(x)}").ToArray();
             
-            ContainerManagerGenerator containerManagerGenerator = new();
+            DataManagerGenerator containerManagerGenerator = new();
             containerManagerGenerator.Generate(dataNames);
         }
 

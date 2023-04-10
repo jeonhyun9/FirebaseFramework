@@ -17,10 +17,10 @@ public struct DataHuman : IBaseData
     {
         get
         {
-		    if (DataContainerManager.Instance.GetDataContainer<DataAnimal>() == null)
+		    if (DataManager.Instance.GetDataContainer<DataAnimal>() == null)
                 return default;
 				
-            return DataContainerManager.Instance.GetDataByNameId<DataAnimal>(PetNameId);
+            return DataManager.Instance.GetDataByNameId<DataAnimal>(PetNameId);
         }
     }
 	

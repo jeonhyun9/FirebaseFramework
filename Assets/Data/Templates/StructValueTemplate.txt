@@ -4,9 +4,9 @@
     {
         get
         {
-		    if (DataContainerManager.Instance.GetDataContainer<#type#>() == null)
+		    if (DataManager.Instance.GetDataContainer<#type#>() == null)
                 return default;
 				
-            return DataContainerManager.Instance.GetDataByNameId<#type#>(#name#NameId);
+            return DataManager.Instance.GetDataByNameId<#type#>(#name#NameId);
         }
     }

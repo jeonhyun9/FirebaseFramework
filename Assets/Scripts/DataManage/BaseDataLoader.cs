@@ -58,7 +58,7 @@ public abstract class BaseDataLoader
     {
         fileName = Path.GetFileNameWithoutExtension(fileName);
 
-        return DataContainerManager.Instance.AddDataContainer(fileName, json);
+        return DataManager.Instance.AddDataContainer(fileName, json);
     }
 
     protected void ChangeState(State state)

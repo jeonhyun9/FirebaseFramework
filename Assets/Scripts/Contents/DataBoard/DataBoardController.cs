@@ -1,35 +1,36 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DataBoardController : MonoBehaviour
+public class DataBoardController
 {
-    private string PrefabName => typeof(DataBoardController).Name.Replace("Controller", "View");
+    private string PrefabName => "Prefab/UI/DataBoard/DataBoardView";
 
-    [SerializeField]
     private DataBoardView View;
 
     protected DataBoardViewModel Model { get; private set; }
 
-    private void Awake()
+    public async UniTask Initialize(Type[] useTypes)
     {
-        Model = new();
+        Model = new(useTypes);
         Model.SetOnClickType(OnClickType);
-    }
 
-    public void SetModelList<T>(IBaseData[] datas) where T : IBaseData
-    {
-        List<DataUnitModel<IBaseData>> dataUnitModelList = new(datas.Length);
-
-        foreach (IBaseData data in datas)
+        if (View == null)
         {
-            DataUnitModel<IBaseData> model = new(data);
-            dataUnitModelList.Add(model);
-        }
+            GameObject prefab = (GameObject)await Resources.LoadAsync<GameObject>(PrefabName);
 
-        Model.SetDataBoardUnitList(typeof(T), dataUnitModelList);
+            if (prefab == null)
+            {
+                Logger.Error("prefab is null");
+                return;
+            }
+
+            View = UnityEngine.Object.Instantiate(prefab).GetComponent<DataBoardView>();
+            View.Initialize(Model);
+        }
     }
 
     public void OnClickType(string value)
@@ -38,5 +39,10 @@ public class DataBoardController : MonoBehaviour
 
         if (type != null)
             Model.SetCurrentType(type);
+    }
+
+    public void Show()
+    {
+        View.Show();
     }
 }

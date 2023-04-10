@@ -22,9 +22,11 @@ public class UIUnitList : MonoBehaviour
     {
         for(int i = 0; i < datas.Length; i++)
         {
+            useCount++;
+
             GameObject go;
 
-            if (GetUnitCount() <= useCount - 1)
+            if (GetUnitCount() <= useCount)
             {
                 go = Instantiate(templateItem, scrollViewContentsTransform);
             }
@@ -34,11 +36,12 @@ public class UIUnitList : MonoBehaviour
             }
 
             if (go == null)
+            {
+                Logger.Null(go);
                 continue;
+            }
 
             SetUnitModel(go, datas[i]);
-
-            useCount++;
 
             unitList.Add(go);
         }

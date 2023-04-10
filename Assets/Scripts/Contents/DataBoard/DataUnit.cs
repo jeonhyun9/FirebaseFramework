@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class DataUnit<T> : BaseUnit<DataUnitModel<T>> where T : IBaseData
+public class DataUnit : BaseUnit<DataUnitModel<IBaseData>>
 {
     [SerializeField]
     TextMeshProUGUI labelId;
@@ -13,6 +13,6 @@ public class DataUnit<T> : BaseUnit<DataUnitModel<T>> where T : IBaseData
 
     public override void UpdateUI()
     {
-        //labelId.ga
+        gameObject.name = Model.Data.NameId;
     }
 }

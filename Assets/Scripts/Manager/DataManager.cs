@@ -2,9 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataContainerManager : BaseManager<DataContainerManager>
+public class DataManager : BaseManager<DataManager>
 {
     private readonly Dictionary<Type, object> containerDic = new();
+
+    public ICollection<Type> GetAllTypes()
+    {
+        return containerDic.Keys;
+    }
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
     {
@@ -29,6 +34,11 @@ public class DataContainerManager : BaseManager<DataContainerManager>
     public T[] FindAllData<T>(Predicate<T> predicate) where T : IBaseData
     {
         return GetDataContainer<T>() != null ? GetDataContainer<T>().FindAll(predicate) : default;
+    }
+
+    public T[] GetAllData<T>() where T : IBaseData
+    {
+        return GetDataContainer<T>() != null ? GetDataContainer<T>().FindAll(x => x.IsInit) : default;
     }
 
     public bool AddDataContainer<T>(string json) where T : IBaseData
