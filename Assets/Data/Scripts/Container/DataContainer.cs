@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class DataContainer<T> where T : IBaseData
 {
@@ -23,16 +22,7 @@ public class DataContainer<T> where T : IBaseData
         try
         {
             JArray jArray = JArray.Parse(json);
-            foreach (var jObj in jArray)
-            {
-                T data = JsonConvert.DeserializeObject<T>(jObj.ToString());
-
-                if (!TryAddData(data))
-                    return false;
-            }
-            datas = dicById.Values.ToArray();
-
-            return true;
+            return AddDatas(jArray);
         }
         catch (Exception e)
         {
@@ -68,6 +58,21 @@ public class DataContainer<T> where T : IBaseData
     public T[] FindAll(Predicate<T> predicate)
     {
         return Array.FindAll(datas, predicate);
+    }
+
+    private bool AddDatas(JArray array)
+    {
+        foreach (var jObj in array)
+        {
+            T data = JsonConvert.DeserializeObject<T>(jObj.ToString());
+
+            if (!TryAddData(data))
+                return false;
+        }
+
+        datas = dicById.Values.ToArray();
+
+        return true;
     }
 
     private bool TryAddData(T data)

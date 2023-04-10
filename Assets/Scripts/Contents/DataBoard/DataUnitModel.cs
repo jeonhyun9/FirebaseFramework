@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataUnitModel
+public class DataUnitModel<T> : IBaseUnitModel where T : IBaseData
 {
-    public IBaseData Data { get; private set; }
+    public readonly T Data;
 
-    public DataUnitModel(IBaseData data)
+    public DataUnitModel(T data)
     {
         Data = data;
     }

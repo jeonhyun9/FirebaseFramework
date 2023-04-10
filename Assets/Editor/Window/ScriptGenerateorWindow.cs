@@ -12,13 +12,14 @@ namespace Tools
         private const float height = 200f;
         private const float spacing = 5f;
 
-        [MenuItem("Tools/Generate Script")]
+        //[MenuItem("Tools/Generate Script")]
         public static void OpenDataUploaderWindow()
         {
             ScriptGenerateorWindow window = (ScriptGenerateorWindow)GetWindow(typeof(ScriptGenerateorWindow));
             window.InitializeWindow(window, width, height, spacing);
         }
 
+        //¹Ì±¸Çö
         protected override void InitializeParameters()
         {
             throw new System.NotImplementedException();

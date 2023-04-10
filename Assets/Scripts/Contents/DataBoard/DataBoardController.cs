@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataBoardController : MonoBehaviour
@@ -14,18 +16,27 @@ public class DataBoardController : MonoBehaviour
     private void Awake()
     {
         Model = new();
+        Model.SetOnClickType(OnClickType);
     }
 
-    public void SetModelList<T>(T[] datas) where T : IBaseData
+    public void SetModelList<T>(IBaseData[] datas) where T : IBaseData
     {
-        List<DataUnitModel> dataUnitModelList = new (datas.Length);
+        List<DataUnitModel<IBaseData>> dataUnitModelList = new(datas.Length);
 
-        foreach(T data in datas)
+        foreach (IBaseData data in datas)
         {
-            DataUnitModel model = new(data);
+            DataUnitModel<IBaseData> model = new(data);
             dataUnitModelList.Add(model);
         }
 
         Model.SetDataBoardUnitList(typeof(T), dataUnitModelList);
+    }
+
+    public void OnClickType(string value)
+    {
+        Type type = Type.GetType(value);
+
+        if (type != null)
+            Model.SetCurrentType(type);
     }
 }
