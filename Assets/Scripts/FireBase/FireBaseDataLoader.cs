@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Firebase;
 using Firebase.Storage;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         fireBaseDef = new FireBaseDefine(bucketName);
         storage = FirebaseStorage.GetInstance(fireBaseDef.AppSpot);
+        SetOnChangeState(CleanUpFireBase);
     }
 
     public async UniTaskVoid LoadData()
@@ -70,9 +72,6 @@ public class FireBaseDataLoader : BaseDataLoader
         UniTask[] tasks = jsonList.Select(json => AddJsonToDic(json, progressIncrementValue)).ToArray();
 
         await UniTask.WhenAll(tasks);
-
-        if (storage?.App != null)
-            storage.App.Dispose();
 
         return true;
     }
@@ -199,4 +198,22 @@ public class FireBaseDataLoader : BaseDataLoader
 
         return loadedBytes;
     }
+
+    private void CleanUpFireBase(State state)
+    {
+        if (state == State.Done || state == State.Fail)
+        {
+            if (storage.App != null)
+                storage.App.Dispose();
+
+            FirebaseApp.DefaultInstance.Dispose();
+
+            GameObject go = GameObject.Find("Firebase Services");
+
+            if (go != null)
+                UnityEngine.Object.Destroy(go);
+        }
+    }
+
+    
 }

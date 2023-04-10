@@ -41,11 +41,17 @@ public abstract class BaseDataLoader
 
     public State CurrentState { get; protected set; }
 
-    protected Action OnLoadData;
+    protected Action OnLoadData { get; private set; }
+    protected Action<State> OnChangeState;
 
     public void SetOnLoadData(Action action)
     {
         OnLoadData = action;
+    }
+
+    public void SetOnChangeState(Action<State> action)
+    {
+        OnChangeState = action;
     }
 
     protected bool AddDataContainerToManager(string fileName, string json)
@@ -58,5 +64,8 @@ public abstract class BaseDataLoader
     protected void ChangeState(State state)
     {
         CurrentState = state;
+
+        if (OnChangeState != null)
+            OnChangeState(state);
     }
 }
