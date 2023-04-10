@@ -13,6 +13,6 @@ public class DataUnit<T> : BaseUnit<DataUnitModel<T>> where T : IBaseData
 
     public override void UpdateUI()
     {
-        labelId.ga
+        //labelId.ga
     }
 }
