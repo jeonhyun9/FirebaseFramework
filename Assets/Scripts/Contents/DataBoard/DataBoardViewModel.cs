@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-public class DataBoardViewModel
+public class DataBoardViewModel : BaseViewModel
 {
     public List<Type> DataBoardTypeList { get; private set; } = new();   
     
@@ -16,7 +16,7 @@ public class DataBoardViewModel
 
     public Action<string> OnClickType { get; private set; }
 
-    public DataBoardViewModel(Type[] useTypes)
+    public void SetUseTypes(Type[] useTypes)
     {
         foreach (Type type in useTypes)
         {

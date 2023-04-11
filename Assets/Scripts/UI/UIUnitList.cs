@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,17 +19,17 @@ public class UIUnitList : MonoBehaviour
         useCount = 0;
     }
 
-    public void AddUnits<T>(T[] datas) where T : IBaseUnitModel
+    public async UniTask AddUnits<T>(T[] datas) where T : IBaseUnitModel
     {
         for(int i = 0; i < datas.Length; i++)
         {
             useCount++;
 
-            GameObject go;
+            GameObject go = null;
 
             if (GetUnitCount() <= useCount)
             {
-                go = Instantiate(templateItem, scrollViewContentsTransform);
+                await UniTask.RunOnThreadPool(() => { go =  Instantiate(templateItem, scrollViewContentsTransform); });
             }
             else
             {

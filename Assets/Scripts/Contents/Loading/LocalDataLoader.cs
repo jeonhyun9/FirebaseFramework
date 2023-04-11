@@ -5,21 +5,18 @@ using System.Linq;
 
 public class LocalDataLoader : BaseDataLoader
 {
-    private readonly string localJsonDataPath;
+    private string localJsonDataPath;
 
-    public LocalDataLoader(string localJsonDataPathValue)
+    public void SetLocalJsonDataPath(string localJsonDataPathValue)
     {
         localJsonDataPath = localJsonDataPathValue;
     }
 
-    public async UniTaskVoid LoadData()
+    public async override UniTaskVoid LoadData()
     {
         bool loadDataResult = await LoadDataFromLocalPath(localJsonDataPath);
 
-        if (loadDataResult && OnLoadData != null)
-            OnLoadData.Invoke();
-
-        ChangeState(State.Done);
+        ChangeState(loadDataResult ? State.Done : State.Fail);
     }
 
     private async UniTask<bool> LoadDataFromLocalPath(string jsonPath)
@@ -56,7 +53,7 @@ public class LocalDataLoader : BaseDataLoader
                 return false;
             }
 
-            bool addContainerResult = AddDataContainerToManager(fileName, localJson);
+            bool addContainerResult = OnLoadJson(fileName, localJson);
 
             if (!addContainerResult)
             {

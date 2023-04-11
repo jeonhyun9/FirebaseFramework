@@ -1,7 +1,7 @@
-public enum SceneType
+public enum UIType
 {
     Loading,
-    Main,
+    DataBoard,
 }
 
 public enum AnimalType

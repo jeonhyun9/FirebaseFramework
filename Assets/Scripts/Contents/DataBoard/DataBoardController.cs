@@ -5,32 +5,26 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DataBoardController
+public class DataBoardController : BaseController
 {
-    private string PrefabName => "Prefab/UI/DataBoard/DataBoardView";
+    private DataBoardViewModel Model => GetModel<DataBoardViewModel>();
 
-    private DataBoardView View;
+    private readonly Type[] useTypes;
 
-    protected DataBoardViewModel Model { get; private set; }
-
-    public async UniTask Initialize(Type[] useTypes)
+    public DataBoardController(Type[] useTypesValue)
     {
-        Model = new(useTypes);
+        useTypes = useTypesValue;
+    }
+
+    public override void InitContentsName()
+    {
+        ContentsName = nameof(DataBoardController).Replace("Controller","");
+    }
+
+    public override void InitModel()
+    {
+        Model.SetUseTypes(useTypes);
         Model.SetOnClickType(OnClickType);
-
-        if (View == null)
-        {
-            GameObject prefab = (GameObject)await Resources.LoadAsync<GameObject>(PrefabName);
-
-            if (prefab == null)
-            {
-                Logger.Error("prefab is null");
-                return;
-            }
-
-            View = UnityEngine.Object.Instantiate(prefab).GetComponent<DataBoardView>();
-            View.Initialize(Model);
-        }
     }
 
     public void OnClickType(string value)
@@ -39,10 +33,5 @@ public class DataBoardController
 
         if (type != null)
             Model.SetCurrentType(type);
-    }
-
-    public void Show()
-    {
-        View.Show();
     }
 }

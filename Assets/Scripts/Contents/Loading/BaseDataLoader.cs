@@ -1,10 +1,11 @@
 #pragma warning disable 1998
 
+using Cysharp.Threading.Tasks;
 using System;
 using System.IO;
 using UnityEngine;
 
-public abstract class BaseDataLoader
+public abstract class BaseDataLoader : BaseViewModel
 {
     public enum State
     {
@@ -41,24 +42,20 @@ public abstract class BaseDataLoader
 
     public State CurrentState { get; protected set; }
 
-    protected Action OnLoadData { get; private set; }
     protected Action<State> OnChangeState;
 
-    public void SetOnLoadData(Action action)
-    {
-        OnLoadData = action;
-    }
+    protected Func<string, string, bool> OnLoadJson;
+
+    public abstract UniTaskVoid LoadData();
 
     public void SetOnChangeState(Action<State> action)
     {
         OnChangeState = action;
     }
 
-    protected bool AddDataContainerToManager(string fileName, string json)
+    public void SetOnLoadJson(Func<string, string, bool> function)
     {
-        fileName = Path.GetFileNameWithoutExtension(fileName);
-
-        return DataManager.Instance.AddDataContainer(fileName, json);
+        OnLoadJson = function;
     }
 
     protected void ChangeState(State state)

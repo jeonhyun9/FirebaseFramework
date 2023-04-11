@@ -9,18 +9,18 @@ using UnityEngine;
 
 public class FireBaseDataLoader : BaseDataLoader
 {
-    private readonly Dictionary<string, string> dicJsonByFileName = new ();
-    private FireBaseDefine fireBaseDef;
-    private readonly FirebaseStorage storage;
+    public FirebaseStorage Storage { get; private set; }
 
-    public FireBaseDataLoader(string bucketName)
+    private readonly Dictionary<string, string> dicJsonByFileName = new();
+    private FireBaseDefine fireBaseDef;
+    
+    public void SetBucketName(string bucketName)
     {
         fireBaseDef = new FireBaseDefine(bucketName);
-        storage = FirebaseStorage.GetInstance(fireBaseDef.AppSpot);
-        SetOnChangeState(CleanUpFireBase);
+        Storage = FirebaseStorage.GetInstance(fireBaseDef.AppSpot);
     }
 
-    public async UniTaskVoid LoadData()
+    public async override UniTaskVoid LoadData()
     {
         bool loadDataDicResult = await LoadDataDicFromFireBase();
 
@@ -32,7 +32,7 @@ public class FireBaseDataLoader : BaseDataLoader
             
         foreach (string fileName in dicJsonByFileName.Keys)
         {
-            bool addContainerResult = AddDataContainerToManager(fileName, dicJsonByFileName[fileName]);
+            bool addContainerResult = OnLoadJson(fileName, dicJsonByFileName[fileName]);
 
             if (!addContainerResult)
             {
@@ -42,9 +42,6 @@ public class FireBaseDataLoader : BaseDataLoader
         }
 
         Logger.Success($"Load Data Version : {fireBaseDef.Version}");
-
-        if (OnLoadData != null)
-            OnLoadData.Invoke();
 
         ChangeState(State.Done);
 
@@ -80,7 +77,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadVersion);
 
-        StorageReference versionRef = storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
+        StorageReference versionRef = Storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
 
         string currentVersion = await LoadString(versionRef);
 
@@ -98,7 +95,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadJsonList);
 
-        StorageReference storageRef = storage.RootReference.Child(refPath);
+        StorageReference storageRef = Storage.RootReference.Child(refPath);
 
         string[] jsonListArray;
 
@@ -129,7 +126,7 @@ public class FireBaseDataLoader : BaseDataLoader
 
         string fileName = Path.GetFileName(jsonName);
 
-        StorageReference jsonDataRef = storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
+        StorageReference jsonDataRef = Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
 
         byte[] loadedBytes = await LoadBytes(jsonDataRef);
 
@@ -203,8 +200,8 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         if (state == State.Done || state == State.Fail)
         {
-            if (storage.App != null)
-                storage.App.Dispose();
+            if (Storage.App != null)
+                Storage.App.Dispose();
 
             FirebaseApp.DefaultInstance.Dispose();
 
@@ -213,7 +210,5 @@ public class FireBaseDataLoader : BaseDataLoader
             if (go != null)
                 UnityEngine.Object.Destroy(go);
         }
-    }
-
-    
+    } 
 }

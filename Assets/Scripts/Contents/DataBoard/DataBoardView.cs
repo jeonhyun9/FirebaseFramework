@@ -2,28 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Cysharp.Threading.Tasks;
 
-public class DataBoardView : MonoBehaviour
+public class DataBoardView : BaseView
 {
     [SerializeField]
-    UIUnitList unitItemList;
+    private UIUnitList unitItemList;
 
-    public DataBoardViewModel Model { get; private set; }
+    public DataBoardViewModel Model => GetModel<DataBoardViewModel>();
 
-    public void Initialize(DataBoardViewModel model)
+    public override async UniTask ShowAsync()
     {
-        Model = model;
-        CreateUIUnitList();
-    }
+        if (unitItemList == null)
+            return;
 
-    public void CreateUIUnitList()
-    {
-        if (unitItemList != null)
-            unitItemList.AddUnits(Model.CurrentModelList.ToArray());
-    }
+        await unitItemList.AddUnits(Model.CurrentModelList.ToArray());
 
-    public void Show()
-    {
         unitItemList.gameObject.SetActive(true);
     }
 }

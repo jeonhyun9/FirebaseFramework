@@ -1,4 +1,6 @@
-public abstract class BaseManager<T> where T : BaseManager<T>, new()
+using UnityEngine;
+
+public abstract class BaseManager<T> : MonoBehaviour where T : BaseManager<T>, new()
 {
     private static T instance;
 
@@ -7,7 +9,17 @@ public abstract class BaseManager<T> where T : BaseManager<T>, new()
         get
         {
             if (instance == null)
-                instance = new T();
+            {
+                GameObject go = GameObject.Find(typeof(T).Name);
+
+                if (go == null)
+                {
+                    go = new GameObject(typeof(T).Name);
+                    go.AddComponent<T>();
+                }
+
+                instance = go.GetComponent<T>();
+            }
 
             return instance;
         }

@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataManager : BaseManager<DataManager>
 {
     private readonly Dictionary<Type, object> containerDic = new();
 
-    public ICollection<Type> GetAllTypes()
+    public Type[] GetAllTypes()
     {
-        return containerDic.Keys;
+        return containerDic.Keys.ToArray();
     }
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
