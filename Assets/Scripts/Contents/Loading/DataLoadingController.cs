@@ -49,7 +49,7 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
             case LoadDataType.FireBase:
                 FireBaseDataLoader = new();
                 FireBaseDataLoader.SetBucketName(bucketName);
-                FireBaseDataLoader.SetOnFailLoadData(OnFailFireBaseDataLoader);
+                FireBaseDataLoader.SetOnFinishLoadData(OnFinishFireBaseDataLoader);
                 FireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
                 FireBaseDataLoader.LoadData().Forget();
 
@@ -59,7 +59,7 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
         return null;
     }
 
-    private void OnFailFireBaseDataLoader()
+    private void OnFinishFireBaseDataLoader()
     {
         if (FireBaseDataLoader == null)
         {

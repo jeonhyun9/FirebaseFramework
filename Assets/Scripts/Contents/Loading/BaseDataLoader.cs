@@ -45,15 +45,15 @@ public abstract class BaseDataLoader : IBaseViewModel
 
     public Dictionary<string, string> DicJsonByFileName { get; protected set; } = new();
 
-    public Action OnFailLoadData { get; private set; }
+    public Action OnFinishLoadData { get; private set; }
 
     public Action OnSuccessLoadData { get; private set; }
 
     public abstract UniTaskVoid LoadData();
 
-    public void SetOnFailLoadData(Action action)
+    public void SetOnFinishLoadData(Action action)
     {
-        OnFailLoadData = action;
+        OnFinishLoadData = action;
     }
     
     public void SetOnSuccessLoadData(Action action)

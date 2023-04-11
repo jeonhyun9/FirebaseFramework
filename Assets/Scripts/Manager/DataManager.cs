@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class DataManager : BaseManager<DataManager>
 {
     private readonly Dictionary<Type, object> containerDic = new();
 
-    public Type[] GetAllTypes()
-    {
-        return containerDic.Keys.ToArray();
-    }
+    public Type[] GetAllTypes() => containerDic.Keys.ToArray();
 
     public DataContainer<T> GetDataContainer<T>() where T : IBaseData
     {
@@ -61,9 +57,25 @@ public class DataManager : BaseManager<DataManager>
 
         return false;
     }
+
+    public bool AddDataContainerByDataDic(Dictionary<string, string> dicJsonByFileName)
+    {
+        foreach (string fileName in dicJsonByFileName.Keys)
+        {
+            bool result = AddDataContainer(fileName, dicJsonByFileName[fileName]);
+
+            if (!result)
+                return false;
+        }
+
+        return true;
+    }
 	
 	public bool AddDataContainer(string fileName, string json)
     {
+        if (fileName.Contains(".json"))
+            fileName = fileName.Replace(".json", "");
+
         Type type = Type.GetType($"Data{fileName}");
 
         switch (type)
@@ -79,18 +91,5 @@ public class DataManager : BaseManager<DataManager>
         Logger.Error($"Invalid Type : {fileName}");
 
         return false;
-    }
-
-    public bool AddDataContainerByDataDic(Dictionary<string,string> dicJsonByFileName)
-    {
-        foreach(string fileName in dicJsonByFileName.Keys)
-        {
-            bool result = AddDataContainer(fileName, dicJsonByFileName[fileName]);
-
-            if (!result)
-                return false;
-        }
-
-        return true;
     }
 }

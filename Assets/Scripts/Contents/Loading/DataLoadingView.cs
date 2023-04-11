@@ -23,10 +23,15 @@ public class DataLoadingView : BaseView
 
     private async UniTask ShowLoadProgress()
     {
-        while (Model.IsLoading)
+        while (true)
         {
-            progressText.SafeSetText(Model.CurrentProgressString);
-            progressBar.value = Model.CurrentProgressValue;
+            UpdateLoadingUI();
+
+            if (Model.IsLoading == false)
+            {
+                Model.OnFinishLoadData();
+                break;
+            }
 
             await UniTask.Yield(PlayerLoopTiming.Update);
         }
@@ -38,9 +43,11 @@ public class DataLoadingView : BaseView
             await UniTask.Delay(waitingMilliSec);
             Hide();
         }
-        else
-        {
-            Model.OnFailLoadData();
-        }
+    }
+
+    private void UpdateLoadingUI()
+    {
+        progressText.SafeSetText(Model.CurrentProgressString);
+        progressBar.value = Model.CurrentProgressValue;
     }
 }

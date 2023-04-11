@@ -38,25 +38,26 @@ public class DataScene : MonoBehaviour
             await ShowDataBoard();
     }
 
+    private DataLoadingController InitDataLoader(DataLoadingController.LoadDataType loadDataTypeValue, string localJsonDataPathValue, string bucketNameValue)
+    {
+        return new DataLoadingController(loadDataTypeValue, localJsonDataPathValue, bucketNameValue);
+    }
+
     private async UniTask<bool> ShowDataLoading()
     {
-        DataLoadingController dataLoadingController = InitDataLoading(loadDataType, localJsonDataPath, bucketName);
+        DataLoadingController dataLoadingController = InitDataLoader(loadDataType, localJsonDataPath, bucketName);
         await dataLoadingController.ProcessAsync();
         return dataLoadingController.IsSuccess;
     }
 
-    private DataLoadingController InitDataLoading(DataLoadingController.LoadDataType loadDataTypeValue, string localJsonDataPathValue, string bucketNameValue)
+    private DataBoardController InitDataBoard(Type[] useTypes)
     {
-        return new DataLoadingController(loadDataTypeValue, localJsonDataPathValue, bucketNameValue);
+        return new DataBoardController(useTypes);
     }
 
     private async UniTask ShowDataBoard()
     {
         DataBoardController dataBoardController = InitDataBoard(DataBoardUseTypes);
         await dataBoardController.ProcessAsync();
-    }
-    private DataBoardController InitDataBoard(Type[] useTypes)
-    {
-        return new DataBoardController(useTypes);
     }
 }
