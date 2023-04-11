@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 using System.Linq;
 
-public class DataBoardViewModel : BaseViewModel
+public class DataBoardViewModel : IBaseViewModel
 {
     public List<Type> DataBoardTypeList { get; private set; } = new();   
     

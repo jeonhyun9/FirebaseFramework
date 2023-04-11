@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class DataScene : MonoBehaviour
 {
+    [SerializeField]
+    DataLoadingController.LoadDataType loadDataType;
+
     [Header("Local Json Path")]
     [SerializeField]
     private string localJsonDataPath = PathDefine.Json;
@@ -17,22 +20,43 @@ public class DataScene : MonoBehaviour
 
     private Type[] DataBoardUseTypes => DataManager.Instance.GetAllTypes();
 
-    private void ShowDataBoard()
+    private void Awake()
     {
-        UIManager.Instance.CreateUI(InitDataBoard(DataBoardUseTypes));
+        ShowData();
+    }
+
+    private void ShowData()
+    {
+        ShowDataAsync().Forget();
+    }
+
+    private async UniTaskVoid ShowDataAsync()
+    {
+        bool result = await ShowDataLoading();
+
+        if (result)
+            await ShowDataBoard();
+    }
+
+    private async UniTask<bool> ShowDataLoading()
+    {
+        DataLoadingController dataLoadingController = InitDataLoading(loadDataType, localJsonDataPath, bucketName);
+        await dataLoadingController.ProcessAsync();
+        return dataLoadingController.IsSuccess;
+    }
+
+    private DataLoadingController InitDataLoading(DataLoadingController.LoadDataType loadDataTypeValue, string localJsonDataPathValue, string bucketNameValue)
+    {
+        return new DataLoadingController(loadDataTypeValue, localJsonDataPathValue, bucketNameValue);
+    }
+
+    private async UniTask ShowDataBoard()
+    {
+        DataBoardController dataBoardController = InitDataBoard(DataBoardUseTypes);
+        await dataBoardController.ProcessAsync();
     }
     private DataBoardController InitDataBoard(Type[] useTypes)
     {
         return new DataBoardController(useTypes);
-    }
-
-    private void ShowDataLoading()
-    {
-
-    }
-
-    private void ProcessLoadingController()
-    {
-
     }
 }

@@ -1,60 +1,74 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseController
+public abstract class BaseController<T,V> where T : BaseView where V : IBaseViewModel
 {
-    public string ContentsName { get; protected set; }
-    public string PrefabPath => $"Prefab/UI/{ContentsName}/{ContentsName}View";
+    private string viewName;
+    protected string ViewPrefabPath => $"{PathDefine.PrefabResourcesPath}/{viewName.Replace("View","")}/{viewName}";
 
-    protected BaseView BaseView;
+    protected T View { get; private set; }
 
-    public T GetView<T>() where T : BaseView
+    protected V Model { get; private set; }
+
+    protected Transform UITransform => UIManager.Instance.UITransform;
+
+    /// <summary> Model 생성 </summary>
+    protected abstract V CreateModel();
+
+    /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
+    // 추후 타입 별로 PrefabPath 사용하도록 수정하고 추상메소드 제거하자
+    protected abstract string GetViewPrefabName();
+
+    public void StartProcess()
     {
-        return (T)BaseView;
+        ProcessAsync().Forget();
     }
 
-    public BaseViewModel BaseModel { get; protected set; } = new();
-
-    public T GetModel<T>() where T : BaseViewModel
-    {
-        return (T)BaseModel;
-    }
-
-    /// <summary> Model 할당 </summary>
-    public abstract void InitModel();
-
-    /// <summary> ContentsName 지정.. ex)DataBoardController => DataBoard </summary>
-    public abstract void InitContentsName();
-
-    public async UniTaskVoid Process(Transform viewTransform)
-    {
-        await LoadAsync(viewTransform);
-        await ShowAsync();
-    }
-
-    private async UniTask LoadAsync(Transform viewTransform)
+    public async UniTask ProcessAsync()
     {
         InitModel();
 
-        if (BaseView == null)
-        {
-            GameObject prefab = (GameObject)await Resources.LoadAsync<GameObject>(PrefabPath);
+        bool loadResult = await LoadViewAsync();
 
-            if (prefab == null)
-            {
-                Logger.Error("prefab is null");
-                return;
-            }
+        if (!loadResult)
+            return;
 
-            BaseView = Object.Instantiate(prefab, viewTransform).GetComponent<BaseView>();
-            BaseView.SetModel(BaseModel);
-        }
+        View.Hide();
+
+        await View.UpdateViewAsync();
+
+        View.Show();
+
+        await View.ShowAsync();
     }
 
-    private async UniTask ShowAsync()
+    private void InitModel()
     {
-        await BaseView.ShowAsync();
+        Model = CreateModel();
+    }
+
+    private async UniTask<bool> LoadViewAsync()
+    {
+        viewName = GetViewPrefabName();
+
+        GameObject prefab = (GameObject)await Resources.LoadAsync<GameObject>(ViewPrefabPath);
+        
+        if (prefab == null)
+        {
+            Logger.Null(ViewPrefabPath);
+            return false;
+        }
+
+        View = Object.Instantiate(prefab, UITransform).GetComponent<T>();
+
+        if (View == null)
+        {
+            Logger.Null(View);
+            return false;
+        }
+
+        View.SetModel(Model);
+
+        return true;
     }
 }

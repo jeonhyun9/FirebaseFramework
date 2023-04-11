@@ -11,7 +11,6 @@ public class FireBaseDataLoader : BaseDataLoader
 {
     public FirebaseStorage Storage { get; private set; }
 
-    private readonly Dictionary<string, string> dicJsonByFileName = new();
     private FireBaseDefine fireBaseDef;
     
     public void SetBucketName(string bucketName)
@@ -22,36 +21,14 @@ public class FireBaseDataLoader : BaseDataLoader
 
     public async override UniTaskVoid LoadData()
     {
-        bool loadDataDicResult = await LoadDataDicFromFireBase();
+        bool loadDataResult = await LoadDataDicFromFireBase();
 
-        if (!loadDataDicResult)
-        {
-            ChangeState(State.Fail);
-            return;
-        }
-            
-        foreach (string fileName in dicJsonByFileName.Keys)
-        {
-            bool addContainerResult = OnLoadJson(fileName, dicJsonByFileName[fileName]);
-
-            if (!addContainerResult)
-            {
-                ChangeState(State.Fail);
-                return;
-            }
-        }
-
-        Logger.Success($"Load Data Version : {fireBaseDef.Version}");
-
-        ChangeState(State.Done);
-
-        return;
+        ChangeState(loadDataResult ? State.Success : State.Fail);
     }
 
-
-    public async UniTask<bool> LoadDataDicFromFireBase()
+    private async UniTask<bool> LoadDataDicFromFireBase()
     {
-        dicJsonByFileName.Clear();
+        DicJsonByFileName.Clear();
 
         if (!await LoadFireBaseDefVersion())
             return false;
@@ -69,6 +46,8 @@ public class FireBaseDataLoader : BaseDataLoader
         UniTask[] tasks = jsonList.Select(json => AddJsonToDic(json, progressIncrementValue)).ToArray();
 
         await UniTask.WhenAll(tasks);
+
+        Logger.Success($"Load Data Version : {fireBaseDef.Version}");
 
         return true;
     }
@@ -138,7 +117,7 @@ public class FireBaseDataLoader : BaseDataLoader
             if (!string.IsNullOrEmpty(loadedString))
             {
                 // 컨테이너에 담길 데이터 추가
-                dicJsonByFileName.Add(fileName, loadedString);
+                DicJsonByFileName.Add(fileName, loadedString);
                 CurrentProgressValue += progressValue;
                 Logger.Success($"Load Json From FireBase : {fileName}");
             }
@@ -195,20 +174,4 @@ public class FireBaseDataLoader : BaseDataLoader
 
         return loadedBytes;
     }
-
-    private void CleanUpFireBase(State state)
-    {
-        if (state == State.Done || state == State.Fail)
-        {
-            if (Storage.App != null)
-                Storage.App.Dispose();
-
-            FirebaseApp.DefaultInstance.Dispose();
-
-            GameObject go = GameObject.Find("Firebase Services");
-
-            if (go != null)
-                UnityEngine.Object.Destroy(go);
-        }
-    } 
 }

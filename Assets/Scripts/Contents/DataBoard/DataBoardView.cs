@@ -1,23 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class DataBoardView : BaseView
 {
     [SerializeField]
-    private UIUnitList unitItemList;
+    private UIUnitItemList unitItemList;
 
     public DataBoardViewModel Model => GetModel<DataBoardViewModel>();
 
-    public override async UniTask ShowAsync()
+    public async override UniTask UpdateViewAsync()
     {
         if (unitItemList == null)
+        {
+            Logger.Null(unitItemList);
             return;
+        }
 
-        await unitItemList.AddUnits(Model.CurrentModelList.ToArray());
+        unitItemList.AddUnits(Model.CurrentModelList.ToArray());
 
-        unitItemList.gameObject.SetActive(true);
+        //비동기 사용안하면 이것을 return하자
+        await UniTask.CompletedTask;
     }
 }

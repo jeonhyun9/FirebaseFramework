@@ -1,21 +1,43 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseView : MonoBehaviour
 {
-    public BaseViewModel BaseModel { get; private set; }
+    public enum AsyncType
+    {
+        Async,
+        NonAsync,
+    }
 
-    public void SetModel(BaseViewModel model)
+    public IBaseViewModel BaseModel { get; private set; }
+
+    public void SetModel(IBaseViewModel model)
     {
         BaseModel = model;
     }
 
-    public T GetModel<T>() where T : BaseViewModel
+    public T GetModel<T>() where T : IBaseViewModel
     {
         return (T)BaseModel;
     }
 
-    public abstract UniTask ShowAsync();
+    public virtual async UniTask UpdateViewAsync()
+    {
+        await UniTask.CompletedTask;
+    }
+
+    public virtual async UniTask ShowAsync()
+    {
+        await UniTask.CompletedTask;
+    }
+
+    public void Show()
+    {
+        gameObject.SafeSetActive(true);
+    }
+
+    public void Hide()
+    {
+        gameObject.SafeSetActive(false);
+    }
 }

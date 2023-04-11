@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DataBoardController : BaseController
+public class DataBoardController : BaseController<DataBoardView,DataBoardViewModel>
 {
-    private DataBoardViewModel Model => GetModel<DataBoardViewModel>();
-
     private readonly Type[] useTypes;
 
     public DataBoardController(Type[] useTypesValue)
@@ -16,15 +14,18 @@ public class DataBoardController : BaseController
         useTypes = useTypesValue;
     }
 
-    public override void InitContentsName()
+    protected override string GetViewPrefabName()
     {
-        ContentsName = nameof(DataBoardController).Replace("Controller","");
+        return nameof(DataBoardController).Replace("Controller","View");
     }
 
-    public override void InitModel()
+    protected override DataBoardViewModel CreateModel()
     {
-        Model.SetUseTypes(useTypes);
-        Model.SetOnClickType(OnClickType);
+        DataBoardViewModel model = new();
+        model.SetUseTypes(useTypes);
+        model.SetOnClickType(OnClickType);
+
+        return model;
     }
 
     public void OnClickType(string value)

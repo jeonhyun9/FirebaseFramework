@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataLoadingController : BaseController
+public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoader>
 {
     public enum LoadDataType
     {
@@ -10,13 +10,11 @@ public class DataLoadingController : BaseController
         FireBase,
     }
 
-    private BaseDataLoader Model => GetModel<BaseDataLoader>();
+    public bool IsSuccess => Model?.CurrentState == BaseDataLoader.State.Success;
 
-    private LocalDataLoader LocalDataModel => GetModel<LocalDataLoader>();
+    private LocalDataLoader LocalDataLoader;
 
-    private FireBaseDataLoader FireBaseDataModel => GetModel<FireBaseDataLoader>();
-
-    private DataLoadingView View => GetView<DataLoadingView>();
+    private FireBaseDataLoader FireBaseDataLoader;
 
     private readonly LoadDataType loadDataType;
 
@@ -31,55 +29,67 @@ public class DataLoadingController : BaseController
         bucketName = bucketNameValue;
     }
 
-    public override void InitContentsName()
+    protected override string GetViewPrefabName()
     {
-        ContentsName = nameof(DataLoadingController).Replace("Controller", "");
+        return nameof(DataLoadingController).Replace("Controller", "View");
     }
 
-    public override void InitModel()
+    protected override BaseDataLoader CreateModel()
     {
-        Model.SetOnLoadJson(AddDataContainerToManager);
-
         switch (loadDataType)
         {
             case LoadDataType.LocalPath:
-                LocalDataLoader localDataModel = Model as LocalDataLoader;
-                localDataModel.SetLocalJsonDataPath(localJsonDataPath);
-                localDataModel.LoadData().Forget();
-                break;
+                LocalDataLoader = new();
+                LocalDataLoader.SetLocalJsonDataPath(localJsonDataPath);
+                LocalDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+                LocalDataLoader.LoadData().Forget();
+
+                return LocalDataLoader;
 
             case LoadDataType.FireBase:
-                FireBaseDataLoader fireBaseDataModel = Model as FireBaseDataLoader;
-                fireBaseDataModel.SetBucketName(bucketName);
-                fireBaseDataModel.SetOnChangeState(CleanUpFireBase);
-                fireBaseDataModel.LoadData().Forget();
-                break;
+                FireBaseDataLoader = new();
+                FireBaseDataLoader.SetBucketName(bucketName);
+                FireBaseDataLoader.SetOnFailLoadData(OnFailFireBaseDataLoader);
+                FireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+                FireBaseDataLoader.LoadData().Forget();
+
+                return FireBaseDataLoader;
         }
+
+        return null;
     }
 
-    private void CleanUpFireBase(BaseDataLoader.State state)
+    private void OnFailFireBaseDataLoader()
     {
-        if (loadDataType != LoadDataType.FireBase)
-            return;
-
-        if (state == BaseDataLoader.State.Done || state == BaseDataLoader.State.Fail)
+        if (FireBaseDataLoader == null)
         {
-            if (FireBaseDataModel.Storage.App != null)
-                FireBaseDataModel.Storage.App.Dispose();
+            Logger.Null(FireBaseDataLoader);
+            return;
+        }
 
-            Firebase.FirebaseApp.DefaultInstance.Dispose();
+        if (FireBaseDataLoader.Storage.App != null)
+            FireBaseDataLoader.Storage.App.Dispose();
 
-            GameObject go = GameObject.Find("Firebase Services");
+        Firebase.FirebaseApp.DefaultInstance.Dispose();
 
-            if (go != null)
-                Object.Destroy(go);
+        //씬에 남아있는 경우가 있음..
+        GameObject go = GameObject.Find("Firebase Services");
+
+        if (go != null)
+        {
+            Logger.Log("Firebase Services destroyed.");
+            Object.Destroy(go);
         }
     }
 
-    private bool AddDataContainerToManager(string fileName, string json)
+    private void OnSuccessDataLoader()
     {
-        fileName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+        if (Model == null)
+        {
+            Logger.Null(Model);
+            return;
+        }
 
-        return DataManager.Instance.AddDataContainer(fileName, json);
+        DataManager.Instance.AddDataContainerByDataDic(Model.DicJsonByFileName);
     }
 }

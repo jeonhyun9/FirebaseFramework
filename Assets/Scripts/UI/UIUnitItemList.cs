@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIUnitList : MonoBehaviour
+public class UIUnitItemList : MonoBehaviour
 {
     [SerializeField]
     GameObject templateItem;
@@ -19,7 +19,7 @@ public class UIUnitList : MonoBehaviour
         useCount = 0;
     }
 
-    public async UniTask AddUnits<T>(T[] datas) where T : IBaseUnitModel
+    public void AddUnits<T>(T[] datas) where T : IBaseUnitModel
     {
         for(int i = 0; i < datas.Length; i++)
         {
@@ -29,7 +29,7 @@ public class UIUnitList : MonoBehaviour
 
             if (GetUnitCount() <= useCount)
             {
-                await UniTask.RunOnThreadPool(() => { go =  Instantiate(templateItem, scrollViewContentsTransform); });
+                go = Instantiate(templateItem, scrollViewContentsTransform);
             }
             else
             {

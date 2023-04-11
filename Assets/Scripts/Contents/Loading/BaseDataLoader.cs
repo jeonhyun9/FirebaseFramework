@@ -1,19 +1,17 @@
-#pragma warning disable 1998
-
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public abstract class BaseDataLoader : BaseViewModel
+public abstract class BaseDataLoader : IBaseViewModel
 {
     public enum State
     {
-        None,
         LoadVersion,
         LoadJsonList,
         LoadJson,
-        Done,
+        Success,
         Fail,
     }
 
@@ -29,40 +27,42 @@ public abstract class BaseDataLoader : BaseViewModel
                     return "Loading JsonList...";
                 case State.LoadJson:
                     return "Loading Json...";
-                case State.Done:
-                    return "Done!";
+                case State.Success:
+                    return "Loading Success!";
                 case State.Fail:
-                    return "Fail!";
+                    return "Loading Fail!";
                 default:
                     return null;
             }
         }
     }
+
     public float CurrentProgressValue { get; protected set; } = 0f;
 
     public State CurrentState { get; protected set; }
 
-    protected Action<State> OnChangeState;
+    public bool IsLoading => CurrentState != State.Success && CurrentState != State.Fail;
 
-    protected Func<string, string, bool> OnLoadJson;
+    public Dictionary<string, string> DicJsonByFileName { get; protected set; } = new();
+
+    public Action OnFailLoadData { get; private set; }
+
+    public Action OnSuccessLoadData { get; private set; }
 
     public abstract UniTaskVoid LoadData();
 
-    public void SetOnChangeState(Action<State> action)
+    public void SetOnFailLoadData(Action action)
     {
-        OnChangeState = action;
+        OnFailLoadData = action;
     }
-
-    public void SetOnLoadJson(Func<string, string, bool> function)
+    
+    public void SetOnSuccessLoadData(Action action)
     {
-        OnLoadJson = function;
+        OnSuccessLoadData = action;
     }
 
     protected void ChangeState(State state)
     {
         CurrentState = state;
-
-        if (OnChangeState != null)
-            OnChangeState(state);
     }
 }

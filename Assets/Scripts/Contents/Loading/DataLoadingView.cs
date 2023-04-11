@@ -1,9 +1,6 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DataLoadingView : BaseView
@@ -14,24 +11,36 @@ public class DataLoadingView : BaseView
     [SerializeField]
     private Slider progressBar;
 
+    [SerializeField]
+    private int waitingMilliSec = 1000;
+
     private BaseDataLoader Model => GetModel<BaseDataLoader>();
 
-    public override async UniTask ShowAsync()
+    public async override UniTask ShowAsync()
     {
         await ShowLoadProgress();
     }
 
     private async UniTask ShowLoadProgress()
     {
-        while (Model.CurrentState != BaseDataLoader.State.Fail)
+        while (Model.IsLoading)
         {
-            if (Model.CurrentProgressString != null)
-            {
-                progressText.SafeSetText(Model.CurrentProgressString);
-                progressBar.value = Model.CurrentProgressValue;
-            }
+            progressText.SafeSetText(Model.CurrentProgressString);
+            progressBar.value = Model.CurrentProgressValue;
 
             await UniTask.Yield(PlayerLoopTiming.Update);
+        }
+
+        if (Model.CurrentState == BaseDataLoader.State.Success)
+        {
+            Model.OnSuccessLoadData();
+
+            await UniTask.Delay(waitingMilliSec);
+            Hide();
+        }
+        else
+        {
+            Model.OnFailLoadData();
         }
     }
 }

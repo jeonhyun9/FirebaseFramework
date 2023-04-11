@@ -16,7 +16,7 @@ public class LocalDataLoader : BaseDataLoader
     {
         bool loadDataResult = await LoadDataFromLocalPath(localJsonDataPath);
 
-        ChangeState(loadDataResult ? State.Done : State.Fail);
+        ChangeState(loadDataResult ? State.Success : State.Fail);
     }
 
     private async UniTask<bool> LoadDataFromLocalPath(string jsonPath)
@@ -53,13 +53,7 @@ public class LocalDataLoader : BaseDataLoader
                 return false;
             }
 
-            bool addContainerResult = OnLoadJson(fileName, localJson);
-
-            if (!addContainerResult)
-            {
-                ChangeState(State.Fail);
-                return false;
-            }
+            DicJsonByFileName.Add(fileName, localJson);
 
             CurrentProgressValue += progressIncrementValue;
         }

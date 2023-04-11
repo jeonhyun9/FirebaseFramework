@@ -13,5 +13,6 @@ public class PathDefine
     public const string JsonListText = "Assets/Data/Jsons/JsonList.txt";
     public const string DataManagerTemplate = "Assets/Data/Templates/DataManagerTemplate.txt";
     public const string AddContainerTypeTemplate = "Assets/Data/Templates/AddContainerTypeTemplate.txt";
+    public const string PrefabResourcesPath = "Prefab/UI";
 }
 

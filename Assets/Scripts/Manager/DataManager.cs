@@ -80,4 +80,17 @@ public class DataManager : BaseManager<DataManager>
 
         return false;
     }
+
+    public bool AddDataContainerByDataDic(Dictionary<string,string> dicJsonByFileName)
+    {
+        foreach(string fileName in dicJsonByFileName.Keys)
+        {
+            bool result = AddDataContainer(fileName, dicJsonByFileName[fileName]);
+
+            if (!result)
+                return false;
+        }
+
+        return true;
+    }
 }
