@@ -34,7 +34,7 @@ public static class Logger
         Debug.LogError($"[Error] {message}");
     }
 
-    public static void Seprator()
+    public static void Separator()
     {
         Debug.Log(separator);
     }
