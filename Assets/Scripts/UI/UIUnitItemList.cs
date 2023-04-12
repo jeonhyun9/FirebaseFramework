@@ -9,10 +9,9 @@ public class UIUnitItemList : MonoBehaviour
     GameObject templateItem;
 
     [SerializeField]
-    Transform scrollViewContentsTransform;
+    Transform contentsTransform;
 
     private int useCount = 0;
-    private List<GameObject> unitList = new();
 
     public void ResetUseCount()
     {
@@ -27,9 +26,9 @@ public class UIUnitItemList : MonoBehaviour
 
             GameObject go;
 
-            if (GetUnitCount() <= useCount)
+            if (GetUnitCount() < useCount)
             {
-                go = Instantiate(templateItem, scrollViewContentsTransform);
+                go = Instantiate(templateItem, contentsTransform);
                 go.SafeSetActive(false);
             }
             else
@@ -44,8 +43,6 @@ public class UIUnitItemList : MonoBehaviour
             }
 
             SetUnitModel(go, datas[i]);
-
-            unitList.Add(go);
         }
 
         ActiveOffNotUse();
@@ -61,7 +58,7 @@ public class UIUnitItemList : MonoBehaviour
 
     public GameObject GetUnit(int index)
     {
-        if (unitList == null)
+        if (contentsTransform == null)
             return null;
 
         if (index < 0)
@@ -70,20 +67,20 @@ public class UIUnitItemList : MonoBehaviour
         if (index >= GetUnitCount())
             return null;
 
-        return unitList[index];
+        return contentsTransform.GetChild(index).gameObject;
     }
 
     public int GetUnitCount()
     {
-        if (unitList == null)
+        if (contentsTransform == null)
             return 0;
 
-        return unitList.Count;
+        return contentsTransform.childCount;
     }
 
     public void ActiveOffNotUse()
     {
         for (int i = useCount; i < GetUnitCount(); ++i)
-            unitList[i].SetActive(false);
+            GetUnit(i).SetActive(false);
     }
 }

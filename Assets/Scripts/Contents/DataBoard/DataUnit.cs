@@ -14,5 +14,8 @@ public class DataUnit : BaseUnit<DataUnitModel<IBaseData>>
     public override void UpdateUI()
     {
         gameObject.name = Model.Data.NameId;
+
+        labelId.SafeSetText(Model.Data.Id.ToString());
+        labelNameId.SafeSetText(Model.Data.NameId.ToString());
     }
 }

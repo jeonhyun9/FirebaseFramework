@@ -34,5 +34,7 @@ public class DataBoardController : BaseController<DataBoardView,DataBoardViewMod
 
         if (type != null)
             Model.SetCurrentType(type);
+
+        View.UpdateUnitItem();
     }
 }
