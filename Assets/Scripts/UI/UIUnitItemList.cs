@@ -1,5 +1,3 @@
-using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,15 +17,15 @@ public class UIUnitItemList : MonoBehaviour
         useCount = 0;
     }
 
-    public void AddUnits<T>(T[] datas) where T : IBaseUnitModel
+    public void AddUnitItemWithModels<T>(T[] models) where T : IBaseUnitModel
     {
-        for (int i = 0; i < datas.Length; i++)
+        for (int i = 0; i < models.Length; i++)
         {
             useCount++;
 
             GameObject go;
 
-            if (GetUnitCount() < useCount)
+            if (GetUnitListCount() < useCount)
             {
                 go = Instantiate(templateItem, contentsTransform);
                 go.SafeSetActive(false);
@@ -39,12 +37,9 @@ public class UIUnitItemList : MonoBehaviour
             }
 
             if (go == null)
-            {
-                Logger.Null(go);
                 continue;
-            }
 
-            SetUnitModel(go, datas[i]);
+            SetUnitModel(go, models[i]);
         }
 
         ActiveOffNotUse();
@@ -53,9 +48,17 @@ public class UIUnitItemList : MonoBehaviour
     private void SetUnitModel<T>(GameObject go, T model) where T : IBaseUnitModel
     {
         BaseUnit<T> unit = go.GetComponent<BaseUnit<T>>();
-        unit.SetModel(model);
-        unit.UpdateUI();
-        unit.Show();
+
+        if (unit == null)
+        {
+            unit.SetModel(model);
+            unit.UpdateUI();
+            unit.Show();
+        }
+        else
+        {
+            Logger.Null("unit");
+        }
     }
 
     public GameObject GetUnit(int index)
@@ -66,14 +69,14 @@ public class UIUnitItemList : MonoBehaviour
         return unitList[index];
     }
 
-    public int GetUnitCount()
+    public int GetUnitListCount()
     {
         return unitList.Count;
     }
 
     public void ActiveOffNotUse()
     {
-        for (int i = useCount; i < GetUnitCount(); ++i)
+        for (int i = useCount; i < GetUnitListCount(); ++i)
             unitList[i].SetActive(false);
     }
 }

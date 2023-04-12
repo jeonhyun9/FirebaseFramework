@@ -38,12 +38,12 @@ public class DataBoardView : BaseView
     {
         if (unitItemList == null)
         {
-            Logger.Null(unitItemList);
+            Logger.Null("unitItemList");
             return;
         }
 
         unitItemList.ResetUseCount();
-        unitItemList.AddUnits(Model.CurrentModelList.ToArray());
+        unitItemList.AddUnitItemWithModels(Model.CurrentModelList.ToArray());
     }
 
     //매개변수로 클릭한 옵션의 index를 받음

@@ -24,9 +24,9 @@ public static class Logger
         Debug.LogError($"[Exception] {e}");
     }
 
-    public static void Null(object nullObject)
+    public static void Null(string nullObjectName)
     {
-        Debug.LogError($"[Null] {nullObject} is null");
+        Debug.LogError($"[Null] {nullObjectName} is null");
     }
 
     public static void Error(string message)

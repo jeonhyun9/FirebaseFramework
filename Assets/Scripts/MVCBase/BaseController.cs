@@ -55,7 +55,7 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
         
         if (prefab == null)
         {
-            Logger.Null(ViewPrefabPath);
+            Logger.Null("ViewPrefabPath");
             return false;
         }
 
@@ -63,7 +63,7 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
 
         if (View == null)
         {
-            Logger.Null(View);
+            Logger.Null("View");
             return false;
         }
 
