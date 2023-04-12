@@ -12,6 +12,7 @@ public class UIUnitItemList : MonoBehaviour
     Transform contentsTransform;
 
     private int useCount = 0;
+    private readonly List<GameObject> unitList = new();
 
     public void ResetUseCount()
     {
@@ -20,7 +21,7 @@ public class UIUnitItemList : MonoBehaviour
 
     public void AddUnits<T>(T[] datas) where T : IBaseUnitModel
     {
-        for(int i = 0; i < datas.Length; i++)
+        for (int i = 0; i < datas.Length; i++)
         {
             useCount++;
 
@@ -30,6 +31,7 @@ public class UIUnitItemList : MonoBehaviour
             {
                 go = Instantiate(templateItem, contentsTransform);
                 go.SafeSetActive(false);
+                unitList.Add(go);
             }
             else
             {
@@ -58,29 +60,20 @@ public class UIUnitItemList : MonoBehaviour
 
     public GameObject GetUnit(int index)
     {
-        if (contentsTransform == null)
+        if (index < 0 || index >= unitList.Count)
             return null;
 
-        if (index < 0)
-            return null;
-
-        if (index >= GetUnitCount())
-            return null;
-
-        return contentsTransform.GetChild(index).gameObject;
+        return unitList[index];
     }
 
     public int GetUnitCount()
     {
-        if (contentsTransform == null)
-            return 0;
-
-        return contentsTransform.childCount;
+        return unitList.Count;
     }
 
     public void ActiveOffNotUse()
     {
         for (int i = useCount; i < GetUnitCount(); ++i)
-            GetUnit(i).SetActive(false);
+            unitList[i].SetActive(false);
     }
 }
