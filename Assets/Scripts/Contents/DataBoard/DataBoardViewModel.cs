@@ -16,11 +16,13 @@ public class DataBoardViewModel : IBaseViewModel
 
     public void SetUseTypes(Type[] useTypes)
     {
+        if (useTypes.Length == 0)
+            return;
+
+        CurrentType = useTypes[0];
+
         foreach (Type type in useTypes)
         {
-            if (CurrentType == null)
-                CurrentType = type;
-
             switch (type)
             {
                 case Type t when t == typeof(DataAnimal):

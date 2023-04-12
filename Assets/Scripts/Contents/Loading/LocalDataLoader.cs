@@ -43,20 +43,31 @@ public class LocalDataLoader : BaseDataLoader
 
         foreach (string fileName in localJsonFileNames)
         {
-            string localJson = null;
-
-            await UniTask.RunOnThreadPool(() => { localJson = File.ReadAllText(Path.Combine(jsonPath, fileName)); });
-
-            if (string.IsNullOrEmpty(localJson))
+            bool result = await LoadJsonToDic(Path.Combine(jsonPath, fileName), progressIncrementValue);
+            if (!result)
             {
                 ChangeState(State.Fail);
                 return false;
             }
-
-            DicJsonByFileName.Add(fileName, localJson);
-
-            CurrentProgressValue += progressIncrementValue;
         }
+
+        return true;
+    }
+
+    private async UniTask<bool> LoadJsonToDic(string filePath, float progressIncrementValue)
+    {
+        string localJson = null;
+
+        await UniTask.RunOnThreadPool(() => { localJson = File.ReadAllText(filePath); });
+
+        if (string.IsNullOrEmpty(localJson))
+        {
+            return false;
+        }
+
+        DicJsonByFileName.Add(Path.GetFileName(filePath), localJson);
+
+        CurrentProgressValue += progressIncrementValue;
 
         return true;
     }

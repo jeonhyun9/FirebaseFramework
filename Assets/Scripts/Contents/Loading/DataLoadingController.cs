@@ -12,9 +12,9 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     public bool IsSuccess => Model?.CurrentState == BaseDataLoader.State.Success;
 
-    private LocalDataLoader LocalDataLoader;
+    private LocalDataLoader LocalDataLoader => Model.GetLoader<LocalDataLoader>();
 
-    private FireBaseDataLoader FireBaseDataLoader;
+    private FireBaseDataLoader FireBaseDataLoader => Model.GetLoader<FireBaseDataLoader>();
 
     private readonly LoadDataType loadDataType;
 
@@ -39,21 +39,21 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
         switch (loadDataType)
         {
             case LoadDataType.LocalPath:
-                LocalDataLoader = new();
-                LocalDataLoader.SetLocalJsonDataPath(localJsonDataPath);
-                LocalDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
-                LocalDataLoader.LoadData().Forget();
+                LocalDataLoader localDataLoader = new();
+                localDataLoader.SetLocalJsonDataPath(localJsonDataPath);
+                localDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+                localDataLoader.LoadData().Forget();
 
-                return LocalDataLoader;
+                return localDataLoader;
 
             case LoadDataType.FireBase:
-                FireBaseDataLoader = new();
-                FireBaseDataLoader.SetBucketName(bucketName);
-                FireBaseDataLoader.SetOnFinishLoadData(OnFinishFireBaseDataLoader);
-                FireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
-                FireBaseDataLoader.LoadData().Forget();
+                FireBaseDataLoader fireBaseDataLoader = new();
+                fireBaseDataLoader.SetBucketName(bucketName);
+                fireBaseDataLoader.SetOnFinishLoadData(OnFinishFireBaseDataLoader);
+                fireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+                fireBaseDataLoader.LoadData().Forget();
 
-                return FireBaseDataLoader;
+                return fireBaseDataLoader;
         }
 
         return null;
@@ -61,12 +61,6 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     private void OnFinishFireBaseDataLoader()
     {
-        if (FireBaseDataLoader == null)
-        {
-            Logger.Null(FireBaseDataLoader);
-            return;
-        }
-
         if (FireBaseDataLoader.Storage.App != null)
             FireBaseDataLoader.Storage.App.Dispose();
 
@@ -84,12 +78,6 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     private void OnSuccessDataLoader()
     {
-        if (Model == null)
-        {
-            Logger.Null(Model);
-            return;
-        }
-
         DataManager.Instance.AddDataContainerByDataDic(Model.DicJsonByFileName);
     }
 }

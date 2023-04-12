@@ -1,11 +1,8 @@
 using Cysharp.Threading.Tasks;
-using Firebase;
 using Firebase.Storage;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 public class FireBaseDataLoader : BaseDataLoader
 {
@@ -21,15 +18,16 @@ public class FireBaseDataLoader : BaseDataLoader
 
     public async override UniTaskVoid LoadData()
     {
-        bool loadDataResult = await LoadDataDicFromFireBase();
+        DicJsonByFileName.Clear();
+
+        //FireBaseStorage에서 파일명과 json을 불러와서 Dictionary에 담는 과정
+        bool loadDataResult = await LoadDataFromFireBase();
 
         ChangeState(loadDataResult ? State.Success : State.Fail);
     }
 
-    private async UniTask<bool> LoadDataDicFromFireBase()
+    private async UniTask<bool> LoadDataFromFireBase()
     {
-        DicJsonByFileName.Clear();
-
         if (!await LoadFireBaseDefVersion())
             return false;
         
@@ -43,13 +41,7 @@ public class FireBaseDataLoader : BaseDataLoader
 
         float progressIncrementValue = 1f / jsonList.Length;
 
-        UniTask[] tasks = jsonList.Select(json => AddJsonToDic(json, progressIncrementValue)).ToArray();
-
-        await UniTask.WhenAll(tasks);
-
-        Logger.Success($"Load Data Version : {fireBaseDef.Version}");
-
-        return true;
+        return await LoadAllJsonToDic(jsonList, progressIncrementValue);
     }
 
     private async UniTask<bool> LoadFireBaseDefVersion()
@@ -99,12 +91,30 @@ public class FireBaseDataLoader : BaseDataLoader
         return jsonListArray;
     }
 
-    private async UniTask AddJsonToDic(string jsonName, float progressValue)
+    private async UniTask<bool> LoadAllJsonToDic(string[] jsonList, float progressIncrementValue)
     {
-        ChangeState(State.LoadJson);
+        UniTask<bool>[] tasks = jsonList.Select(json => LoadJsonToDic(json, progressIncrementValue)).ToArray();
+        bool[] results = await UniTask.WhenAll(tasks);
 
-        string fileName = Path.GetFileName(jsonName);
+        return results.All(x => true);
+    }
 
+    private async UniTask<bool> LoadJsonToDic(string jsonName, float progressIncrementValue)
+    {
+        string loadedString = await LoadJsonByName(jsonName);
+
+        if (!string.IsNullOrEmpty(loadedString))
+        {
+            AddToDic(Path.GetFileName(jsonName), loadedString);
+            CurrentProgressValue += progressIncrementValue;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async UniTask<string> LoadJsonByName(string jsonName)
+    {
         StorageReference jsonDataRef = Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
 
         byte[] loadedBytes = await LoadBytes(jsonDataRef);
@@ -115,17 +125,20 @@ public class FireBaseDataLoader : BaseDataLoader
             string loadedString = loadedBytes.GetStringUTF8();
 
             if (!string.IsNullOrEmpty(loadedString))
-            {
-                // 컨테이너에 담길 데이터 추가
-                DicJsonByFileName.Add(fileName, loadedString);
-                CurrentProgressValue += progressValue;
-                Logger.Success($"Load Json From FireBase : {fileName}");
-            }
+                return loadedString;
         }
-        else
-        {
-            Logger.Error($"Invalid load json {fileName}");
-        }
+       
+        Logger.Error($"Invalid load json {jsonName}");
+        return null;
+    }
+    
+    private void AddToDic(string jsonName, string jsonContents)
+    {
+        string fileName = Path.GetFileName(jsonName);
+
+        // 컨테이너에 담길 데이터 추가
+        DicJsonByFileName.Add(fileName, jsonContents);
+        Logger.Success($"Load Json From FireBase : {fileName}");
     }
 
     private async UniTask<string> LoadString(StorageReference storageRef)

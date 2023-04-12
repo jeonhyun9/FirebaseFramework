@@ -15,6 +15,11 @@ public abstract class BaseDataLoader : IBaseViewModel
         Fail,
     }
 
+    public T GetLoader<T>() where T : BaseDataLoader
+    {
+        return this is T ? (T)this : null;
+    }
+
     public string CurrentProgressString
     {
         get

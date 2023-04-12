@@ -29,7 +29,7 @@ public class DataLoadingView : BaseView
 
             if (Model.IsLoading == false)
             {
-                Model.OnFinishLoadData();
+                Model.OnFinishLoadData?.Invoke();
                 break;
             }
 
@@ -38,7 +38,7 @@ public class DataLoadingView : BaseView
 
         if (Model.CurrentState == BaseDataLoader.State.Success)
         {
-            Model.OnSuccessLoadData();
+            Model.OnSuccessLoadData?.Invoke();
 
             await UniTask.Delay(waitingMilliSec);
             Hide();

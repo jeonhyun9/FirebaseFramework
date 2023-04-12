@@ -25,11 +25,12 @@ public class UIUnitItemList : MonoBehaviour
         {
             useCount++;
 
-            GameObject go = null;
+            GameObject go;
 
             if (GetUnitCount() <= useCount)
             {
                 go = Instantiate(templateItem, scrollViewContentsTransform);
+                go.SafeSetActive(false);
             }
             else
             {
