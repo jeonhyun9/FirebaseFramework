@@ -49,7 +49,7 @@ public class UIUnitItemList : MonoBehaviour
     {
         BaseUnit<T> unit = go.GetComponent<BaseUnit<T>>();
 
-        if (unit == null)
+        if (unit != null)
         {
             unit.SetModel(model);
             unit.UpdateUI();

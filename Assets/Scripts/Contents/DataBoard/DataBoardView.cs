@@ -18,19 +18,24 @@ public class DataBoardView : BaseView
 
     public async override UniTask UpdateViewAsync()
     {
+        if (options == null)
+            InitDropdownOptions();
+
+        UpdateUnitItem();
+
+        await UniTask.CompletedTask;
+    }
+
+    private void InitDropdownOptions()
+    {
         if (dropdownType)
         {
-            options = new (Model.DataBoardTypeList.Count);
+            options = new(Model.DataBoardTypeList.Count);
 
             options.AddRange(Model.DataBoardTypeList.Select(type => new TMP_Dropdown.OptionData(type.Name)));
 
             dropdownType.AddOptions(options);
         }
-
-        UpdateUnitItem();
-
-        //비동기 사용안하면 이것을 return하자
-        await UniTask.CompletedTask;
     }
 
     //현재 선택된 타입으로 업데이트
