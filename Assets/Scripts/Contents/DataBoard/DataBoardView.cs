@@ -11,6 +11,9 @@ public class DataBoardView : BaseView
     private UIUnitItemList unitItemList;
 
     [SerializeField]
+    private UIUnitItemList propertyNamesItemList;
+
+    [SerializeField]
     private TMP_Dropdown dropdownType;
 
     private List<TMP_Dropdown.OptionData> options;
@@ -21,6 +24,7 @@ public class DataBoardView : BaseView
         if (options == null)
             InitDropdownOptions();
 
+        UpdatePropertyNames();
         UpdateUnitItem();
 
         await UniTask.CompletedTask;
@@ -38,7 +42,6 @@ public class DataBoardView : BaseView
         }
     }
 
-    //현재 선택된 타입으로 업데이트
     public void UpdateUnitItem()
     {
         if (unitItemList == null)
@@ -49,6 +52,27 @@ public class DataBoardView : BaseView
 
         unitItemList.ResetUseCount();
         unitItemList.AddUnitItemWithModels(Model.CurrentModelList.ToArray());
+        propertyNamesItemList.ActiveOffNotUse();
+    }
+
+    public void UpdatePropertyNames()
+    {
+        if (propertyNamesItemList == null)
+        {
+            Logger.Null("propertyNamesItemList");
+            return;
+        }
+
+        propertyNamesItemList.ResetUseCount();
+
+        for(int i = 0; i < Model.PropertyNames.Length; i++)
+        {
+            TextMeshProUGUI label = propertyNamesItemList.AddUnitItem<TextMeshProUGUI>(i);
+            label.SafeSetText(Model.PropertyNames[i]);
+            label.gameObject.SafeSetActive(true);
+        }
+
+        propertyNamesItemList.ActiveOffNotUse();
     }
 
     //매개변수로 클릭한 옵션의 index를 받음

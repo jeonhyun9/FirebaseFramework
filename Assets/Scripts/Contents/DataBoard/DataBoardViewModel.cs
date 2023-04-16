@@ -12,6 +12,8 @@ public class DataBoardViewModel : IBaseViewModel
 
     public List<DataUnitModel<IBaseData>> CurrentModelList => DicDataBoardUnitModelList[CurrentType];
 
+    public string[] PropertyNames { get; private set; }
+
     public Action<string> OnClickType { get; private set; }
 
     public void SetUseTypes(Type[] useTypes)
@@ -20,7 +22,6 @@ public class DataBoardViewModel : IBaseViewModel
             return;
 
         CurrentType = useTypes[0];
-
         foreach (Type type in useTypes)
         {
             switch (type)
@@ -34,6 +35,11 @@ public class DataBoardViewModel : IBaseViewModel
                     break;
             }
         }
+    }
+
+    public void SetPropertyNames(string[] propertyNames)
+    {
+        PropertyNames = propertyNames;
     }
 
     private void AddDataBoardUnitModelList<T>(T[] datas) where T : IBaseData

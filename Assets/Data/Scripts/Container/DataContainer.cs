@@ -3,11 +3,13 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 public class DataContainer<T> where T : IBaseData
 {
     private readonly Dictionary<int, T> dicById = new();
     private readonly Dictionary<string, T> dicByNameId = new();
+    private List<string> propertyNames = null;
     private T[] datas = null;
 
     public bool Deserialized => dicById != null && dicByNameId != null && datas != null;
@@ -60,6 +62,11 @@ public class DataContainer<T> where T : IBaseData
         return Array.FindAll(datas, predicate);
     }
 
+    public List<string> GetAllPropertyNames()
+    {
+        return propertyNames;
+    }
+
     private bool AddDatas(JArray array)
     {
         foreach (var jObj in array)
@@ -71,6 +78,8 @@ public class DataContainer<T> where T : IBaseData
         }
 
         datas = dicById.Values.ToArray();
+
+        InitPropertyNames();
 
         return true;
     }
@@ -96,5 +105,20 @@ public class DataContainer<T> where T : IBaseData
         }
 
         return true;
+    }
+
+    private void InitPropertyNames()
+    {
+        propertyNames = new();
+
+        Type type = typeof(T);
+
+        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (PropertyInfo property in properties)
+            propertyNames.Add(property.Name);
+
+        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance );
+        foreach (FieldInfo field in fields)
+            propertyNames.Add(field.Name);
     }
 }

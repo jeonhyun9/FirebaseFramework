@@ -19,6 +19,7 @@ public class DataBoardController : BaseController<DataBoardView,DataBoardViewMod
         DataBoardViewModel model = new();
         model.SetUseTypes(useTypes);
         model.SetOnClickType(OnClickType);
+        model.SetPropertyNames(new string[] { "Id", "NameId", "IsInit" });
 
         return model;
     }
@@ -31,5 +32,6 @@ public class DataBoardController : BaseController<DataBoardView,DataBoardViewMod
             Model.SetCurrentType(type);
 
         View.UpdateUnitItem();
+        View.UpdatePropertyNames();
     }
 }
