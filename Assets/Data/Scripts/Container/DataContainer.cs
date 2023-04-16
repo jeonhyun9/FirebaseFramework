@@ -67,7 +67,7 @@ public class DataContainer<T> where T : IBaseData
         return propertyNames;
     }
 
-    private bool AddDatas(JArray array)
+    private bool AddDatas(JArray array, bool initPropertyNames = false)
     {
         foreach (var jObj in array)
         {
@@ -79,7 +79,8 @@ public class DataContainer<T> where T : IBaseData
 
         datas = dicById.Values.ToArray();
 
-        InitPropertyNames();
+        if (initPropertyNames)
+            InitPropertyNames();
 
         return true;
     }
