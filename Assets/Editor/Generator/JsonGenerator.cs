@@ -13,7 +13,6 @@ namespace Tools
         private string jsonFileName;
         public void Init(string readExcelPath, string jsonSavePathValue)
         {
-            InitType(Type.Json);
             folderPath = jsonSavePathValue;
             jsonFileName = Path.GetFileNameWithoutExtension(readExcelPath) + ".json";
         }

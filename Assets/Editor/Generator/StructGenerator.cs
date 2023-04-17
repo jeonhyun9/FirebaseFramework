@@ -13,8 +13,6 @@ namespace Tools
         
         public void Init(string readExcelPath)
         {
-            InitType(Type.Struct);
-
             structRootName = $"Data{Path.GetFileNameWithoutExtension(readExcelPath)}";
             structFileName = structRootName + ".cs";
             folderPath = PathDefine.DataStruct;
@@ -39,7 +37,7 @@ namespace Tools
 
             StringBuilder sb = new();
 
-            sb.AppendLine(GetDataTemplate(PathDefine.StartDataTemplate, name: structRootName));
+            sb.AppendLine(GetDataTemplate(TemplatePathDefine.StartDataTemplate, ("name", structRootName)));
 
             for (int i = 0; i < columnNames.Count; i++)
             {
@@ -50,15 +48,15 @@ namespace Tools
                 if (type.Contains("struct:"))
                 {
                     type = type.Replace("struct:", "");
-                    sb.AppendLine(GetDataTemplate(PathDefine.StructValueTemplate, type, name, modifier));
+                    sb.AppendLine(GetDataTemplate(TemplatePathDefine.StructValueTemplate, ("type", type), ("name", name), ("modifier", modifier)));
                 }
                 else
                 {
-                    sb.AppendLine(GetDataTemplate(PathDefine.DataValueTemplate, type, name, modifier));
+                    sb.AppendLine(GetDataTemplate(TemplatePathDefine.DataValueTemplate, ("type", type), ("name", name), ("modifier", modifier)));
                 }
             }
 
-            sb.AppendLine(GetDataTemplate(PathDefine.EndDateTemplate));
+            sb.AppendLine(GetDataTemplate(TemplatePathDefine.EndDateTemplate));
 
             OnEndGenerate(folderPath, structFileName, sb.ToString());
         }

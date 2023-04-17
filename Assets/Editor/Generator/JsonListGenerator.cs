@@ -7,10 +7,6 @@ namespace Tools
     public class JsonListGenerator : BaseGenerator
     {
         private string JsonListName => Path.GetFileName(PathDefine.JsonListText);
-        public JsonListGenerator()
-        {
-            InitType(Type.JsonList);
-        }
 
         public void Generate(string jsonFolderPathValue)
         {

@@ -12,22 +12,23 @@ namespace Tools
         private const float height = 200f;
         private const float spacing = 5f;
 
-        //[MenuItem("Tools/Generate Script")]
-        public static void OpenDataUploaderWindow()
+        [MenuItem("Tools/Generate Script")]
+        public static void OpenScriptGenerateorWindow()
         {
             ScriptGenerateorWindow window = (ScriptGenerateorWindow)GetWindow(typeof(ScriptGenerateorWindow));
             window.InitializeWindow(window, width, height, spacing);
         }
 
+        protected override void DrawActionButton()
+        {
+            //throw new System.NotImplementedException();
+        }
+
         //¹Ì±¸Çö
         protected override void InitializeParameters()
         {
-            throw new System.NotImplementedException();
-        }
-
-        protected override void DrawActionButton()
-        {
-            throw new System.NotImplementedException();
+            AddEnumType(typeof(ScriptGenerator.ScriptType));
+            AddParameter("ScriptType", ScriptGenerator.ScriptType.MVC);
         }
     }
 }

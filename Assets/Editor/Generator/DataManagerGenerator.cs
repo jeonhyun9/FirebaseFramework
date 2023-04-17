@@ -11,7 +11,6 @@ namespace Tools
         private string ContainerManagerName => Path.GetFileName(PathDefine.DataManager);
         public DataManagerGenerator()
         {
-            InitType(Type.ContainerManager);
             folderPath = PathDefine.Manager;
         }
         
@@ -20,9 +19,9 @@ namespace Tools
             Array.Sort(dataTypeList);
 
             string types = string.Join(Environment.NewLine, dataTypeList.Select(dataType =>
-                GetDataTemplate(PathDefine.AddContainerTypeTemplate, name: dataType)));
+                GetDataTemplate(TemplatePathDefine.AddContainerTypeTemplate, ("name", dataType))));
 
-            string containerManager = GetDataTemplate(PathDefine.DataManagerTemplate, type: types);
+            string containerManager = GetDataTemplate(TemplatePathDefine.DataManagerTemplate, ("type", types));
 
             OnEndGenerate(folderPath, ContainerManagerName, containerManager);
         }

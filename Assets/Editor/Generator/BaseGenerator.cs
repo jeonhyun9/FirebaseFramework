@@ -5,21 +5,11 @@ namespace Tools
 {
     public class BaseGenerator
     {
-        protected enum Type
-        {
-            Json,
-            Struct,
-            ContainerManager,
-            JsonList,
-            VersionText,
-        }
-
         protected string folderPath;
-        private Type generatorType;
         protected int DataTypeIndex => 1;
         protected int NameIndex => DataTypeIndex + 1;
         protected int ValueIndex => NameIndex + 1;
-        protected string GetDataTemplate(string path, string type = null, string name = null, string modifier = null)
+        protected string GetDataTemplate(string path, params (string, string)[] args)
         {
             if (!File.Exists(path))
             {
@@ -29,14 +19,11 @@ namespace Tools
 
             var template = File.ReadAllText(path);
 
-            if (!string.IsNullOrEmpty(type))
-                template = template.Replace("#type#", type);
-
-            if (!string.IsNullOrEmpty(name))
-                template = template.Replace("#name#", name);
-
-            if (!string.IsNullOrEmpty(modifier))
-                template = template.Replace("#modifier#", modifier);
+            foreach(var arg in args)
+            {
+                if (!string.IsNullOrEmpty(arg.Item2))
+                    template = template.Replace($"#{arg.Item1}#", arg.Item2);
+            }
 
             return template;
         }
@@ -69,10 +56,6 @@ namespace Tools
 
             Logger.Log($"{fileNameWithExtension} {(File.Exists(savePath) ? "Edited" : "Created")}");
             File.WriteAllText(savePath, generatedValue);
-        }
-        protected void InitType(Type type)
-        {
-            generatorType = type;
         }
     }
 }

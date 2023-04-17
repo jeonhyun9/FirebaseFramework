@@ -11,6 +11,7 @@ namespace Tools
         private Dictionary<string, object> parameters = new();
         private Dictionary<string, object> defaultParameters = new();
         private float spacing;
+        private Type useEnumType;
 
         /// <summary> Window 사이즈 초기화 .. spacing - 변수 사이 간격 </summary>
         protected void InitializeWindow(BaseEdtiorWindow window, float width, float height, float spacingValue)
@@ -51,6 +52,11 @@ namespace Tools
             defaultParameters[name] = defaultValue;
         }
 
+        protected void AddEnumType(Type enumType)
+        {
+            useEnumType = enumType;
+        }
+
         private void SetParameterFromEditorPrefs()
         {
             foreach(string name in defaultParameters.Keys)
@@ -69,6 +75,11 @@ namespace Tools
 
                     case Type t when t == typeof(bool):
                         parameters[name] = EditorPrefs.GetBool(name, (bool)defaultParameters[name]);
+                        break;
+
+                    case Type t when t == useEnumType:
+                        string enumString = EditorPrefs.GetString(name, defaultParameters[name].ToString());
+                        parameters[name] = Enum.Parse(useEnumType, enumString);
                         break;
                 }
             }
@@ -93,6 +104,10 @@ namespace Tools
                     case Type t when t == typeof(bool):
                         EditorPrefs.SetBool(name, (bool)parameters[name]);
                         break;
+
+                    case Type t when t == useEnumType:
+                        EditorPrefs.SetString(name, parameters[name].ToString());
+                        break;
                 }
             }
         }
@@ -101,7 +116,7 @@ namespace Tools
         {
             foreach (string name in defaultParameters.Keys)
             {
-                Type type = defaultParameters[name].GetType();
+                Type type = parameters[name].GetType();
 
                 EditorGUILayout.LabelField(GetParameterLabel(name));
 
@@ -117,6 +132,10 @@ namespace Tools
 
                     case Type t when t == typeof(bool):
                         parameters[name] = EditorGUILayout.Toggle((bool)parameters[name]);
+                        break;
+
+                    case Type t when t == useEnumType:
+                        parameters[name] = EditorGUILayout.EnumPopup(useEnumType.Name, (Enum)parameters[name]);
                         break;
                 }
 
