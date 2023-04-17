@@ -32,6 +32,6 @@ public class DataBoardController : BaseController<DataBoardView,DataBoardViewMod
             Model.SetCurrentType(type);
 
         View.UpdateUnitItem();
-        View.UpdatePropertyNames();
+        //View.UpdatePropertyNames();
     }
 }
