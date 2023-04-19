@@ -26,7 +26,7 @@ namespace Tools
 
         protected override void DrawActionButton()
         {
-            if (GUILayout.Button("ScriptGenerator", GUILayout.Height(50)))
+            if (GUILayout.Button("Generate", GUILayout.Height(50)))
             {
                 if (scriptGenerator == null)
                 {
