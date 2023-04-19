@@ -9,6 +9,7 @@ public class PathDefine
     public const string JsonListText = "Assets/Data/Jsons/JsonList.txt";
     public const string PrefabResourcesPath = "Prefab/UI";
     public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
+    public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
 }
 
 public class TemplatePathDefine
@@ -20,7 +21,7 @@ public class TemplatePathDefine
     public const string DataManagerTemplate = "Assets/Templates/DataManagerTemplate.txt";
     public const string AddContainerTypeTemplate = "Assets/Templates/AddContainerTypeTemplate.txt";
     public const string MVC_ControllerTemplate = "Assets/Templates/MVC_ControllerTemplate.txt";
-    public const string MVC_ModelTemplate = "Assets/Templates/MVC_ModelTemplate.txt";
+    public const string MVC_ViewModelTemplate = "Assets/Templates/MVC_ViewModelTemplate.txt";
     public const string MVC_ViewTemplate = "Assets/Templates/MVC_ViewTemplate.txt";
     public const string UnitTemplate = "Assets/Templates/UnitTemplate.txt";
     public const string UnitModelTemplate = "Assets/Templates/UnitModelTemplate.txt";

@@ -17,12 +17,17 @@ namespace Tools
         private void GenerateScript(string templatePath, string name, string saveName)
         {
             string contents = GetDataTemplate(templatePath, ("name", name));
-            SaveFileAtPath(templatePath, saveName, contents);
+            SaveFileAtPath(folderPath, saveName, contents);
         }
 
         #region GenerateScript By Type
         public void Generate(ScriptType type, string name)
         {
+            folderPath = $"{PathDefine.ContentsScriptsFolderPath}/{name}";
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
             switch (type)
             {
                 case ScriptType.MVC:
@@ -41,7 +46,7 @@ namespace Tools
             string viewName = $"{name}View.cs";
 
             GenerateScript(TemplatePathDefine.MVC_ControllerTemplate, name, controllerName);
-            GenerateScript(TemplatePathDefine.MVC_ModelTemplate, name, modelName);
+            GenerateScript(TemplatePathDefine.MVC_ViewModelTemplate, name, modelName);
             GenerateScript(TemplatePathDefine.MVC_ViewTemplate, name, viewName);
 
             CreatePrefab(name, Path.GetFileNameWithoutExtension(viewName));
@@ -69,7 +74,7 @@ namespace Tools
             if (!Directory.Exists(prefabFolderPath))
                 Directory.CreateDirectory(prefabFolderPath);
 
-            string prefabPath = $"{prefabFolderPath}/{prefabName}";
+            string prefabPath = $"{prefabFolderPath}/{prefabName}.prefab";
 
             Object existingPrefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 

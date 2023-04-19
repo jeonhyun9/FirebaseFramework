@@ -28,10 +28,15 @@ namespace Tools
 
         protected void AddParameter(string name, object defaultValue, Type enumType = null)
         {
-            defaultParameters[name] = defaultValue;
-
             if (enumType != null)
+            {
+                defaultParameters[name] = (Enum)defaultValue;
                 useEnumTypes[name] = enumType;
+            }
+            else
+            {
+                defaultParameters[name] = defaultValue;
+            }
         }
 
         private void Awake()
@@ -75,11 +80,12 @@ namespace Tools
                         parameters[name] = EditorPrefs.GetBool(name, (bool)defaultParameters[name]);
                         break;
 
-                    case Type t when t == typeof(Enum):
-                        string enumString = EditorPrefs.GetString(name, defaultParameters[name].ToString());
+                    default:
                         if (useEnumTypes.ContainsKey(name))
-                            parameters[name] = Enum.Parse(useEnumTypes[name].GetType(), enumString);
-
+                        {
+                            string enumString = EditorPrefs.GetString(name, defaultParameters[name].ToString());
+                            parameters[name] = Enum.Parse(useEnumTypes[name], enumString);
+                        }
                         break;
                 }
             }
@@ -105,8 +111,9 @@ namespace Tools
                         EditorPrefs.SetBool(name, (bool)parameters[name]);
                         break;
 
-                    case Type t when t == typeof(Enum):
-                        EditorPrefs.SetString(name, parameters[name].ToString());
+                    default:
+                        if (useEnumTypes.ContainsKey(name))
+                            EditorPrefs.SetString(name, parameters[name].ToString());
                         break;
                 }
             }
@@ -116,7 +123,7 @@ namespace Tools
         {
             foreach (string name in defaultParameters.Keys)
             {
-                Type type = parameters[name].GetType();
+                Type type = defaultParameters[name].GetType();
 
                 EditorGUILayout.LabelField(GetParameterLabel(name));
 
@@ -134,7 +141,7 @@ namespace Tools
                         parameters[name] = EditorGUILayout.Toggle((bool)parameters[name]);
                         break;
 
-                    case Type t when t == typeof(Enum):
+                    default:
                         if (useEnumTypes.ContainsKey(name))
                             parameters[name] = EditorGUILayout.EnumPopup(useEnumTypes[name].Name, (Enum)parameters[name]);
                         break;

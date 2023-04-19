@@ -7,7 +7,8 @@ public class #name#Controller : BaseController< #name#View, #name#ViewModel>
         return nameof( #name#Controller).Replace("Controller", "View");
     }
 	
-	protected override  #name#ViewModel CreateModel()
+	protected override #name#ViewModel CreateModel()
     {
+		return null;
 	}
 }

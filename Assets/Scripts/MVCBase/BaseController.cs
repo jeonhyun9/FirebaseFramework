@@ -16,7 +16,6 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
     protected abstract V CreateModel();
 
     /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
-    // 추후 타입 별로 PrefabPath 사용하도록 수정하고 추상메소드 제거하자
     protected abstract string GetViewPrefabName();
 
     public void StartProcess()

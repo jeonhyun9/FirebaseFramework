@@ -23,18 +23,13 @@ public class DataLoadingView : BaseView
 
     private async UniTask ShowLoadProgress()
     {
-        while (true)
+        while (Model.IsLoading == false)
         {
             UpdateLoadingUI();
-
-            if (Model.IsLoading == false)
-            {
-                Model.OnFinishLoadData?.Invoke();
-                break;
-            }
-
             await UniTask.Yield(PlayerLoopTiming.Update);
         }
+
+        Model.OnFinishLoadData?.Invoke();
 
         if (Model.CurrentState == BaseDataLoader.State.Success)
         {

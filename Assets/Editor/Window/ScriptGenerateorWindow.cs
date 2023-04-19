@@ -32,6 +32,7 @@ namespace Tools
                 {
                     scriptGenerator = new();
                     scriptGenerator.Generate(ScriptType, ContentsName);
+                    Close();
                 }
             }
         }
