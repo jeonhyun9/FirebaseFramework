@@ -21,7 +21,7 @@ namespace Tools
 
             jsonListDesc = string.Join(",", jsonFiles);
 
-            OnEndGenerate(jsonFolderPathValue, JsonListName, jsonListDesc);
+            SaveFileAtPath(jsonFolderPathValue, JsonListName, jsonListDesc);
         }
     }
 }

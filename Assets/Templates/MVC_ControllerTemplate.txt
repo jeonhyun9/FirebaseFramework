@@ -1,0 +1,13 @@
+using UnityEngine;
+
+public class #name#Controller : BaseController< #name#View, #name#ViewModel>
+{
+    protected override string GetViewPrefabName()
+    {
+        return nameof( #name#Controller).Replace("Controller", "View");
+    }
+	
+	protected override  #name#ViewModel CreateModel()
+    {
+	}
+}

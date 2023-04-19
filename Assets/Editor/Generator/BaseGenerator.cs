@@ -38,7 +38,7 @@ namespace Tools
 
             return name;
         }
-        protected void OnEndGenerate(string folderPath, string fileNameWithExtension, string generatedValue)
+        protected void SaveFileAtPath(string folderPath, string fileNameWithExtension, string generatedValue)
         {
             string savePath = Path.Combine(folderPath, fileNameWithExtension);
 

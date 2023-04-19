@@ -57,7 +57,7 @@ namespace Tools
 
             string newJson = JsonConvert.SerializeObject(dataDicList);
 
-            OnEndGenerate(folderPath, jsonFileName, newJson);
+            SaveFileAtPath(folderPath, jsonFileName, newJson);
         }
 
         private System.Type GetDataType(string columnType)

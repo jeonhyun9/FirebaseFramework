@@ -58,7 +58,7 @@ namespace Tools
 
             sb.AppendLine(GetDataTemplate(TemplatePathDefine.EndDateTemplate));
 
-            OnEndGenerate(folderPath, structFileName, sb.ToString());
+            SaveFileAtPath(folderPath, structFileName, sb.ToString());
         }
 
         private string GetAccessModifier(string name)

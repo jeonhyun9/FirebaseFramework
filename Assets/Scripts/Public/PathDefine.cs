@@ -8,15 +8,21 @@ public class PathDefine
     public const string VersionText = "Assets/Data/Jsons/Version.txt";
     public const string JsonListText = "Assets/Data/Jsons/JsonList.txt";
     public const string PrefabResourcesPath = "Prefab/UI";
+    public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
 }
 
 public class TemplatePathDefine
 {
-    public const string StartDataTemplate = "Assets/Data/Templates/StartDataTemplate.txt";
-    public const string EndDateTemplate = "Assets/Data/Templates/EndDataTemplate.txt";
-    public const string DataValueTemplate = "Assets/Data/Templates/DataValueTemplate.txt";
-    public const string StructValueTemplate = "Assets/Data/Templates/StructValueTemplate.txt";
-    public const string DataManagerTemplate = "Assets/Data/Templates/DataManagerTemplate.txt";
-    public const string AddContainerTypeTemplate = "Assets/Data/Templates/AddContainerTypeTemplate.txt";
+    public const string StartDataTemplate = "Assets/Templates/StartDataTemplate.txt";
+    public const string EndDateTemplate = "Assets/Templates/EndDataTemplate.txt";
+    public const string DataValueTemplate = "Assets/Templates/DataValueTemplate.txt";
+    public const string StructValueTemplate = "Assets/Templates/StructValueTemplate.txt";
+    public const string DataManagerTemplate = "Assets/Templates/DataManagerTemplate.txt";
+    public const string AddContainerTypeTemplate = "Assets/Templates/AddContainerTypeTemplate.txt";
+    public const string MVC_ControllerTemplate = "Assets/Templates/MVC_ControllerTemplate.txt";
+    public const string MVC_ModelTemplate = "Assets/Templates/MVC_ModelTemplate.txt";
+    public const string MVC_ViewTemplate = "Assets/Templates/MVC_ViewTemplate.txt";
+    public const string UnitTemplate = "Assets/Templates/UnitTemplate.txt";
+    public const string UnitModelTemplate = "Assets/Templates/UnitModelTemplate.txt";
 }
 

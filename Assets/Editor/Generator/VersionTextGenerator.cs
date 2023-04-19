@@ -10,7 +10,7 @@ namespace Tools
 
         public void Generate(string jsonFolderPath, string version)
         {
-            OnEndGenerate(jsonFolderPath, VersionTextName, version);
+            SaveFileAtPath(jsonFolderPath, VersionTextName, version);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Tools
 
             string containerManager = GetDataTemplate(TemplatePathDefine.DataManagerTemplate, ("type", types));
 
-            OnEndGenerate(folderPath, ContainerManagerName, containerManager);
+            SaveFileAtPath(folderPath, ContainerManagerName, containerManager);
         }
     }
 }

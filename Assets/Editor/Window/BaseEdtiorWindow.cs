@@ -10,8 +10,8 @@ namespace Tools
     {
         private Dictionary<string, object> parameters = new();
         private Dictionary<string, object> defaultParameters = new();
+        private Dictionary<string, Type> useEnumTypes = new();
         private float spacing;
-        private Type useEnumType;
 
         /// <summary> Window 사이즈 초기화 .. spacing - 변수 사이 간격 </summary>
         protected void InitializeWindow(BaseEdtiorWindow window, float width, float height, float spacingValue)
@@ -19,6 +19,19 @@ namespace Tools
             window.minSize = new Vector2(width, height);
             window.maxSize = new Vector2(width * 2, height);
             spacing = spacingValue;
+        }
+
+        /// <summary> AddParameter로 사용할 변수들을 추가하도록 구현 </summary>
+        protected abstract void InitializeParameters();
+
+        protected abstract void DrawActionButton();
+
+        protected void AddParameter(string name, object defaultValue, Type enumType = null)
+        {
+            defaultParameters[name] = defaultValue;
+
+            if (enumType != null)
+                useEnumTypes[name] = enumType;
         }
 
         private void Awake()
@@ -42,21 +55,6 @@ namespace Tools
             SaveParameters();
         }
 
-        /// <summary> AddParameter로 사용할 변수들을 추가하도록 구현 </summary>
-        protected abstract void InitializeParameters();
-
-        protected abstract void DrawActionButton();
-
-        protected void AddParameter(string name, object defaultValue)
-        {
-            defaultParameters[name] = defaultValue;
-        }
-
-        protected void AddEnumType(Type enumType)
-        {
-            useEnumType = enumType;
-        }
-
         private void SetParameterFromEditorPrefs()
         {
             foreach(string name in defaultParameters.Keys)
@@ -77,9 +75,11 @@ namespace Tools
                         parameters[name] = EditorPrefs.GetBool(name, (bool)defaultParameters[name]);
                         break;
 
-                    case Type t when t == useEnumType:
+                    case Type t when t == typeof(Enum):
                         string enumString = EditorPrefs.GetString(name, defaultParameters[name].ToString());
-                        parameters[name] = Enum.Parse(useEnumType, enumString);
+                        if (useEnumTypes.ContainsKey(name))
+                            parameters[name] = Enum.Parse(useEnumTypes[name].GetType(), enumString);
+
                         break;
                 }
             }
@@ -105,7 +105,7 @@ namespace Tools
                         EditorPrefs.SetBool(name, (bool)parameters[name]);
                         break;
 
-                    case Type t when t == useEnumType:
+                    case Type t when t == typeof(Enum):
                         EditorPrefs.SetString(name, parameters[name].ToString());
                         break;
                 }
@@ -134,8 +134,9 @@ namespace Tools
                         parameters[name] = EditorGUILayout.Toggle((bool)parameters[name]);
                         break;
 
-                    case Type t when t == useEnumType:
-                        parameters[name] = EditorGUILayout.EnumPopup(useEnumType.Name, (Enum)parameters[name]);
+                    case Type t when t == typeof(Enum):
+                        if (useEnumTypes.ContainsKey(name))
+                            parameters[name] = EditorGUILayout.EnumPopup(useEnumTypes[name].Name, (Enum)parameters[name]);
                         break;
                 }
 

@@ -23,7 +23,7 @@ public class DataBoardView : BaseView
         if (options == null)
             InitDropdownOptions();
 
-        //UpdatePropertyNames();
+        UpdatePropertyNames();
         UpdateUnitItem();
 
         await UniTask.CompletedTask;
