@@ -23,7 +23,7 @@ public class DataLoadingView : BaseView
 
     private async UniTask ShowLoadProgress()
     {
-        while (Model.IsLoading == false)
+        while (Model.IsLoading)
         {
             UpdateLoadingUI();
             await UniTask.Yield(PlayerLoopTiming.Update);

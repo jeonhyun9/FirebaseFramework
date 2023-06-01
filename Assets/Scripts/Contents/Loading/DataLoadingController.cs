@@ -59,18 +59,31 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     private void OnFinishFireBaseDataLoader()
     {
-        if (FireBaseDataLoader.Storage.App != null)
-            FireBaseDataLoader.Storage.App.Dispose();
-
-        Firebase.FirebaseApp.DefaultInstance.Dispose();
-
-        //씬에 남아있는 경우가 있음..
-        GameObject go = GameObject.Find("Firebase Services");
-
-        if (go != null)
+        if (FireBaseDataLoader == null)
         {
-            Logger.Log("Firebase Services destroyed.");
-            Object.Destroy(go);
+            Logger.Null("FireBaseDataLoader");
+            return;
+        }
+        
+        try
+        {
+            if (FireBaseDataLoader.Storage.App != null)
+                FireBaseDataLoader.Storage.App.Dispose();
+        
+            Firebase.FirebaseApp.DefaultInstance.Dispose();
+        
+            //씬에 남아있는 경우가 있음..
+            GameObject go = GameObject.Find("Firebase Services");
+        
+            if (go != null)
+            {
+                Logger.Log("Firebase Services destroyed.");
+                Object.Destroy(go);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Logger.Error(e.ToString());
         }
     }
 

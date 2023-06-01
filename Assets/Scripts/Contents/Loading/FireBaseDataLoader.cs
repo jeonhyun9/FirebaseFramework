@@ -23,6 +23,8 @@ public class FireBaseDataLoader : BaseDataLoader
         //FireBaseStorage에서 파일명과 json을 불러와서 Dictionary에 담는 과정
         bool loadDataResult = await LoadDataFromFireBase();
 
+        Logger.Log($"Load Data Result {loadDataResult}");
+
         ChangeState(loadDataResult ? State.Success : State.Fail);
     }
 
@@ -115,6 +117,8 @@ public class FireBaseDataLoader : BaseDataLoader
 
     private async UniTask<string> LoadJsonByName(string jsonName)
     {
+        Logger.Log($"Try load {jsonName}");
+
         StorageReference jsonDataRef = Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
 
         byte[] loadedBytes = await LoadBytes(jsonDataRef);
