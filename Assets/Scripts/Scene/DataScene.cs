@@ -42,13 +42,13 @@ public class DataScene : MonoBehaviour
         switch (loadDataType)
         {
             case DataLoadingController.LoadDataType.LocalPath:
-                FireBaseDataLoader fireBaseDataLoader = dataLoadingController.CreateFireBaseDataLoader();
+                FireBaseDataLoader fireBaseDataLoader = new ();
                 fireBaseDataLoader.SetBucketName(bucketName);
                 dataLoadingController.SetModel(fireBaseDataLoader);
                 break;
 
             case DataLoadingController.LoadDataType.FireBase:
-                LocalDataLoader localDataLoader = dataLoadingController.CreateLocalDataLoader();
+                LocalDataLoader localDataLoader = new ();
                 localDataLoader.SetLocalJsonDataPath(localJsonDataPath);
                 dataLoadingController.SetModel(localDataLoader);
                 break;

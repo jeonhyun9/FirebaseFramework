@@ -34,18 +34,6 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
         }
     }
 
-    public LocalDataLoader CreateLocalDataLoader()
-    {
-        LocalDataLoader localDataLoader = new();
-        return localDataLoader;
-    }
-
-    public FireBaseDataLoader CreateFireBaseDataLoader()
-    {
-        FireBaseDataLoader fireBaseDataLoader = new();
-        return fireBaseDataLoader;
-    }
-
     private void OnFinishFireBaseDataLoader()
     {
         if (FireBaseDataLoader == null)
