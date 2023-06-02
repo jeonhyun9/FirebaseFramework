@@ -12,11 +12,15 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
 
     protected Transform UITransform => UIManager.Instance.UITransform;
 
-    /// <summary> Model 생성 </summary>
-    protected abstract V CreateModel();
-
     /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
     protected abstract string GetViewPrefabName();
+
+    protected abstract void Enter();
+
+    public void SetModel(V model)
+    {
+        Model = model;
+    }
 
     public void StartProcess()
     {
@@ -25,7 +29,13 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
 
     public async UniTask ProcessAsync()
     {
-        InitModel();
+        if (Model == null)
+        {
+            Logger.Error("Model is not initialized");
+            return;
+        }
+
+        Enter();
 
         bool loadResult = await LoadViewAsync();
 
@@ -39,11 +49,6 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
         View.Show();
 
         await View.ShowAsync();
-    }
-
-    private void InitModel()
-    {
-        Model = CreateModel();
     }
 
     private async UniTask<bool> LoadViewAsync()

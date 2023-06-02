@@ -14,47 +14,36 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     private FireBaseDataLoader FireBaseDataLoader => Model.GetLoader<FireBaseDataLoader>();
 
-    private readonly LoadDataType loadDataType;
-
-    private readonly string localJsonDataPath;
-
-    private readonly string bucketName;
-
-    public DataLoadingController(LoadDataType loadDataTypeValue, string localJsonDataPathValue, string bucketNameValue)
-    {
-        loadDataType = loadDataTypeValue;
-        localJsonDataPath = localJsonDataPathValue;
-        bucketName = bucketNameValue;
-    }
-
     protected override string GetViewPrefabName()
     {
         return nameof(DataLoadingController).Replace("Controller", "View");
     }
 
-    protected override BaseDataLoader CreateModel()
+    protected override void Enter()
     {
-        switch (loadDataType)
+        if (LocalDataLoader != null)
         {
-            case LoadDataType.LocalPath:
-                LocalDataLoader localDataLoader = new();
-                localDataLoader.SetLocalJsonDataPath(localJsonDataPath);
-                localDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
-                localDataLoader.LoadData().Forget();
-
-                return localDataLoader;
-
-            case LoadDataType.FireBase:
-                FireBaseDataLoader fireBaseDataLoader = new();
-                fireBaseDataLoader.SetBucketName(bucketName);
-                fireBaseDataLoader.SetOnFinishLoadData(OnFinishFireBaseDataLoader);
-                fireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
-                fireBaseDataLoader.LoadData().Forget();
-
-                return fireBaseDataLoader;
+            LocalDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+            LocalDataLoader.LoadData().Forget();
         }
+        else if (FireBaseDataLoader != null)
+        {
+            FireBaseDataLoader.SetOnFinishLoadData(OnFinishFireBaseDataLoader);
+            FireBaseDataLoader.SetOnSuccessLoadData(OnSuccessDataLoader);
+            FireBaseDataLoader.LoadData().Forget();
+        }
+    }
 
-        return null;
+    public LocalDataLoader CreateLocalDataLoader()
+    {
+        LocalDataLoader localDataLoader = new();
+        return localDataLoader;
+    }
+
+    public FireBaseDataLoader CreateFireBaseDataLoader()
+    {
+        FireBaseDataLoader fireBaseDataLoader = new();
+        return fireBaseDataLoader;
     }
 
     private void OnFinishFireBaseDataLoader()
@@ -91,4 +80,6 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
     {
         DataManager.Instance.AddDataContainerByDataDic(Model.DicJsonByFileName);
     }
+
+
 }

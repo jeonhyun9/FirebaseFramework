@@ -35,26 +35,38 @@ public class DataScene : MonoBehaviour
             await ShowDataBoard();
     }
 
-    private DataLoadingController InitDataLoader(DataLoadingController.LoadDataType loadDataTypeValue, string localJsonDataPathValue, string bucketNameValue)
-    {
-        return new DataLoadingController(loadDataTypeValue, localJsonDataPathValue, bucketNameValue);
-    }
-
     private async UniTask<bool> ShowDataLoading()
     {
-        DataLoadingController dataLoadingController = InitDataLoader(loadDataType, localJsonDataPath, bucketName);
+        DataLoadingController dataLoadingController = new ();
+
+        switch (loadDataType)
+        {
+            case DataLoadingController.LoadDataType.LocalPath:
+                FireBaseDataLoader fireBaseDataLoader = dataLoadingController.CreateFireBaseDataLoader();
+                fireBaseDataLoader.SetBucketName(bucketName);
+                dataLoadingController.SetModel(fireBaseDataLoader);
+                break;
+
+            case DataLoadingController.LoadDataType.FireBase:
+                LocalDataLoader localDataLoader = dataLoadingController.CreateLocalDataLoader();
+                localDataLoader.SetLocalJsonDataPath(localJsonDataPath);
+                dataLoadingController.SetModel(localDataLoader);
+                break;
+        }
+
         await dataLoadingController.ProcessAsync();
         return dataLoadingController.IsSuccess;
     }
 
-    private DataBoardController InitDataBoard(Type[] useTypes)
-    {
-        return new DataBoardController(useTypes);
-    }
-
     private async UniTask ShowDataBoard()
     {
-        DataBoardController dataBoardController = InitDataBoard(DataBoardUseTypes);
+        DataBoardController dataBoardController = new ();
+
+        DataBoardViewModel model = new();
+        model.SetUseTypes(DataBoardUseTypes);
+
+        dataBoardController.SetModel(model);
+
         await dataBoardController.ProcessAsync();
     }
 }
