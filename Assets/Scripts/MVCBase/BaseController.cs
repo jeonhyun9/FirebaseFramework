@@ -55,7 +55,7 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
     {
         viewName = GetViewPrefabName();
 
-        GameObject prefab = (GameObject)await Resources.LoadAsync<GameObject>(ViewPrefabPath);
+        GameObject prefab = await AddressableManager.Instance.InstantiateAsync(viewName);
         
         if (prefab == null)
         {

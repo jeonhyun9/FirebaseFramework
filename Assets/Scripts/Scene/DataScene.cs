@@ -15,10 +15,15 @@ public class DataScene : MonoBehaviour
     [SerializeField]
     private string bucketName = "jhgunity";
 
+    [SerializeField]
+    private TextAsset testText;
+
     private Type[] DataBoardUseTypes => DataManager.Instance.GetAllTypes();
 
     private void Awake()
     {
+        AddressableManager.Instance.Initialize(testText.text);
+
         ShowData();
     }
 

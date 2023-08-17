@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace Tools
 {
-    public class DataUploaderWindow : BaseEdtiorWindow
+    public class DataUploaderEditorWindow : BaseEdtiorWindow
     {
         private const float width = 400f;
         private const float height = 300f;
@@ -17,7 +17,7 @@ namespace Tools
         [MenuItem("Tools/Upload Data to FireBase Storage")]
         public static void OpenDataUploaderWindow()
         {
-            DataUploaderWindow window = (DataUploaderWindow)GetWindow(typeof(DataUploaderWindow));
+            DataUploaderEditorWindow window = (DataUploaderEditorWindow)GetWindow(typeof(DataUploaderEditorWindow));
             window.InitializeWindow(window, width, height, spacing);
         }
 

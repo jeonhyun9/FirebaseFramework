@@ -468,6 +468,7 @@ MonoBehaviour:
   loadDataType: 1
   localJsonDataPath: Assets/Data/Jsons
   bucketName: jhgunity
+  testText: {fileID: 4900000, guid: d7bc79098ced79c4fbd6f389d0d28a47, type: 3}
 --- !u!4 &1939531283
 Transform:
   m_ObjectHideFlags: 0

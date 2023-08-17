@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Tools
 {
-    public class DataGeneratorWindow : BaseEdtiorWindow
+    public class DataGeneratorEditorWindow : BaseEdtiorWindow
     {
         private const float width = 400f;
         private const float height = 200f;
@@ -18,7 +18,7 @@ namespace Tools
         [MenuItem("Tools/Generate Data From Excel Folder")]
         public static void OpenDataGeneratorWindow()
         {
-            DataGeneratorWindow window = (DataGeneratorWindow)GetWindow(typeof(DataGeneratorWindow));
+            DataGeneratorEditorWindow window = (DataGeneratorEditorWindow)GetWindow(typeof(DataGeneratorEditorWindow));
             window.InitializeWindow(window, width, height, spacing);
         }
 

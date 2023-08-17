@@ -10,6 +10,7 @@ public class PathDefine
     public const string PrefabResourcesPath = "Prefab/UI";
     public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
+    public const string AddressablePath = "Assets/Addressable";
 }
 
 public class TemplatePathDefine

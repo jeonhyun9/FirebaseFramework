@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Tools
 {
-    public class ScriptGenerateorWindow : BaseEdtiorWindow
+    public class ScriptGenerateorEditorWindow : BaseEdtiorWindow
     {
         private const float width = 400f;
         private const float height = 200f;
@@ -20,7 +20,7 @@ namespace Tools
         [MenuItem("Tools/Generate Script")]
         public static void OpenScriptGenerateorWindow()
         {
-            ScriptGenerateorWindow window = (ScriptGenerateorWindow)GetWindow(typeof(ScriptGenerateorWindow));
+            ScriptGenerateorEditorWindow window = (ScriptGenerateorEditorWindow)GetWindow(typeof(ScriptGenerateorEditorWindow));
             window.InitializeWindow(window, width, height, spacing);
         }
 
