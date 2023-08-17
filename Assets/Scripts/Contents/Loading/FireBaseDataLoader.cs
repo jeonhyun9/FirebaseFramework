@@ -191,4 +191,20 @@ public class FireBaseDataLoader : BaseDataLoader
 
         return loadedBytes;
     }
+
+    private async UniTask<string> GetDownloadUrlFromStoragePath(string storagePath)
+    {
+        StorageReference reference = Storage.GetReferenceFromUrl($"{fireBaseDef.AppSpot}{storagePath}");
+
+        try
+        {
+            var downloadUrl = await reference.GetDownloadUrlAsync();
+            return downloadUrl.ToString();
+        }
+        catch (Exception e)
+        {
+            Logger.Exception($"Failed to get firebase download url from path : {storagePath}", e);
+            return null;
+        }
+    }
 }
