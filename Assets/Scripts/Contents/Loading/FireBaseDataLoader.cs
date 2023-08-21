@@ -6,19 +6,20 @@ using System.Linq;
 
 public class FireBaseDataLoader : BaseDataLoader
 {
-    public FirebaseStorage Storage { get; private set; }
-
     private FireBaseDefine fireBaseDef;
+
+    public FirebaseStorage Storage => fireBaseDef.Storage;
     
-    public void SetBucketName(string bucketName)
+    public void InitializeFireBaseDefine(string bucketName)
     {
         fireBaseDef = new FireBaseDefine(bucketName);
-        Storage = FirebaseStorage.GetInstance(fireBaseDef.AppSpot);
     }
 
     public async override UniTaskVoid LoadData()
     {
         DicJsonByFileName.Clear();
+
+        Logger.Log("Start Load Data");
 
         //FireBaseStorage에서 파일명과 json을 불러와서 Dictionary에 담는 과정
         bool loadDataResult = await LoadDataFromFireBase();
@@ -50,7 +51,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadVersion);
 
-        StorageReference versionRef = Storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
+        StorageReference versionRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
 
         string currentVersion = await LoadString(versionRef);
 
@@ -68,7 +69,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadJsonList);
 
-        StorageReference storageRef = Storage.RootReference.Child(refPath);
+        StorageReference storageRef = fireBaseDef.Storage.RootReference.Child(refPath);
 
         string[] jsonListArray;
 
@@ -119,7 +120,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         Logger.Log($"Try load {jsonName}");
 
-        StorageReference jsonDataRef = Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
+        StorageReference jsonDataRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
 
         byte[] loadedBytes = await LoadBytes(jsonDataRef);
 
@@ -194,7 +195,7 @@ public class FireBaseDataLoader : BaseDataLoader
 
     private async UniTask<string> GetDownloadUrlFromStoragePath(string storagePath)
     {
-        StorageReference reference = Storage.GetReferenceFromUrl($"{fireBaseDef.AppSpot}{storagePath}");
+        StorageReference reference = fireBaseDef.Storage.GetReferenceFromUrl($"{fireBaseDef.AppSpot}{storagePath}");
 
         try
         {

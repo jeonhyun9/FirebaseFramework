@@ -5,17 +5,27 @@ using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 public class AddressableManager : BaseManager<AddressableManager>
 {
     private Dictionary<Type, Dictionary<string, string>> addressableDic = new Dictionary<Type, Dictionary<string, string>>();
 
-
     public void Initialize(string json)
     {
         addressableDic = JsonConvert.DeserializeObject<Dictionary<Type, Dictionary<string, string>>>(json);
         Logger.Log(addressableDic.ToString());
+    }
+
+    public async UniTask DownloadAllAssetsAsync()
+    {
+        foreach(Type type in addressableDic.Keys)
+        {
+            foreach(string key in addressableDic[type].Keys)
+                await Addressables.DownloadDependenciesAsync(key);
+        }
     }
 
     public async UniTask<T> LoadAssetAsync<T>(string name) where T : UnityEngine.Object
@@ -36,6 +46,8 @@ public class AddressableManager : BaseManager<AddressableManager>
 
     private bool IsContain(Type type, string name)
     {
+        Logger.Log(Addressables.RuntimePath);
+
         if (!addressableDic.ContainsKey(type))
         {
             Logger.Error($"{type} is not contained in addressable.");

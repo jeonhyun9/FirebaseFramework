@@ -17,7 +17,7 @@ MonoBehaviour:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
-  m_BuildRemoteCatalog: 0
+  m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
   m_CatalogRequestsTimeout: 0
   m_DisableCatalogUpdateOnStart: 0
@@ -34,9 +34,9 @@ MonoBehaviour:
   m_MonoScriptBundleNaming: 0
   m_MonoScriptBundleCustomNaming: 
   m_RemoteCatalogBuildPath:
-    m_Id: 
+    m_Id: c3a15b37e58e766459f6e89bd5df7a1d
   m_RemoteCatalogLoadPath:
-    m_Id: 
+    m_Id: 35bf62347cabcb546b198373533d8c6e
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: 
@@ -60,6 +60,20 @@ MonoBehaviour:
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 35bf62347cabcb546b198373533d8c6e
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: d3b36af03e0d86e48816ed1a07ca1c72
+        m_Value: ServerData/[BuildTarget]
+      - m_Id: 4bc52eac8fa14034890087d8a5d731cd
+        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+    - m_InheritedParent: 
+      m_Id: 82dabed1d7e60ed42bc5b226502c8226
+      m_ProfileName: Firebase
+      m_Values:
+      - m_Id: 7ae26e2624d089f4c9578ebe9583246f
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: c3a15b37e58e766459f6e89bd5df7a1d
+        m_Value: Addressable/[BuildTarget]
+      - m_Id: 35bf62347cabcb546b198373533d8c6e
+        m_Value: Addressable/[BuildTarget]
       - m_Id: d3b36af03e0d86e48816ed1a07ca1c72
         m_Value: ServerData/[BuildTarget]
       - m_Id: 4bc52eac8fa14034890087d8a5d731cd
@@ -97,7 +111,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8c512160cbaac76459d43ec5d13e17e5, type: 2}
   - {fileID: 11400000, guid: 967c3144d2b045248ad658c08a39b263, type: 2}
   - {fileID: 11400000, guid: 2f0c1621b1d3ecb48a585ca363d613c4, type: 2}
-  m_ActiveProfileId: 5047bcb9bd2e5bc40b8ce1cf7824e56f
+  m_ActiveProfileId: 82dabed1d7e60ed42bc5b226502c8226
   m_HostingServicesManager:
     m_HostingServiceInfos: []
     m_Settings: {fileID: 11400000}

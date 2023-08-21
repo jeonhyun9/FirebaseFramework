@@ -1,8 +1,12 @@
+using System;
+using Cysharp.Threading.Tasks;
 using Firebase.Storage;
 using UnityEngine;
 
 public struct FireBaseDefine
 {
+    public FirebaseStorage Storage => FirebaseStorage.GetInstance(AppSpot);
+
     public FireBaseDefine(string bucketName, string version = null)
     {
         BucketName = bucketName;
@@ -64,5 +68,23 @@ public struct FireBaseDefine
         return $"JsonDatas/{Version}/{jsonNameWithExtension}";
     }
 
+    public string AddressablePath => "Addressable/";
+
     public int MaxJsonSizeBytes => 10000;
+
+    public async UniTask<string> GetDownloadUrlFromStoragePath(string storagePath)
+    {
+        StorageReference reference = Storage.GetReferenceFromUrl($"{AppSpot}{storagePath}");
+
+        try
+        {
+            var downloadUrl = await reference.GetDownloadUrlAsync();
+            return downloadUrl.ToString();
+        }
+        catch (Exception e)
+        {
+            Logger.Exception($"Failed to get firebase download url from path : {storagePath}", e);
+            return null;
+        }
+    }
 }

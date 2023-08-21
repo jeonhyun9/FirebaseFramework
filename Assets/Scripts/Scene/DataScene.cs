@@ -22,13 +22,21 @@ public class DataScene : MonoBehaviour
 
     private void Awake()
     {
-        AddressableManager.Instance.Initialize(testText.text);
-
-        ShowData();
+        try
+        {
+            Logger.Log(testText.ToString());
+            AddressableManager.Instance.Initialize(testText.text);
+            ShowData();
+        }
+        catch (Exception e)
+        {
+            Logger.Log(e.ToString());
+        }
     }
 
     private void ShowData()
     {
+        Logger.Log("Show Data");
         ShowDataAsync().Forget();
     }
 
@@ -46,13 +54,13 @@ public class DataScene : MonoBehaviour
 
         switch (loadDataType)
         {
-            case DataLoadingController.LoadDataType.LocalPath:
+            case DataLoadingController.LoadDataType.FireBase:
                 FireBaseDataLoader fireBaseDataLoader = new ();
-                fireBaseDataLoader.SetBucketName(bucketName);
+                fireBaseDataLoader.InitializeFireBaseDefine(bucketName);
                 dataLoadingController.SetModel(fireBaseDataLoader);
                 break;
 
-            case DataLoadingController.LoadDataType.FireBase:
+            case DataLoadingController.LoadDataType.LocalPath:
                 LocalDataLoader localDataLoader = new ();
                 localDataLoader.SetLocalJsonDataPath(localJsonDataPath);
                 dataLoadingController.SetModel(localDataLoader);
