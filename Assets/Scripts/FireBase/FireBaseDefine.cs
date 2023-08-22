@@ -30,9 +30,11 @@ public struct FireBaseDefine
 
     public string AppSpot => $"gs://{BucketName}.appspot.com/";
 
-    public string CurrentVersionPath => "CurrentVersion/Version.txt";
+    public string CurrentJsonVersionStoragePath => $"CurrentVersion/{NameDefine.JsonVersionTxtName}";
 
-    public string JsonDatasPath
+    public string CurrentAddressableVersionStoragePath => $"CurrentVersion/{NameDefine.AddressableVersionTxtName}";
+
+    public string JsonDatasStoragePath
     {
         get
         {
@@ -45,30 +47,19 @@ public struct FireBaseDefine
         }
     }
 
-    public string JsonListPath
+    public string JsonListStoragePath => $"JsonDatas/{Version}/JsonList.txt";
+
+    public string GetJsonStoragePath(string jsonNameWithExtension)
     {
-        get
-        {
-            if (string.IsNullOrEmpty(Version))
-            {
-                Logger.Warning("Version not initialized");
-                return null;
-            }
-            return $"JsonDatas/{Version}/JsonList.txt";
-        }
+        return $"{JsonDatasStoragePath}{jsonNameWithExtension}";
     }
 
-    public string GetJsonPath(string jsonNameWithExtension)
-    {
-        if (string.IsNullOrEmpty(Version))
-        {
-            Logger.Warning("Version not initialized");
-            return null;
-        }
-        return $"JsonDatas/{Version}/{jsonNameWithExtension}";
-    }
+    public string AddressableBuildPath => $"{PathDefine.AddressableBuildPathByFlatform}/{Version}";
 
-    public string AddressablePath => "Addressable/";
+    public string GetAddressableBuildStoragePath(string addressableBuildNameWithExtension)
+    {
+        return $"{AddressableBuildPath}/{addressableBuildNameWithExtension}";
+    }
 
     public int MaxJsonSizeBytes => 10000;
 

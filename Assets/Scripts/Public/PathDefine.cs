@@ -1,5 +1,6 @@
 public class PathDefine
 {
+    #region const
     public const string Excel = "Assets/Data/Excels";
     public const string Json = "Assets/Data/Jsons";
     public const string DataStruct = "Assets/Data/Scripts/Structs";
@@ -11,6 +12,21 @@ public class PathDefine
     public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
     public const string AddressablePath = "Assets/Addressable";
+    #endregion
+
+    #region property
+    public static string AddressableBuildPathByFlatform
+    {
+        get
+        {
+#if UNITY_STANDALONE
+            return "Addressable/StandaloneWindows64";
+#elif UNITY_AOS
+            return "Addressable/Android";
+#endif
+        }
+    }
+#endregion
 }
 
 public class TemplatePathDefine

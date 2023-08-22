@@ -16,7 +16,6 @@ public class AddressableManager : BaseManager<AddressableManager>
     public void Initialize(string json)
     {
         addressableDic = JsonConvert.DeserializeObject<Dictionary<Type, Dictionary<string, string>>>(json);
-        Logger.Log(addressableDic.ToString());
     }
 
     public async UniTask DownloadAllAssetsAsync()

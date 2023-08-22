@@ -34,7 +34,7 @@ public class FireBaseDataLoader : BaseDataLoader
         if (!await LoadFireBaseDefVersion())
             return false;
         
-        string[] jsonList = await LoadJsonList(fireBaseDef.JsonListPath);
+        string[] jsonList = await LoadJsonList(fireBaseDef.JsonListStoragePath);
 
         if (!jsonList.IsValidArray())
         {
@@ -51,7 +51,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadVersion);
 
-        StorageReference versionRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.CurrentVersionPath);
+        StorageReference versionRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.CurrentJsonVersionStoragePath);
 
         string currentVersion = await LoadString(versionRef);
 
@@ -120,7 +120,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         Logger.Log($"Try load {jsonName}");
 
-        StorageReference jsonDataRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.GetJsonPath(jsonName));
+        StorageReference jsonDataRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.GetJsonStoragePath(jsonName));
 
         byte[] loadedBytes = await LoadBytes(jsonDataRef);
 
