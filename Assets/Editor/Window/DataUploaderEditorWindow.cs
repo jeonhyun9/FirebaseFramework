@@ -24,7 +24,7 @@ namespace Tools
         protected override void InitializeParameters()
         {
             AddParameter("JsonPath", PathDefine.Json);
-            AddParameter("BucketName", "jhgunity");
+            AddParameter("BucketName", NameDefine.BucketDefaultName);
             AddParameter("Version", "0.0.0");
         }
 
@@ -33,13 +33,13 @@ namespace Tools
             if (GUILayout.Button("Upload", GUILayout.Height(50)))
             {
                 GameObject uploaderGo = new("DataUploader");
-                FireBaseStorageUploader dataUploader = uploaderGo.AddComponent<FireBaseStorageUploader>();
+                FireBaseStorageUploader firebaseStorageUploader = uploaderGo.AddComponent<FireBaseStorageUploader>();
 
-                if (dataUploader == null)
+                if (firebaseStorageUploader == null)
                     return;
 
-                if (dataUploader.Initialize(JsonPath, BucketName, Version))
-                    dataUploader.StartJsonUpload();
+                if (firebaseStorageUploader.Initialize(JsonPath, new FireBaseDefine(BucketName, Version)))
+                    firebaseStorageUploader.StartJsonUpload();
 
                 Close();
             }

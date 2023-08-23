@@ -11,7 +11,8 @@ public class PathDefine
     public const string PrefabResourcesPath = "Prefab/UI";
     public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
-    public const string AddressablePath = "Assets/Addressable";
+    public const string Addressable = "Assets/Addressable";
+    public const string AddressablePathJson = "Assets/Addressable/AddressablePath.txt";
     #endregion
 
     #region property

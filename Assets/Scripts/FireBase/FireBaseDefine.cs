@@ -7,15 +7,16 @@ public struct FireBaseDefine
 {
     public FirebaseStorage Storage => FirebaseStorage.GetInstance(AppSpot);
 
-    public FireBaseDefine(string bucketName, string version = null)
+    public FireBaseDefine(string bucketName, string jsonVersion = null, string addressableVersion = null)
     {
         BucketName = bucketName;
-        Version = version;
+        JsonVersion = jsonVersion;
+        AddressableVersion = addressableVersion;
     }
 
-    public void SetVersion(string version)
+    public void SetJsonVersion(string version)
     {
-        Version = version;
+        JsonVersion = version;
     }
 
     public string BucketName
@@ -23,7 +24,12 @@ public struct FireBaseDefine
         get; private set;
     }
 
-    public string Version
+    public string JsonVersion
+    {
+        get; private set;
+    }
+
+    public string AddressableVersion
     {
         get; private set;
     }
@@ -38,28 +44,30 @@ public struct FireBaseDefine
     {
         get
         {
-            if (string.IsNullOrEmpty(Version))
+            if (string.IsNullOrEmpty(JsonVersion))
             {
                 Logger.Warning("Version not initialized");
                 return null;
             }
-            return $"JsonDatas/{Version}/";
+            return $"JsonDatas/{JsonVersion}/";
         }
     }
 
-    public string JsonListStoragePath => $"JsonDatas/{Version}/JsonList.txt";
+    public string JsonListStoragePath => $"JsonDatas/{JsonVersion}/JsonList.txt";
 
     public string GetJsonStoragePath(string jsonNameWithExtension)
     {
         return $"{JsonDatasStoragePath}{jsonNameWithExtension}";
     }
 
-    public string AddressableBuildPath => $"{PathDefine.AddressableBuildPathByFlatform}/{Version}";
+    public string AddressableBuildPath => $"{PathDefine.AddressableBuildPathByFlatform}/{AddressableVersion}";
 
     public string GetAddressableBuildStoragePath(string addressableBuildNameWithExtension)
     {
         return $"{AddressableBuildPath}/{addressableBuildNameWithExtension}";
     }
+
+    public string AddressableListStoragePath => $"{AddressableBuildPath}/{NameDefine.AddressableListName}";
 
     public int MaxJsonSizeBytes => 10000;
 

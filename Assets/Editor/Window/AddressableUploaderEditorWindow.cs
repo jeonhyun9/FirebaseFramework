@@ -24,7 +24,7 @@ namespace Tools
         protected override void InitializeParameters()
         {
             AddParameter("AddressableBuildPath", PathDefine.AddressableBuildPathByFlatform);
-            AddParameter("BucketName", "jhgunity");
+            AddParameter("BucketName", NameDefine.BucketDefaultName);
             AddParameter("Version", "0");
         }
 
@@ -38,7 +38,7 @@ namespace Tools
                 if (dataUploader == null)
                     return;
 
-                if (dataUploader.Initialize(AddressableBuildPath, BucketName, Version))
+                if (dataUploader.Initialize(AddressableBuildPath, new FireBaseDefine(BucketName, addressableVersion:Version)))
                     dataUploader.StartAddressableBuildUpload();
 
                 Close();

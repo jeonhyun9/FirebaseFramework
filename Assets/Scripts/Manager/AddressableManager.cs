@@ -11,18 +11,18 @@ using UnityEngine.SceneManagement;
 
 public class AddressableManager : BaseManager<AddressableManager>
 {
-    private Dictionary<Type, Dictionary<string, string>> addressableDic = new Dictionary<Type, Dictionary<string, string>>();
+    private AddressableList addressableList;
 
     public void Initialize(string json)
     {
-        addressableDic = JsonConvert.DeserializeObject<Dictionary<Type, Dictionary<string, string>>>(json);
+        //addressableDic = JsonConvert.DeserializeObject<Dictionary<Type, Dictionary<string, string>>>(json);
     }
 
     public async UniTask DownloadAllAssetsAsync()
     {
-        foreach(Type type in addressableDic.Keys)
+        foreach(Type type in addressableList.AddressableDic.Keys)
         {
-            foreach(string key in addressableDic[type].Keys)
+            foreach(string key in addressableList.AddressableDic[type].Keys)
                 await Addressables.DownloadDependenciesAsync(key);
         }
     }
@@ -32,7 +32,7 @@ public class AddressableManager : BaseManager<AddressableManager>
         if (!IsContain(typeof(T), name))
             return null;
 
-        return await Addressables.LoadAssetAsync<T>(addressableDic[typeof(T)][name]);
+        return await Addressables.LoadAssetAsync<T>(addressableList.AddressableDic[typeof(T)][name]);
     }
 
     public async UniTask<GameObject> InstantiateAsync(string name)
@@ -40,20 +40,20 @@ public class AddressableManager : BaseManager<AddressableManager>
         if (!IsContain(typeof(GameObject), name))
             return null;
 
-        return await Addressables.InstantiateAsync(addressableDic[typeof(GameObject)][name]);
+        return await Addressables.InstantiateAsync(addressableList.AddressableDic[typeof(GameObject)][name]);
     }
 
     private bool IsContain(Type type, string name)
     {
         Logger.Log(Addressables.RuntimePath);
 
-        if (!addressableDic.ContainsKey(type))
+        if (!addressableList.AddressableDic.ContainsKey(type))
         {
             Logger.Error($"{type} is not contained in addressable.");
             return false;
         }
 
-        if (!addressableDic[type].ContainsKey(name))
+        if (!addressableList.AddressableDic[type].ContainsKey(name))
         {
             Logger.Error($"{name} is not contained in addressable.");
             return false;

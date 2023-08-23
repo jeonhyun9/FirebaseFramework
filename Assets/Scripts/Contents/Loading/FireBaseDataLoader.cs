@@ -8,8 +8,6 @@ public class FireBaseDataLoader : BaseDataLoader
 {
     private FireBaseDefine fireBaseDef;
 
-    public FirebaseStorage Storage => fireBaseDef.Storage;
-    
     public void InitializeFireBaseDefine(string bucketName)
     {
         fireBaseDef = new FireBaseDefine(bucketName);
@@ -57,7 +55,7 @@ public class FireBaseDataLoader : BaseDataLoader
 
         if (!string.IsNullOrEmpty(currentVersion))
         {
-            fireBaseDef.SetVersion(currentVersion);
+            fireBaseDef.SetJsonVersion(currentVersion);
             CurrentProgressValue += 0.1f;
             return true;
         }
@@ -207,5 +205,11 @@ public class FireBaseDataLoader : BaseDataLoader
             Logger.Exception($"Failed to get firebase download url from path : {storagePath}", e);
             return null;
         }
+    }
+
+    public void Dispose()
+    {
+        if (Storage != null && Storage.App != null)
+            Storage.App.Dispose();
     }
 }

@@ -44,8 +44,7 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
         
         try
         {
-            if (FireBaseDataLoader.Storage.App != null)
-                FireBaseDataLoader.Storage.App.Dispose();
+            FireBaseDataLoader.Dispose();
         
             Firebase.FirebaseApp.DefaultInstance.Dispose();
         

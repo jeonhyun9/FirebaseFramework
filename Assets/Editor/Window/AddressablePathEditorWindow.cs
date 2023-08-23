@@ -22,7 +22,7 @@ public class AddressablePathEditorWindow : BaseEdtiorWindow
 
     protected override void InitializeParameters()
     {
-        AddParameter("AddressablePath", PathDefine.AddressablePath);
+        AddParameter("AddressablePath", PathDefine.AddressablePathJson);
     }
 
     protected override void DrawActionButton()

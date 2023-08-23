@@ -5,7 +5,7 @@ using UnityEngine;
 public class DataScene : MonoBehaviour
 {
     [SerializeField]
-    DataLoadingController.LoadDataType loadDataType;
+    private DataLoadingController.LoadDataType loadDataType;
 
     [Header("Local Json Path")]
     [SerializeField]
@@ -13,7 +13,7 @@ public class DataScene : MonoBehaviour
 
     [Header("FireBase Bucket Name")]
     [SerializeField]
-    private string bucketName = "jhgunity";
+    private string bucketName = NameDefine.BucketDefaultName;
 
     [SerializeField]
     private TextAsset testText;
