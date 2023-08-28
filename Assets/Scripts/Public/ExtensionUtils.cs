@@ -14,9 +14,11 @@ public static class ExtensionUtils
         if (!bytes.IsValidArray() || !compareBytes.IsValidArray())
             return false;
 
-        return System.Security.Cryptography.MD5.Create().ComputeHash(bytes)
-            .SequenceEqual(System.Security.Cryptography
-            .MD5.Create().ComputeHash(compareBytes));
+        using (System.Security.Cryptography.MD5 md5Hash1 = System.Security.Cryptography.MD5.Create())
+        using (System.Security.Cryptography.MD5 md5Hash2 = System.Security.Cryptography.MD5.Create())
+        {
+            return md5Hash1.ComputeHash(bytes).SequenceEqual(md5Hash2.ComputeHash(compareBytes));
+        }
     }
 
     public static string GetStringUTF8(this byte[] bytes)

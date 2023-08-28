@@ -17,15 +17,15 @@ public class AddressablePathGenerator : BaseGenerator
         Logger.Log(addresableAssetPath);
 
         AddressableAssetSettings addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
-        AddressableAssetGroup defaultGroup = addressableSettings.DefaultGroup;
 
         string[] guids = AssetDatabase.FindAssets("t:object", new string[] { addresableAssetPath });
+
+        ClearNotUseEntries(addressableSettings, guids);
 
         foreach (string guid in guids)
         {
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
-            // 폴더는 건너뜀
             Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
 
             if (assetType == typeof(DefaultAsset))
@@ -38,12 +38,32 @@ public class AddressablePathGenerator : BaseGenerator
 
             string assetName = Path.GetFileNameWithoutExtension(assetPath);
 
-            AddressableAssetEntry entry = addressableSettings.CreateOrMoveEntry(guid, defaultGroup);
+            AddressableAssetGroup targetGroup = null;
+            string groupName = assetType.Name;
+
+            foreach (var group in addressableSettings.groups)
+            {
+                if (group.Name == groupName)
+                {
+                    targetGroup = group;
+                    break;
+                }
+            }
+
+            if (targetGroup == null)
+                targetGroup = addressableSettings.CreateGroup(groupName, false, false, false, null);
+
+            AddressableAssetEntry entry = addressableSettings.CreateOrMoveEntry(guid, targetGroup);
 
             if (entry != null)
             {
                 if (entry.address != guid)
                     entry.address = guid;
+
+                if (!addressableSettings.GetLabels().Contains(groupName))
+                    addressableSettings.AddLabel(groupName);
+
+                entry.SetLabel(groupName, true);
             }
 
             if (!addressableDic.ContainsKey(assetType))
@@ -55,7 +75,7 @@ public class AddressablePathGenerator : BaseGenerator
             }
             else
             {
-                Logger.Error($"중복 이름.. {assetName}");
+                Logger.Error($"Duplicate name... {assetName}");
                 continue;
             }
         }
@@ -65,6 +85,25 @@ public class AddressablePathGenerator : BaseGenerator
 
         string json = JsonConvert.SerializeObject(addressableDic);
 
-        SaveFileAtPath(addresableAssetPath, "AddressablePath.txt", json);
+        SaveFileAtPath(addresableAssetPath, NameDefine.AddressablePathName, json);
+    }
+
+    private void ClearNotUseEntries(AddressableAssetSettings addressableSettings, string[] guids)
+    {
+        HashSet<string> guidsHashSet = new HashSet<string>(guids);
+
+        foreach (AddressableAssetGroup group in addressableSettings.groups)
+        {
+            List<AddressableAssetEntry> removeList = new List<AddressableAssetEntry>();
+
+            foreach (AddressableAssetEntry entry in group.entries)
+            {
+                if (!guidsHashSet.Contains(entry.guid))
+                    removeList.Add(entry);
+            }
+
+            foreach (AddressableAssetEntry entryToRemove in removeList)
+                group.RemoveAssetEntry(entryToRemove);
+        }
     }
 }

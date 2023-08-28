@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
-public class DataScene : MonoBehaviour
+public class LoadingScene : MonoBehaviour
 {
     [SerializeField]
     private DataLoadingController.LoadDataType loadDataType;
@@ -14,33 +14,29 @@ public class DataScene : MonoBehaviour
     [Header("FireBase Bucket Name")]
     [SerializeField]
     private string bucketName = NameDefine.BucketDefaultName;
-
-    [SerializeField]
-    private TextAsset testText;
-
     private Type[] DataBoardUseTypes => DataManager.Instance.GetAllTypes();
 
     private void Awake()
     {
-        try
-        {
-            Logger.Log(testText.ToString());
-            AddressableManager.Instance.Initialize(testText.text);
-            ShowData();
-        }
-        catch (Exception e)
-        {
-            Logger.Log(e.ToString());
-        }
+        Loading().Forget();
     }
 
-    private void ShowData()
+    private async UniTask Loading()
     {
-        Logger.Log("Show Data");
-        ShowDataAsync().Forget();
+        bool addressableResult = await AddressableManager.Instance.LoadAddressableAsync();
+
+        if (addressableResult)
+        {
+            await ShowDataAsync();
+        }
+        else
+        {
+            Logger.Error("Fail to Load Addressable");
+            Application.Quit();
+        }
     }
 
-    private async UniTaskVoid ShowDataAsync()
+    private async UniTask ShowDataAsync()
     {
         bool result = await ShowDataLoading();
 

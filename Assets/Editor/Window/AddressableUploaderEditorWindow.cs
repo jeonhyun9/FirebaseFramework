@@ -33,13 +33,13 @@ namespace Tools
             if (GUILayout.Button("Upload", GUILayout.Height(50)))
             {
                 GameObject uploaderGo = new("AddressableUploader");
-                FireBaseStorageUploader dataUploader = uploaderGo.AddComponent<FireBaseStorageUploader>();
+                FireBaseStorageUploader firebaseUploader = uploaderGo.AddComponent<FireBaseStorageUploader>();
 
-                if (dataUploader == null)
+                if (firebaseUploader == null)
                     return;
 
-                if (dataUploader.Initialize(AddressableBuildPath, new FireBaseDefine(BucketName, addressableVersion:Version)))
-                    dataUploader.StartAddressableBuildUpload();
+                if (firebaseUploader.Initialize(AddressableBuildPath, new FireBaseStorage(BucketName, addressableVersion:Version)))
+                    firebaseUploader.StartAddressableBuildUpload();
 
                 Close();
             }

@@ -38,7 +38,7 @@ namespace Tools
                 if (firebaseStorageUploader == null)
                     return;
 
-                if (firebaseStorageUploader.Initialize(JsonPath, new FireBaseDefine(BucketName, Version)))
+                if (firebaseStorageUploader.Initialize(JsonPath, new FireBaseStorage(BucketName, Version)))
                     firebaseStorageUploader.StartJsonUpload();
 
                 Close();

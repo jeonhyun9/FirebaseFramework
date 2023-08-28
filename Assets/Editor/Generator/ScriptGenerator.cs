@@ -12,6 +12,7 @@ namespace Tools
         {
             MVC,
             Unit,
+            Manager,
         }
 
         private void GenerateScript(string templatePath, string name, string saveName)
@@ -21,9 +22,30 @@ namespace Tools
         }
 
         #region GenerateScript By Type
+        private string GetFolderPathByScriptType(ScriptType type)
+        {
+            switch (type)
+            {
+                case ScriptType.MVC:
+                case ScriptType.Unit:
+                    return PathDefine.ContentsScriptsFolderPath;
+
+                case ScriptType.Manager:
+                    return PathDefine.Manager;
+            }
+
+            return null;
+        }
+
         public void Generate(ScriptType type, string name)
         {
-            folderPath = $"{PathDefine.ContentsScriptsFolderPath}/{name}";
+            folderPath = GetFolderPathByScriptType(type);
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                Logger.Null("folder Path");
+                return;
+            }
 
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
@@ -35,6 +57,10 @@ namespace Tools
                     break;
                 case ScriptType.Unit:
                     GenerateUnit(name);
+                    break;
+                case ScriptType.Manager:
+                    GenerateScript(TemplatePathDefine.ManagerTemplate, name, $"{name}Manager.cs");
+                    AssetDatabase.Refresh();
                     break;
             }
         }

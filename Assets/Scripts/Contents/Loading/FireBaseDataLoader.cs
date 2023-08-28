@@ -6,11 +6,11 @@ using System.Linq;
 
 public class FireBaseDataLoader : BaseDataLoader
 {
-    private FireBaseDefine fireBaseDef;
+    private FireBaseStorage fireBaseStorage;
 
     public void InitializeFireBaseDefine(string bucketName)
     {
-        fireBaseDef = new FireBaseDefine(bucketName);
+        fireBaseStorage = new FireBaseStorage(bucketName);
     }
 
     public async override UniTaskVoid LoadData()
@@ -32,7 +32,7 @@ public class FireBaseDataLoader : BaseDataLoader
         if (!await LoadFireBaseDefVersion())
             return false;
         
-        string[] jsonList = await LoadJsonList(fireBaseDef.JsonListStoragePath);
+        string[] jsonList = await LoadJsonList(fireBaseStorage.JsonListStoragePath);
 
         if (!jsonList.IsValidArray())
         {
@@ -49,13 +49,13 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadVersion);
 
-        StorageReference versionRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.CurrentJsonVersionStoragePath);
+        StorageReference versionRef = fireBaseStorage.GetStoragePath(fireBaseStorage.CurrentJsonVersionStoragePath);
 
-        string currentVersion = await LoadString(versionRef);
+        string currentVersion = await fireBaseStorage.LoadString(versionRef);
 
         if (!string.IsNullOrEmpty(currentVersion))
         {
-            fireBaseDef.SetJsonVersion(currentVersion);
+            fireBaseStorage.SetJsonVersion(currentVersion);
             CurrentProgressValue += 0.1f;
             return true;
         }
@@ -67,13 +67,13 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadJsonList);
 
-        StorageReference storageRef = fireBaseDef.Storage.RootReference.Child(refPath);
+        StorageReference storageRef = fireBaseStorage.GetStoragePath(refPath);
 
         string[] jsonListArray;
 
         try
         {
-            byte[] jsonListBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
+            byte[] jsonListBytes = await fireBaseStorage.LoadBytes(storageRef);
             jsonListArray = jsonListBytes.GetStringUTF8()?.Split(",");
 
             if (!jsonListArray.IsValidArray())
@@ -118,9 +118,9 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         Logger.Log($"Try load {jsonName}");
 
-        StorageReference jsonDataRef = fireBaseDef.Storage.RootReference.Child(fireBaseDef.GetJsonStoragePath(jsonName));
+        StorageReference jsonDataRef = fireBaseStorage.GetStoragePath(fireBaseStorage.GetJsonStoragePath(jsonName));
 
-        byte[] loadedBytes = await LoadBytes(jsonDataRef);
+        byte[] loadedBytes = await fireBaseStorage.LoadBytes(jsonDataRef);
 
         //불러온 데이터 예외처리
         if (loadedBytes.IsValidArray())
@@ -144,72 +144,8 @@ public class FireBaseDataLoader : BaseDataLoader
         Logger.Success($"Load Json From FireBase : {fileName}");
     }
 
-    private async UniTask<string> LoadString(StorageReference storageRef)
-    {
-        string stringValue;
-
-        try
-        {
-            byte[] loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-            stringValue = loadedBytes.GetStringUTF8();
-
-            if (string.IsNullOrEmpty(stringValue))
-            {
-                Logger.Error($"Failed to load file : {storageRef.Name}");
-                return null;
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
-            return null;
-        }
-
-        return stringValue;
-    }
-
-    private async UniTask<byte[]> LoadBytes(StorageReference storageRef)
-    {
-        byte[] loadedBytes;
-
-        try
-        {
-            loadedBytes = await storageRef.GetBytesAsync(fireBaseDef.MaxJsonSizeBytes);
-
-            if (!loadedBytes.IsValidArray())
-            {
-                Logger.Error($"Failed to load file : {storageRef.Name}");
-                return null;
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
-            return null;
-        }
-
-        return loadedBytes;
-    }
-
-    private async UniTask<string> GetDownloadUrlFromStoragePath(string storagePath)
-    {
-        StorageReference reference = fireBaseDef.Storage.GetReferenceFromUrl($"{fireBaseDef.AppSpot}{storagePath}");
-
-        try
-        {
-            var downloadUrl = await reference.GetDownloadUrlAsync();
-            return downloadUrl.ToString();
-        }
-        catch (Exception e)
-        {
-            Logger.Exception($"Failed to get firebase download url from path : {storagePath}", e);
-            return null;
-        }
-    }
-
     public void Dispose()
     {
-        if (Storage != null && Storage.App != null)
-            Storage.App.Dispose();
+        fireBaseStorage.Dispose();
     }
 }
