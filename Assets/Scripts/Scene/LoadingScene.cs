@@ -7,12 +7,8 @@ public class LoadingScene : MonoBehaviour
     [SerializeField]
     private DataLoadingController.LoadDataType loadDataType;
 
-    [Header("Local Json Path")]
-    [SerializeField]
     private string localJsonDataPath = PathDefine.Json;
 
-    [Header("FireBase Bucket Name")]
-    [SerializeField]
     private string bucketName = NameDefine.BucketDefaultName;
     private Type[] DataBoardUseTypes => DataManager.Instance.GetAllTypes();
 
@@ -23,17 +19,7 @@ public class LoadingScene : MonoBehaviour
 
     private async UniTask Loading()
     {
-        bool addressableResult = await AddressableManager.Instance.LoadAddressableAsync();
-
-        if (addressableResult)
-        {
-            await ShowDataAsync();
-        }
-        else
-        {
-            Logger.Error("Fail to Load Addressable");
-            Application.Quit();
-        }
+        await ShowDataAsync();
     }
 
     private async UniTask ShowDataAsync()

@@ -11,3 +11,9 @@ public enum AnimalType
     Dog,
     Cat,
 }
+
+public enum SceneState
+{
+    RootScene,
+    LoadingScene,
+}

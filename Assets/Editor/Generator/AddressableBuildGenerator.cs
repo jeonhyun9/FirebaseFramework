@@ -7,20 +7,23 @@ using Tools;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.AddressableAssets.Settings.GroupSchemas;
+using UnityEngine;
 
-public class AddressablePathGenerator : BaseGenerator
+public class AddressableBuildGenerator : BaseGenerator
 {
     private Dictionary<Type, Dictionary<string, string>> addressableDic = new Dictionary<Type, Dictionary<string, string>>();
 
     public void Generate(string addresableAssetPath)
     {
-        Logger.Log(addresableAssetPath);
-
         AddressableAssetSettings addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
 
         string[] guids = AssetDatabase.FindAssets("t:object", new string[] { addresableAssetPath });
 
         ClearNotUseEntries(addressableSettings, guids);
+        
+        EditorUtility.SetDirty(addressableSettings);
+        AssetDatabase.Refresh();
 
         foreach (string guid in guids)
         {
@@ -51,7 +54,12 @@ public class AddressablePathGenerator : BaseGenerator
             }
 
             if (targetGroup == null)
-                targetGroup = addressableSettings.CreateGroup(groupName, false, false, false, null);
+            {
+                AddressableAssetGroup defaultGroup = addressableSettings.FindGroup("Default");
+
+                if (defaultGroup != null)
+                    targetGroup = addressableSettings.CreateGroup(groupName, false, false, false, defaultGroup.Schemas);
+            }
 
             AddressableAssetEntry entry = addressableSettings.CreateOrMoveEntry(guid, targetGroup);
 
@@ -86,6 +94,8 @@ public class AddressablePathGenerator : BaseGenerator
         string json = JsonConvert.SerializeObject(addressableDic);
 
         SaveFileAtPath(addresableAssetPath, NameDefine.AddressablePathName, json);
+
+        BuildAddressables();
     }
 
     private void ClearNotUseEntries(AddressableAssetSettings addressableSettings, string[] guids)
@@ -105,5 +115,38 @@ public class AddressablePathGenerator : BaseGenerator
             foreach (AddressableAssetEntry entryToRemove in removeList)
                 group.RemoveAssetEntry(entryToRemove);
         }
+    }
+
+    private void BuildAddressables()
+    {
+        string buildPath = GetLocalBuildPath();
+
+        if (Directory.Exists(buildPath))
+        {
+            string[] files = Directory.GetFiles(buildPath);
+            foreach (string file in files)
+            {
+                File.Delete(file);
+            }
+        }
+
+        AssetDatabase.Refresh();
+
+        AddressableAssetSettings.BuildPlayerContent();
+
+        AssetDatabase.Refresh();
+    }
+
+    public string GetLocalBuildPath()
+    {
+        string profileId = AddressableAssetSettingsDefaultObject.Settings.activeProfileId;
+        var profileSettings = AddressableAssetSettingsDefaultObject.Settings.profileSettings;
+        var localBuildPath = profileSettings.GetValueByName(profileId, "Local.BuildPath");
+
+        string projectPath = Application.dataPath.Replace("/Assets", "");
+        string buildTarget = EditorUserBuildSettings.activeBuildTarget.ToString();
+        localBuildPath = localBuildPath.Replace("[BuildTarget]", buildTarget);
+
+        return $"{projectPath}/{localBuildPath}";
     }
 }

@@ -39,9 +39,9 @@ public struct FireBaseStorage
         return $"{AddressableBuildPath}/{addressableBuildNameWithExtension}";
     }
 
-    public string AddressableListStoragePath => $"{AddressableBuildPath}/{NameDefine.AddressableListName}";
+    public string AddressableBuildInfoStoragePath => $"{AddressableBuildPath}/{NameDefine.AddressableBuildInfoName}";
 
-    private int MaxJsonSizeBytes => 1000000;
+    private int MaxJsonSizeBytes => 10000000;
     #endregion
 
     public FirebaseStorage Storage => FirebaseStorage.GetInstance(AppSpot);
@@ -81,6 +81,15 @@ public struct FireBaseStorage
     public StorageReference GetStoragePath(string path)
     {
         return Storage.RootReference.Child(path);
+    }
+
+    public async UniTask<string> GetDownloadUrl(string path)
+    {
+        var uri = await GetStoragePath(path).GetDownloadUrlAsync();
+
+        Logger.Log($"DownloadUrl : {uri.ToString()}");
+
+        return uri.ToString();
     }
 
     public async UniTask<string> LoadString(StorageReference storageRef)
@@ -132,6 +141,8 @@ public struct FireBaseStorage
 
     public void Dispose()
     {
+        Firebase.FirebaseApp.DefaultInstance.Dispose();
+
         if (Storage?.App != null)
             Storage.App.Dispose();
     }

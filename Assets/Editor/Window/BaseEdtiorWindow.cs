@@ -10,6 +10,10 @@ namespace Tools
     {
         private Dictionary<string, object> parameters = new();
         private Dictionary<string, object> defaultParameters = new();
+        private HashSet<string> labels = new();
+        private Dictionary<string, object> conditionalParameters = new();
+        private Dictionary<string, string> conditionalNameDic = new();
+        private Dictionary<string, object> conditionalValueDic = new();
         private Dictionary<string, Type> useEnumTypes = new();
         private float spacing;
 
@@ -26,7 +30,7 @@ namespace Tools
 
         protected abstract void DrawActionButton();
 
-        protected void AddParameter(string name, object defaultValue, Type enumType = null)
+        protected void AddParameter(string name, object defaultValue, Type enumType = null, bool setDefault = false)
         {
             if (enumType != null)
             {
@@ -37,6 +41,30 @@ namespace Tools
             {
                 defaultParameters[name] = defaultValue;
             }
+        }
+
+        protected void AddLabel(string desc)
+        {
+            labels.Add(desc);
+            defaultParameters[desc] = desc;
+        }
+
+        protected void AddConditionalParameter(string name, object defaultValue, string conditionalName, object conditionalValue, Type enumType = null)
+        {
+            if (enumType != null)
+            {
+                defaultParameters[name] = (Enum)defaultValue;
+                conditionalParameters[name] = (Enum)defaultValue;
+                useEnumTypes[name] = enumType;
+            }
+            else
+            {
+                defaultParameters[name] = defaultValue;
+                conditionalParameters[name] = defaultValue;
+            }
+
+            conditionalNameDic[name] = conditionalName;
+            conditionalValueDic[name] = conditionalValue;
         }
 
         private void Awake()
@@ -64,6 +92,9 @@ namespace Tools
         {
             foreach(string name in defaultParameters.Keys)
             {
+                if (labels.Contains(name))
+                    continue;
+
                 Type type = defaultParameters[name].GetType();
 
                 switch (type)
@@ -95,6 +126,9 @@ namespace Tools
         {
             foreach (string name in defaultParameters.Keys)
             {
+                if (labels.Contains(name))
+                    continue;
+
                 Type type = defaultParameters[name].GetType();
 
                 switch (type)
@@ -123,9 +157,23 @@ namespace Tools
         {
             foreach (string name in defaultParameters.Keys)
             {
+                if (conditionalParameters.ContainsKey(name))
+                {
+                    if (!CheckConditionalParameter(name))
+                        continue;
+                }
+
                 Type type = defaultParameters[name].GetType();
 
-                EditorGUILayout.LabelField(GetParameterLabel(name));
+                if (labels.Contains(name))
+                {
+                    EditorGUILayout.LabelField(name);
+                    continue;
+                }
+                else
+                {
+                    EditorGUILayout.LabelField(GetParameterLabel(name));
+                }
 
                 switch (type)
                 {
@@ -165,6 +213,22 @@ namespace Tools
                 return default;
 
             return parameters[name] is T ? (T)parameters[name] : default;
+        }
+
+        private bool CheckConditionalParameter(string name)
+        {
+            if (conditionalParameters.ContainsKey(name))
+            {
+                string conditionalName = conditionalNameDic[name];
+
+                if (parameters.ContainsKey(conditionalName) &&
+                    parameters[conditionalName].ToString().Equals(conditionalValueDic[name].ToString()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

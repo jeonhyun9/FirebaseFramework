@@ -9,7 +9,7 @@ public class PathDefine
     public const string VersionText = "Assets/Data/Jsons/Version.txt";
     public const string JsonListText = "Assets/Data/Jsons/JsonList.txt";
     public const string PrefabResourcesPath = "Prefab/UI";
-    public const string PrefabResourcesFullPath = "Assets/Resources/Prefab/UI";
+    public const string PrefabAddressableFullPath = "Assets/Addressable/Prefab";
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
     public const string Addressable = "Assets/Addressable";
     public const string AddressablePathJson = "Assets/Addressable/AddressablePath.json";
@@ -44,5 +44,6 @@ public class TemplatePathDefine
     public const string UnitTemplate = "Assets/Templates/UnitTemplate.txt";
     public const string UnitModelTemplate = "Assets/Templates/UnitModelTemplate.txt";
     public const string ManagerTemplate = "Assets/Templates/ManagerTemplate.txt";
+    public const string StaticManagerTemplate = "Assets/Templates/StaticManagerTemplate.txt";
 }
 

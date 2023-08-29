@@ -4,7 +4,6 @@ using UnityEngine;
 public abstract class BaseController<T,V> where T : BaseView where V : IBaseViewModel
 {
     private string viewName;
-    protected string ViewPrefabPath => $"{PathDefine.PrefabResourcesPath}/{viewName.Replace("View","")}/{viewName}";
 
     protected T View { get; private set; }
 

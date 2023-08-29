@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
-  m_DefaultGroup: ca44aa2c5a1e365459ee8520410e37f4
+  m_DefaultGroup: 25451b4d8d6829e4cbd90b2507439a24
   m_CachedHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
@@ -78,9 +78,9 @@ MonoBehaviour:
       - m_Id: 35bf62347cabcb546b198373533d8c6e
         m_Value: Addressable/[BuildTarget]
       - m_Id: d3b36af03e0d86e48816ed1a07ca1c72
-        m_Value: ServerData/[BuildTarget]
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 4bc52eac8fa14034890087d8a5d731cd
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
     m_ProfileEntryNames:
     - m_Id: 7ae26e2624d089f4c9578ebe9583246f
       m_Name: BuildTarget

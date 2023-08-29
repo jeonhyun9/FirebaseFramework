@@ -87,7 +87,6 @@ public class FireBaseStorageUploader : MonoBehaviour
     private IEnumerator UploadAddressableBuild()
     {
         string[] addressableBuildFiles = Directory.GetFiles(PathDefine.AddressableBuildPathByFlatform);
-        string[] addressableFileNames = addressableBuildFiles.Select(x => Path.GetFileName(x)).ToArray();
         string addressablePathFile = File.ReadAllText(PathDefine.AddressablePathJson);
 
         if (addressableBuildFiles.Length == 0)
@@ -100,7 +99,7 @@ public class FireBaseStorageUploader : MonoBehaviour
 
         yield return UploadAddressable(addressableBuildFiles);
 
-        yield return UploadAddressableList(fireBaseStorage.AddressableListStoragePath, CreateAddressableList(addressableFileNames, addressablePathFile));
+        yield return UploadAddressableBuildInfo(fireBaseStorage.AddressableBuildInfoStoragePath, CreateAddressableBuildInfo(addressableBuildFiles, addressablePathFile));
 
         yield return UploadVersionText(fireBaseStorage.CurrentAddressableVersionStoragePath, fireBaseStorage.AddressableVersion);
 
@@ -142,13 +141,15 @@ public class FireBaseStorageUploader : MonoBehaviour
         yield return FireBaseUploadTask(storagePath, File.ReadAllBytes(localPath));
     }
 
-    private IEnumerator UploadAddressableList(string storagePath, AddressableList addressableList)
+    private IEnumerator UploadAddressableBuildInfo(string storagePath, AddressableBuildInfo addressableBuildInfo)
     {
-        EditorUtility.DisplayProgressBar(NameDefine.AddressableListName, $"{NameDefine.AddressableListName} 업로드 중..", progress += progressIncrementValue);
+        yield return fireBaseStorage.GetDownloadUrl(storagePath);
 
-        string addressableListJson = JsonConvert.SerializeObject(addressableList);
+        EditorUtility.DisplayProgressBar(NameDefine.AddressableBuildInfoName, $"{NameDefine.AddressableBuildInfoName} 업로드 중..", progress += progressIncrementValue);
 
-        yield return FireBaseUploadTask(storagePath, Encoding.UTF8.GetBytes(addressableListJson));
+        string addressableBuildInfoJson = JsonConvert.SerializeObject(addressableBuildInfo);
+
+        yield return FireBaseUploadTask(storagePath, Encoding.UTF8.GetBytes(addressableBuildInfoJson));
     }
     
     private IEnumerator UploadVersionText(string storagePath, string version)
@@ -181,19 +182,29 @@ public class FireBaseStorageUploader : MonoBehaviour
         }
     }
 
-    private AddressableList CreateAddressableList(string[] fileNameList, string addressablePathJson)
+    private AddressableBuildInfo CreateAddressableBuildInfo(string[] addressableBuildFilesPath, string addressablePathJson)
     {
-        AddressableList addressableList = new AddressableList(fileNameList.ToList(),
+        Dictionary<string, byte[]> fileNameWithHash = new Dictionary<string, byte[]>();
+
+        foreach(string filePath in addressableBuildFilesPath)
+        {
+            byte[] fileByte = File.ReadAllBytes(filePath);
+            string fileName = Path.GetFileName(filePath);
+
+            fileNameWithHash.Add(fileName, fileByte);
+        }
+
+        AddressableBuildInfo addressableBuildInfo = new AddressableBuildInfo(fileNameWithHash,
             JsonConvert.DeserializeObject<Dictionary<Type, Dictionary<string, string>>>(addressablePathJson));
 
-        return addressableList;
+        return addressableBuildInfo;
     }
 
     private void OnEndUpload()
     {
         EditorUtility.ClearProgressBar();
 
-        fireBaseStorage.Dispose();
+        //fireBaseStorage.Dispose();
 
         DestroyImmediate(gameObject);
     }

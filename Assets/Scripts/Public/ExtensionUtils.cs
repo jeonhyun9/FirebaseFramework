@@ -21,6 +21,17 @@ public static class ExtensionUtils
         }
     }
 
+    public static byte[] GetMD5(this byte[] bytes)
+    {
+        if (!bytes.IsValidArray())
+            return null;
+
+        using (System.Security.Cryptography.MD5 md5Hash = System.Security.Cryptography.MD5.Create())
+        {
+            return md5Hash.ComputeHash(bytes);
+        }
+    }
+
     public static string GetStringUTF8(this byte[] bytes)
     {
         try

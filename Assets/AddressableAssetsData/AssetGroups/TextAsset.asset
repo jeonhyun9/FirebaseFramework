@@ -15,7 +15,7 @@ MonoBehaviour:
   m_GroupName: TextAsset
   m_Data:
     m_SerializedData: []
-  m_GUID: ce2a4aadfc7d94d458077149fe1faf7d
+  m_GUID: 128713dd676abc9488b74e5185a399e0
   m_SerializeEntries:
   - m_GUID: 839628d527fa1e745a696b25900ac9e3
     m_Address: 839628d527fa1e745a696b25900ac9e3
@@ -25,4 +25,6 @@ MonoBehaviour:
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 144d89f1dd1054749b9d52bb364af246, type: 2}
   m_SchemaSet:
-    m_Schemas: []
+    m_Schemas:
+    - {fileID: 11400000, guid: ec9e255826c3886489735e9998f51a04, type: 2}
+    - {fileID: 11400000, guid: 879c5a2e6bec73344b2beb5ec6a1cf3b, type: 2}

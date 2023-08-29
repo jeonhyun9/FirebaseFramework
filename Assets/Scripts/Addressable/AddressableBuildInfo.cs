@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-public struct AddressableList
+public struct AddressableBuildInfo
 {
     [JsonProperty]
-    public IReadOnlyList<string> FileNameList;
+    public IReadOnlyDictionary<string, byte[]> FileNameWithByteDic;
 
     [JsonProperty]
     public IReadOnlyDictionary<Type, Dictionary<string, string>> AddressableDic;
 
-    public AddressableList(List<string> pathListValue, Dictionary<Type, Dictionary<string, string>> addressableDicValue)
+    public AddressableBuildInfo(Dictionary<string, byte[]> pathListValue, Dictionary<Type, Dictionary<string, string>> addressableDicValue)
     {
-        FileNameList = pathListValue;
+        FileNameWithByteDic = pathListValue;
         AddressableDic = addressableDicValue;
     }
 }

@@ -15,6 +15,14 @@ namespace Tools
             Manager,
         }
 
+        #region SubType of Script
+        public enum ManagerType
+        {
+            Base,
+            Static,
+        }
+        #endregion
+
         private void GenerateScript(string templatePath, string name, string saveName)
         {
             string contents = GetDataTemplate(templatePath, ("name", name));
@@ -22,24 +30,19 @@ namespace Tools
         }
 
         #region GenerateScript By Type
-        private string GetFolderPathByScriptType(ScriptType type)
+        private void CreateFolderPath(ScriptType type, string name = null)
         {
             switch (type)
             {
                 case ScriptType.MVC:
                 case ScriptType.Unit:
-                    return PathDefine.ContentsScriptsFolderPath;
+                    folderPath = $"{PathDefine.ContentsScriptsFolderPath}/{name}";
+                    break;
 
                 case ScriptType.Manager:
-                    return PathDefine.Manager;
+                    folderPath = PathDefine.Manager;
+                    break;
             }
-
-            return null;
-        }
-
-        public void Generate(ScriptType type, string name)
-        {
-            folderPath = GetFolderPathByScriptType(type);
 
             if (string.IsNullOrEmpty(folderPath))
             {
@@ -49,6 +52,11 @@ namespace Tools
 
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
+        }
+
+        public void Generate(ScriptType type, string name)
+        {
+            CreateFolderPath(type, name);
 
             switch (type)
             {
@@ -58,11 +66,27 @@ namespace Tools
                 case ScriptType.Unit:
                     GenerateUnit(name);
                     break;
-                case ScriptType.Manager:
-                    GenerateScript(TemplatePathDefine.ManagerTemplate, name, $"{name}Manager.cs");
-                    AssetDatabase.Refresh();
+            }
+        }
+
+        public void GenerateManager(ManagerType managerType, string name)
+        {
+            CreateFolderPath(ScriptType.Manager);
+
+            string templatePath = null;
+
+            switch (managerType)
+            {
+                case ManagerType.Base:
+                    templatePath = TemplatePathDefine.ManagerTemplate;
+                    break;
+                case ManagerType.Static:
+                    templatePath = TemplatePathDefine.StaticManagerTemplate;
                     break;
             }
+
+            GenerateScript(templatePath, name, $"{name}Manager.cs");
+            AssetDatabase.Refresh();
         }
 
         private void GenerateMVC(string name)
@@ -95,7 +119,7 @@ namespace Tools
 
             GameObject newPrefab = new (prefabName);
 
-            string prefabFolderPath = $"{PathDefine.PrefabResourcesFullPath}/{folderName}";
+            string prefabFolderPath = $"{PathDefine.PrefabAddressableFullPath}/{folderName}";
 
             if (!Directory.Exists(prefabFolderPath))
                 Directory.CreateDirectory(prefabFolderPath);

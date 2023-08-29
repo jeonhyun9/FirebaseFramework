@@ -44,9 +44,7 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
         
         try
         {
-            FireBaseDataLoader.Dispose();
-        
-            Firebase.FirebaseApp.DefaultInstance.Dispose();
+            //FireBaseDataLoader.Dispose();
         
             //씬에 남아있는 경우가 있음..
             GameObject go = GameObject.Find("Firebase Services");
