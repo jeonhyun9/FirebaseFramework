@@ -7,15 +7,18 @@ using UnityEngine;
 public struct AddressableBuildInfo
 {
     [JsonProperty]
-    public IReadOnlyDictionary<string, byte[]> FileNameWithByteDic;
+    private Dictionary<string, byte[]> fileNameWithByteDic;
 
     [JsonProperty]
-    public IReadOnlyDictionary<Type, Dictionary<string, string>> AddressableDic;
+    private Dictionary<Type, Dictionary<string, string>> addressableDic;
+
+    public IReadOnlyDictionary<string, byte[]> FileNameWithByteDic => fileNameWithByteDic;
+    public IReadOnlyDictionary<Type, Dictionary<string, string>> AddressableDic => addressableDic;
 
     public AddressableBuildInfo(Dictionary<string, byte[]> pathListValue,
         Dictionary<Type, Dictionary<string, string>> addressableDicValue)
     {
-        FileNameWithByteDic = pathListValue;
-        AddressableDic = addressableDicValue;
+        fileNameWithByteDic = pathListValue;
+        addressableDic = addressableDicValue;
     }
 }

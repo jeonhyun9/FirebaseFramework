@@ -14,7 +14,7 @@ public class AddressableBuildGeneratorEditorWindow : BaseEdtiorWindow
 
     private string AdressableAssetPath => GetParameter<string>("AddressableAssetPath");
 
-    [MenuItem("Tools/Addressable Build Generator")]
+    [MenuItem("Tools/Addressable/Addressable Build Generator")]
     public static void OpenAddresableBuildGenerator()
     {
         AddressableBuildGeneratorEditorWindow window = (AddressableBuildGeneratorEditorWindow)GetWindow(typeof(AddressableBuildGeneratorEditorWindow));

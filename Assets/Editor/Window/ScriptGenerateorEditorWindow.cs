@@ -41,13 +41,12 @@ namespace Tools
 
                     switch (ScriptType)
                     {
-                        case ScriptGenerator.ScriptType.MVC:
-                        case ScriptGenerator.ScriptType.Unit:
-                            scriptGenerator.Generate(ScriptType, ContentsName);
-                            break;
-
                         case ScriptGenerator.ScriptType.Manager:
                             scriptGenerator.GenerateManager(ManagerType, ContentsName);
+                            break;
+
+                        default:
+                            scriptGenerator.Generate(ScriptType, ContentsName);
                             break;
                     }
 

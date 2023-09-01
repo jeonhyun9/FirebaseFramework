@@ -15,6 +15,7 @@ public class PathDefine
     public const string AddressablePathJson = "Assets/Addressable/AddressablePath.json";
     public const string StandaloneDataPath = "/DataGenerator_Data";
     public const string DefinePath = "Assets/Scripts/Public/Define";
+    public const string EditorWindowPath = "Assets/Editor/Window";
     #endregion
 
     #region property
@@ -24,8 +25,10 @@ public class PathDefine
         {
 #if UNITY_STANDALONE
             return "Addressable/StandaloneWindows64";
-#elif UNITY_AOS
+#elif UNITY_ANDROID
             return "Addressable/Android";
+#else
+            return "Addressable";
 #endif
         }
     }
@@ -42,6 +45,8 @@ public class PathDefine
 
 public class TemplatePathDefine
 {
+    public const string TemplatePath = "Assets/Templates/";
+
     public const string StartDataTemplate = "Assets/Templates/StartDataTemplate.txt";
     public const string EndDateTemplate = "Assets/Templates/EndDataTemplate.txt";
     public const string DataValueTemplate = "Assets/Templates/DataValueTemplate.txt";
@@ -56,5 +61,7 @@ public class TemplatePathDefine
     public const string ManagerTemplate = "Assets/Templates/ManagerTemplate.txt";
     public const string MonoManagerTemplate = "Assets/Templates/MonoManagerTemplate.txt";
     public const string UITypeTemplate = "Assets/Templates/UITypeTemplate.txt";
+    public const string EditorWindowTemplate = "Assets/Templates/EditorWindowTemplate.txt";
+    
 }
 

@@ -14,6 +14,7 @@ namespace Tools
             MVC,
             Unit,
             Manager,
+            EditorWindow,
         }
 
         #region SubType of Script
@@ -40,6 +41,10 @@ namespace Tools
                     folderPath = $"{PathDefine.ContentsScriptsFolderPath}/{name}";
                     break;
 
+                case ScriptType.EditorWindow:
+                    folderPath = PathDefine.EditorWindowPath;
+                    break;
+
                 case ScriptType.Manager:
                     folderPath = PathDefine.Manager;
                     break;
@@ -64,10 +69,17 @@ namespace Tools
                 case ScriptType.MVC:
                     GenerateMVC(name);
                     break;
+
                 case ScriptType.Unit:
                     GenerateUnit(name);
                     break;
+
+                case ScriptType.EditorWindow:
+                    GenerateEditorWindow(name);
+                    break;
             }
+
+            AssetDatabase.Refresh();
         }
 
         public void GenerateManager(ManagerType managerType, string name)
@@ -87,6 +99,7 @@ namespace Tools
             }
 
             GenerateScript(templatePath, name, $"{name}Manager.cs");
+
             AssetDatabase.Refresh();
         }
 
@@ -114,6 +127,13 @@ namespace Tools
             GenerateScript(TemplatePathDefine.UnitModelTemplate, name, modelName);
 
             CreatePrefab(name, Path.GetFileNameWithoutExtension(unitName));
+        }
+
+        private void GenerateEditorWindow(string name)
+        {
+            string EditorWindowName = $"{name}EditorWindow.cs";
+
+            GenerateScript(TemplatePathDefine.EditorWindowTemplate, name, EditorWindowName);
         }
 
         private void RefreshUITypeEnum(string addName)

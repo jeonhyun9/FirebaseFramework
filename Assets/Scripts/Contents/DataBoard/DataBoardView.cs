@@ -51,7 +51,7 @@ public class DataBoardView : BaseView
 
         unitItemList.ResetUseCount();
         unitItemList.AddUnitItemWithModels(Model.CurrentModelList.ToArray());
-        propertyNamesItemList.ActiveOffNotUse();
+        unitItemList.ActiveOffNotUse();
     }
 
     public void UpdatePropertyNames()

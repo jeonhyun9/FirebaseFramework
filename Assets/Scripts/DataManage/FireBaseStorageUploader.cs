@@ -25,16 +25,19 @@ public class FireBaseStorageUploader : MonoBehaviour
     private string localFilePath;
 
     private bool initialized;
+    private bool isSetCurrentVersion;
+
     private FireBaseStorage fireBaseStorage;
 
     private float progress;
     private float progressIncrementValue;
 
-    public bool Initialize(string localFilePathValue, FireBaseStorage fireBaseDefValue)
+    public bool Initialize(string localFilePathValue, FireBaseStorage fireBaseDefValue, bool isSetCurrentVersionValue)
     {
         localFilePath = localFilePathValue;
         fireBaseStorage = fireBaseDefValue;
         progress = 0f;
+        isSetCurrentVersion = isSetCurrentVersionValue;
 
         initialized = true;
 
@@ -63,6 +66,17 @@ public class FireBaseStorageUploader : MonoBehaviour
         editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadAddressableBuild(), this);
     }
 
+    public void StartCurrentVersionUpload()
+    {
+        if (!initialized)
+        {
+            Logger.Error("DataUploader not initialized");
+            return;
+        }
+
+        editorCoroutine = EditorCoroutineUtility.StartCoroutine(UploadCurrentVersion(), this);
+    }
+
     private IEnumerator UploadJsonDatas()
     {
         string[] jsonFiles = Directory.GetFiles(localFilePath, "*.json");
@@ -79,7 +93,8 @@ public class FireBaseStorageUploader : MonoBehaviour
 
         yield return UploadJsonList(Path.Combine(localFilePath, NameDefine.JsonListTxtName), fireBaseStorage.JsonListStoragePath);
 
-        yield return UploadVersionText(fireBaseStorage.CurrentJsonVersionStoragePath, fireBaseStorage.JsonVersion);
+        if (isSetCurrentVersion)
+            yield return UploadVersionText(fireBaseStorage.CurrentJsonVersionStoragePath, fireBaseStorage.JsonVersion);
 
         OnEndUpload();
     }
@@ -100,6 +115,18 @@ public class FireBaseStorageUploader : MonoBehaviour
         yield return UploadAddressable(addressableBuildFiles);
 
         yield return UploadAddressableBuildInfo(fireBaseStorage.AddressableBuildInfoStoragePath, CreateAddressableBuildInfo(addressableBuildFiles, addressablePathFile));
+
+        if (isSetCurrentVersion)
+            yield return UploadVersionText(fireBaseStorage.CurrentAddressableVersionStoragePath, fireBaseStorage.AddressableVersion);
+
+        OnEndUpload();
+    }
+
+    private IEnumerator UploadCurrentVersion()
+    {
+        progressIncrementValue = 1f / 2;
+
+        yield return UploadVersionText(fireBaseStorage.CurrentJsonVersionStoragePath, fireBaseStorage.JsonVersion);
 
         yield return UploadVersionText(fireBaseStorage.CurrentAddressableVersionStoragePath, fireBaseStorage.AddressableVersion);
 
@@ -152,11 +179,11 @@ public class FireBaseStorageUploader : MonoBehaviour
     
     private IEnumerator UploadVersionText(string storagePath, string version)
     {
-        EditorUtility.DisplayProgressBar("Version.txt", $"Version.txt 업로드 중..", progress += progressIncrementValue);
+        EditorUtility.DisplayProgressBar($"Version : {version}", $"Version 업로드 중..", progress += progressIncrementValue);
 
         yield return FireBaseUploadTask(storagePath, Encoding.UTF8.GetBytes(version));
 
-        Logger.Success($"Upload Current Version : {version}");
+        Logger.Success($"Upload Set Current Version : {version}");
     }
 
     //storagePath는 Path.Combine 사용하면 안됨

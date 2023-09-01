@@ -12,9 +12,10 @@ namespace Tools
 
         private string BucketName => GetParameter<string>("BucketName");
         private string AddressableBuildPath => GetParameter<string>("AddressableBuildPath");
-        private string Version => GetParameter<string>("Version");
+        private string AddressableVersion => GetParameter<string>("AddressableVersion");
+        private bool IsSetCurrentVersion => GetParameter<bool>("IsSetAddressableVersion");
 
-        [MenuItem("Tools/Upload Addressable Build to FireBase Storage")]
+        [MenuItem("Tools/Addressable/Upload Addressable Build to FireBase Storage")]
         public static void OpenDataUploaderWindow()
         {
             AddressableUploaderEditorWindow window = (AddressableUploaderEditorWindow)GetWindow(typeof(AddressableUploaderEditorWindow));
@@ -23,9 +24,12 @@ namespace Tools
 
         protected override void InitializeParameters()
         {
+            EditorPrefs.SetBool("isSetCurrentVersion", false);
+
             AddParameter("AddressableBuildPath", PathDefine.AddressableBuildPathByFlatform);
             AddParameter("BucketName", NameDefine.BucketDefaultName);
-            AddParameter("Version", "0");
+            AddParameter("AddressableVersion", "0");
+            AddParameter("IsSetAddressableVersion", false);
         }
 
         protected override void DrawActionButton()
@@ -38,7 +42,7 @@ namespace Tools
                 if (firebaseUploader == null)
                     return;
 
-                if (firebaseUploader.Initialize(AddressableBuildPath, new FireBaseStorage(BucketName, addressableVersion:Version)))
+                if (firebaseUploader.Initialize(AddressableBuildPath, new FireBaseStorage(BucketName, addressableVersion:AddressableVersion), IsSetCurrentVersion))
                     firebaseUploader.StartAddressableBuildUpload();
 
                 Close();
