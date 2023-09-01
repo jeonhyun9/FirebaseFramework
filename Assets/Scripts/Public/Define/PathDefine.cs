@@ -13,7 +13,6 @@ public class PathDefine
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
     public const string Addressable = "Assets/Addressable";
     public const string AddressablePathJson = "Assets/Addressable/AddressablePath.json";
-    public const string StandaloneDataPath = "/DataGenerator_Data";
     public const string DefinePath = "Assets/Scripts/Public/Define";
     public const string EditorWindowPath = "Assets/Editor/Window";
     #endregion
