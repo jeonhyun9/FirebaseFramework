@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-public class GameManager : BaseManager<GameManager>
+public class GameManager : BaseMonoManager<GameManager>
 {
     private void Awake()
     {
@@ -16,6 +16,6 @@ public class GameManager : BaseManager<GameManager>
 
         //어드레서블 씬 전환
         if (result)
-            await SceneManager.Instance.ChangeSceneAsync(SceneState.LoadingScene);
+            await SceneManager.Instance.ChangeSceneAsync(SceneType.LoadingScene);
     }
 }

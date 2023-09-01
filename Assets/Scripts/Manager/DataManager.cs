@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class DataManager : BaseStaticManager<DataManager>
+public class DataManager : BaseManager<DataManager>
 {
     private readonly Dictionary<Type, object> containerDic = new();
 

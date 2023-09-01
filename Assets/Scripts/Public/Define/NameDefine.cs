@@ -6,4 +6,5 @@ public class NameDefine
     public const string AddressableBuildInfoName = "AddressableBuildInfo.json";
     public const string AddressableVersionTxtName = "AddressableVersion.txt";
     public const string AddressablePathName = "AddressablePath.json";
+    public const string ViewTypeDefineScriptName = "ViewDefine.cs";
 }

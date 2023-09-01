@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace Tools
         public enum ManagerType
         {
             Base,
-            Static,
+            Mono,
         }
         #endregion
 
@@ -80,8 +81,8 @@ namespace Tools
                 case ManagerType.Base:
                     templatePath = TemplatePathDefine.ManagerTemplate;
                     break;
-                case ManagerType.Static:
-                    templatePath = TemplatePathDefine.StaticManagerTemplate;
+                case ManagerType.Mono:
+                    templatePath = TemplatePathDefine.MonoManagerTemplate;
                     break;
             }
 
@@ -99,6 +100,8 @@ namespace Tools
             GenerateScript(TemplatePathDefine.MVC_ViewModelTemplate, name, modelName);
             GenerateScript(TemplatePathDefine.MVC_ViewTemplate, name, viewName);
 
+            RefreshViewTypeEnum(name);
+
             CreatePrefab(name, Path.GetFileNameWithoutExtension(viewName));
         }
 
@@ -111,6 +114,21 @@ namespace Tools
             GenerateScript(TemplatePathDefine.UnitModelTemplate, name, modelName);
 
             CreatePrefab(name, Path.GetFileNameWithoutExtension(unitName));
+        }
+
+        private void RefreshViewTypeEnum(string addName)
+        {
+            folderPath = PathDefine.DefinePath;
+            string viewName = $"{addName}View";
+
+            string currentEnums = string.Join(",\n\t", Enum.GetNames(typeof(ViewType)));
+
+            if (currentEnums.Contains(viewName))
+                return;
+
+            currentEnums += $",\n\t{addName}View,";
+
+            GenerateScript(TemplatePathDefine.ViewTypeTemplate, currentEnums, NameDefine.ViewTypeDefineScriptName);
         }
 
         private void CreatePrefab(string folderName, string prefabName)
@@ -126,7 +144,7 @@ namespace Tools
 
             string prefabPath = $"{prefabFolderPath}/{prefabName}.prefab";
 
-            Object existingPrefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
+            UnityEngine.Object existingPrefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 
             if (existingPrefab != null)
             {
@@ -138,7 +156,7 @@ namespace Tools
             }
 
             if (newPrefab != null)
-                Object.DestroyImmediate(newPrefab);
+                UnityEngine.Object.DestroyImmediate(newPrefab);
 
             AssetDatabase.Refresh();
         }

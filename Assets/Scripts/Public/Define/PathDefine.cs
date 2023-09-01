@@ -13,6 +13,8 @@ public class PathDefine
     public const string ContentsScriptsFolderPath = "Assets/Scripts/Contents";
     public const string Addressable = "Assets/Addressable";
     public const string AddressablePathJson = "Assets/Addressable/AddressablePath.json";
+    public const string StandaloneDataPath = "/DataGenerator_Data";
+    public const string DefinePath = "Assets/Scripts/Public/Define";
     #endregion
 
     #region property
@@ -25,6 +27,14 @@ public class PathDefine
 #elif UNITY_AOS
             return "Addressable/Android";
 #endif
+        }
+    }
+
+    public static string AddressableLoadPath
+    {
+        get
+        {
+            return $"{UnityEngine.Application.persistentDataPath}/{AddressableBuildPathByFlatform}";
         }
     }
 #endregion
@@ -44,6 +54,7 @@ public class TemplatePathDefine
     public const string UnitTemplate = "Assets/Templates/UnitTemplate.txt";
     public const string UnitModelTemplate = "Assets/Templates/UnitModelTemplate.txt";
     public const string ManagerTemplate = "Assets/Templates/ManagerTemplate.txt";
-    public const string StaticManagerTemplate = "Assets/Templates/StaticManagerTemplate.txt";
+    public const string MonoManagerTemplate = "Assets/Templates/MonoManagerTemplate.txt";
+    public const string ViewTypeTemplate = "Assets/Templates/ViewTypeTemplate.txt";
 }
 

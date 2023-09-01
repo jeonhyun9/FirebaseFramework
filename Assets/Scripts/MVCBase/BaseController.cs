@@ -3,16 +3,12 @@ using UnityEngine;
 
 public abstract class BaseController<T,V> where T : BaseView where V : IBaseViewModel
 {
-    private string viewName;
-
     protected T View { get; private set; }
 
     protected V Model { get; private set; }
 
-    protected Transform UITransform => UIManager.Instance.UITransform;
-
     /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
-    protected abstract string GetViewPrefabName();
+    protected abstract ViewType GetViewType();
 
     protected abstract void Enter();
 
@@ -52,17 +48,7 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
 
     private async UniTask<bool> LoadViewAsync()
     {
-        viewName = GetViewPrefabName();
-
-        GameObject prefab = await AddressableManager.Instance.InstantiateAsync(viewName);
-        
-        if (prefab == null)
-        {
-            Logger.Null("ViewPrefabPath");
-            return false;
-        }
-
-        View = Object.Instantiate(prefab, UITransform).GetComponent<T>();
+        View = await UIManager.Instance.LoadView<T>(GetViewType());
 
         if (View == null)
         {

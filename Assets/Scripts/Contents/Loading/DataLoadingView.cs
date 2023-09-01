@@ -36,7 +36,6 @@ public class DataLoadingView : BaseView
             Model.OnSuccessLoadData?.Invoke();
 
             await UniTask.Delay(waitingMilliSec);
-            Hide();
         }
     }
 

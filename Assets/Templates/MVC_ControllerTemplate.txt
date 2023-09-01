@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class #name#Controller : BaseController<#name#View, #name#ViewModel>
 {
-    protected override string GetViewPrefabName()
+    protected override ViewType GetViewType()
     {
-        return nameof( #name#Controller).Replace("Controller", "View");
+        return ViewType.#name#View;
     }
 	
 	protected override void Enter()

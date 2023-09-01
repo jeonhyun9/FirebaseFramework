@@ -126,6 +126,12 @@ namespace Tools
         {
             foreach (string name in defaultParameters.Keys)
             {
+                if (conditionalParameters.ContainsKey(name))
+                {
+                    if (!CheckConditionalParameter(name))
+                        continue;
+                }
+
                 if (labels.Contains(name))
                     continue;
 

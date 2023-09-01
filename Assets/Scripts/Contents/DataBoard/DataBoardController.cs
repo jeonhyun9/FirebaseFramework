@@ -2,9 +2,9 @@ using System;
 
 public class DataBoardController : BaseController<DataBoardView,DataBoardViewModel>
 {
-    protected override string GetViewPrefabName()
+    protected override ViewType GetViewType()
     {
-        return nameof(DataBoardController).Replace("Controller","View");
+        return ViewType.DataBoardView;
     }
 
     protected override void Enter()

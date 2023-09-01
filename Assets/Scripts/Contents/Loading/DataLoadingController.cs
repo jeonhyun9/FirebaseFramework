@@ -14,9 +14,9 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
 
     private FireBaseDataLoader FireBaseDataLoader => Model.GetLoader<FireBaseDataLoader>();
 
-    protected override string GetViewPrefabName()
+    protected override ViewType GetViewType()
     {
-        return nameof(DataLoadingController).Replace("Controller", "View");
+        return ViewType.DataLoadingView;
     }
 
     protected override void Enter()

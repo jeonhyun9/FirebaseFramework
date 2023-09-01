@@ -76,11 +76,11 @@ MonoBehaviour:
       - m_Id: c3a15b37e58e766459f6e89bd5df7a1d
         m_Value: Addressable/[BuildTarget]
       - m_Id: 35bf62347cabcb546b198373533d8c6e
-        m_Value: Addressable/[BuildTarget]
+        m_Value: '{PathDefine.AddressableLoadPath}'
       - m_Id: d3b36af03e0d86e48816ed1a07ca1c72
-        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+        m_Value: Addressable/[BuildTarget]
       - m_Id: 4bc52eac8fa14034890087d8a5d731cd
-        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+        m_Value: http://jhgunity.s3.ap-northeast-2.amazonaws.com/Addressable/[BuildTarget]
     m_ProfileEntryNames:
     - m_Id: 7ae26e2624d089f4c9578ebe9583246f
       m_Name: BuildTarget

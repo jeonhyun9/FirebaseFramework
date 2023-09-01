@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Firebase.Storage;
 using Newtonsoft.Json;
@@ -9,11 +10,14 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.AddressableAssets.ResourceProviders;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
-public class AddressableManager : BaseStaticManager<AddressableManager>
+public class AddressableManager : BaseManager<AddressableManager>
 {
+    private string loadPath = PathDefine.AddressableLoadPath;
+
     private AddressableBuildInfo addressableBuildInfo;
     private FireBaseStorage fireBaseStorage;
 
@@ -23,7 +27,7 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
 
         if (await LoadAddressableVersion() == false)
             return false;
-
+        
         if (await LoadAddressableBuildInfo() == false)
             return false;
 
@@ -42,11 +46,23 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
         if (addressableBuildInfo.AddressableDic == null)
             return;
 
-        foreach(Type type in addressableBuildInfo.AddressableDic.Keys)
+        List<UniTask> downloadTasks = new List<UniTask>();
+
+        foreach (Type type in addressableBuildInfo.AddressableDic.Keys)
         {
-            foreach(string guids in addressableBuildInfo.AddressableDic[type].Values)
-                await Addressables.DownloadDependenciesAsync(guids);
+            //라벨 설정이 타입별로 되어 있어서 첫번째 것만 불러오면 해당 타입의 라벨을 가진 에셋이 모두 로드됨.
+            string firstGuid = addressableBuildInfo.AddressableDic[type].Values.FirstOrDefault();
+
+            if (firstGuid != null)
+                downloadTasks.Add(DownLoadDependenciesAsUniTask(firstGuid));
         }
+
+        await UniTask.WhenAll(downloadTasks);
+    }
+
+    public async UniTask DownLoadDependenciesAsUniTask(string guid)
+    {
+        await Addressables.DownloadDependenciesAsync(guid);
     }
 
     public async UniTask<T> LoadAssetAsync<T>(string name) where T : UnityEngine.Object
@@ -57,7 +73,7 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
         return await Addressables.LoadAssetAsync<T>(addressableBuildInfo.AddressableDic[typeof(T)][name]);
     }
 
-    public async UniTask LoadSceneAsync(SceneState sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+    public async UniTask LoadSceneAsync(SceneType sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
     {
         string name = sceneName.ToString();
 
@@ -67,12 +83,12 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
         await Addressables.LoadSceneAsync(addressableBuildInfo.AddressableDic[typeof(Scene)][name], loadSceneMode);
     }
 
-    public async UniTask<GameObject> InstantiateAsync(string name)
+    public async UniTask<GameObject> InstantiateAsync(string name, Transform transform = null)
     {
         if (!IsContain(typeof(GameObject), name))
             return null;
 
-        return await Addressables.InstantiateAsync(addressableBuildInfo.AddressableDic[typeof(GameObject)][name]);
+        return await Addressables.InstantiateAsync(addressableBuildInfo.AddressableDic[typeof(GameObject)][name], transform);
     }
 
     private async UniTask<bool> LoadAddressableVersion()
@@ -102,8 +118,7 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
         {
             addressableBuildInfo = JsonConvert.DeserializeObject<AddressableBuildInfo>(addressableBuildInfoJson);
 
-            Logger.Success($"Load Addressable Build Info : {addressableBuildInfoJson}");
-            Logger.Log($"fileNameCount : {addressableBuildInfo.FileNameWithByteDic.Count}");
+            Logger.Log($"fileCount : {addressableBuildInfo.FileNameWithByteDic.Count}");
             return true;
         }
 
@@ -112,17 +127,15 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
 
     private async UniTask<bool> LoadAddressableBuild()
     {
-        string dataPath = $"{Application.persistentDataPath}/{PathDefine.AddressableBuildPathByFlatform}";
-
-        if (!Directory.Exists(dataPath))
-            Directory.CreateDirectory(dataPath);
+        if (!Directory.Exists(loadPath))
+            Directory.CreateDirectory(loadPath);
 
         try
         {
             List<UniTask> tasks = new List<UniTask>();
 
             foreach (string fileName in addressableBuildInfo.FileNameWithByteDic.Keys)
-                tasks.Add(LoadAddressableBuildFileAsync(fileName, dataPath));
+                tasks.Add(LoadAddressableBuildFileAsync(fileName, loadPath));
 
             await UniTask.WhenAll(tasks);
 
@@ -139,8 +152,6 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
     {
         string fullPath = $"{dataPath}/{fileName}";
 
-        Logger.Log($"Check Addressable Full path : {fullPath}");
-
         byte[] originFileByte = addressableBuildInfo.FileNameWithByteDic[fileName];
 
         if (File.Exists(fullPath))
@@ -151,7 +162,7 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
 
             if (localFileByte.IntegrityCheck(originFileByte))
             {
-                Logger.Success($"Load Local Addressable Build : {fullPath}");
+                Logger.Success($"[Local] Load Addressable Build : {fullPath}");
                 return;
             }
         }
@@ -161,7 +172,7 @@ public class AddressableManager : BaseStaticManager<AddressableManager>
 
         await File.WriteAllBytesAsync(fullPath, loadedFileByte);
 
-        Logger.Success($"Load New Addressable Build : {fullPath}");
+        Logger.Success($"[New] Load Addressable Build : {fullPath}");
     }
 
     private bool IsContain(Type type, string name)
