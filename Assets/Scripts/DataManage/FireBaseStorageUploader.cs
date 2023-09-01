@@ -213,10 +213,10 @@ public class FireBaseStorageUploader : MonoBehaviour
 
         foreach(string filePath in addressableBuildFilesPath)
         {
-            byte[] fileByte = File.ReadAllBytes(filePath);
+            byte[] hash = File.ReadAllBytes(filePath).GetSHA256();
             string fileName = Path.GetFileName(filePath);
 
-            fileNameWithHash.Add(fileName, fileByte);
+            fileNameWithHash.Add(fileName, hash);
         }
 
         AddressableBuildInfo addressableBuildInfo = new AddressableBuildInfo(fileNameWithHash,

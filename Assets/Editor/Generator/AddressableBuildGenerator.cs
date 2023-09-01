@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 using Tools;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
+using System.Linq;
 
 public class AddressableBuildGenerator : BaseGenerator
 {
@@ -16,86 +15,107 @@ public class AddressableBuildGenerator : BaseGenerator
 
     public void Generate(string addresableAssetPath)
     {
-        AddressableAssetSettings addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
+        var addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
 
-        string[] guids = AssetDatabase.FindAssets("t:object", new string[] { addresableAssetPath });
-
-        ClearNotUseEntries(addressableSettings, guids);
-        
-        EditorUtility.SetDirty(addressableSettings);
-        AssetDatabase.Refresh();
-
-        foreach (string guid in guids)
-        {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-
-            Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-
-            if (assetType == typeof(DefaultAsset))
-                continue;
-
-            if (assetType == typeof(SceneAsset))
-                assetType = typeof(UnityEngine.SceneManagement.Scene);
-
-            Logger.Log($"{assetType}");
-
-            string assetName = Path.GetFileNameWithoutExtension(assetPath);
-
-            AddressableAssetGroup targetGroup = null;
-            string groupName = assetType.Name;
-
-            foreach (var group in addressableSettings.groups)
-            {
-                if (group.Name == groupName)
-                {
-                    targetGroup = group;
-                    break;
-                }
-            }
-
-            if (targetGroup == null)
-            {
-                AddressableAssetGroup defaultGroup = addressableSettings.FindGroup("Default");
-
-                if (defaultGroup != null)
-                    targetGroup = addressableSettings.CreateGroup(groupName, false, false, false, defaultGroup.Schemas);
-            }
-
-            AddressableAssetEntry entry = addressableSettings.CreateOrMoveEntry(guid, targetGroup);
-
-            if (entry != null)
-            {
-                if (entry.address != guid)
-                    entry.address = guid;
-
-                if (!addressableSettings.GetLabels().Contains(groupName))
-                    addressableSettings.AddLabel(groupName);
-
-                entry.SetLabel(groupName, true);
-            }
-
-            if (!addressableDic.ContainsKey(assetType))
-                addressableDic.Add(assetType, new Dictionary<string, string>());
-
-            if (!addressableDic[assetType].ContainsKey(assetName))
-            {
-                addressableDic[assetType].Add(assetName, guid);
-            }
-            else
-            {
-                Logger.Error($"Duplicate name... {assetName}");
-                continue;
-            }
-        }
-
-        EditorUtility.SetDirty(addressableSettings);
-        AssetDatabase.Refresh();
+        string[] guids = AssetDatabase.FindAssets("t:object", new[] { addresableAssetPath });
+        UpdateSettings(addressableSettings, guids);
 
         string json = JsonConvert.SerializeObject(addressableDic);
-
         SaveFileAtPath(addresableAssetPath, NameDefine.AddressablePathName, json);
 
         BuildAddressables();
+    }
+
+    private void UpdateSettings(AddressableAssetSettings addressableSettings, string[] guids)
+    {
+        EditorUtility.SetDirty(addressableSettings);
+        ClearNotUseEntries(addressableSettings, guids);
+
+        foreach (var guid in guids)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            Type mainAssetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+
+            if (mainAssetType == typeof(DefaultAsset))
+                continue;
+
+            if (mainAssetType == typeof(SceneAsset))
+                mainAssetType = typeof(UnityEngine.SceneManagement.Scene);
+
+            UpdateEntryForAsset(addressableSettings, guid, mainAssetType, assetPath);
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private void UpdateEntryForAsset(AddressableAssetSettings addressableSettings, string guid, Type mainAssetType, string assetPath)
+    {
+        AddressableAssetGroup targetGroup = FindOrCreateGroup(addressableSettings, mainAssetType.Name);
+
+        AddressableAssetEntry entry = addressableSettings.CreateOrMoveEntry(guid, targetGroup);
+
+        if (entry == null)
+            return;
+
+        string assetName = Path.GetFileNameWithoutExtension(assetPath);
+        string groupName = mainAssetType.Name;
+
+        if (!addressableSettings.GetLabels().Contains(groupName))
+            addressableSettings.AddLabel(groupName);
+
+        if (!entry.labels.Contains(groupName))
+            entry.SetLabel(groupName, true);
+
+        entry.SetAddress($"{mainAssetType}_{guid}");
+
+        AddToAddressableDic(mainAssetType, assetName, entry.address);
+
+        #region Check SubAssets
+
+        //씬은 LoadAllAssetsAtPath 사용 시 에러 발생.
+        if (entry.MainAssetType == typeof(SceneAsset))
+            return;
+
+        Type[] subAssetTypes = AssetDatabase.LoadAllAssetsAtPath(entry.AssetPath)
+            .Where(x => x != entry.MainAsset && x.GetType() != entry.MainAsset.GetType())
+            .Select(x => x.GetType())
+            .ToArray();
+
+        //서브에셋이 하나밖에 없고, 타입이 메인 에셋과 다른 경우에는 이름으로 찾을 수 있도록 한다... EX)싱글 스프라이트
+        //이 외에 서브 에셋이 여러개인데 직접 접근해야하는 경우는 거의 없을 것으로 보이지만,
+        //꼭 필요하다면 $"{entry.guid}[{assetName}_{index}]" 로 로드할 수 있다.
+        if (subAssetTypes.Length == 1)
+            AddToAddressableDic(subAssetTypes[0], assetName, $"{entry.guid}[{assetName}]");
+
+        #endregion
+    }
+
+    private AddressableAssetGroup FindOrCreateGroup(AddressableAssetSettings addressableSettings, string groupName)
+    {
+        AddressableAssetGroup targetGroup = addressableSettings.FindGroup(groupName);
+
+        if (targetGroup == null)
+        {
+            AddressableAssetGroup defaultGroup = addressableSettings.FindGroup(NameDefine.AddressableDefaultGroupName);
+            targetGroup = defaultGroup == null ? null : addressableSettings.CreateGroup(groupName, false, false, false, defaultGroup.Schemas);
+        }
+
+        return targetGroup;
+    }
+
+    private void AddToAddressableDic(Type type, string name, string address)
+    {
+        if (!addressableDic.ContainsKey(type))
+            addressableDic.Add(type, new Dictionary<string, string>());
+
+        if (!addressableDic[type].ContainsKey(name))
+        {
+            addressableDic[type].Add(name, address);
+        }
+        else
+        {
+            Logger.Error($"Duplicate name... {name}");
+        }
     }
 
     private void ClearNotUseEntries(AddressableAssetSettings addressableSettings, string[] guids)

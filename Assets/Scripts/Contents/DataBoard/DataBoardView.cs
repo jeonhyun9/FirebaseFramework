@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 
 public class DataBoardView : BaseView
 {
@@ -15,11 +16,17 @@ public class DataBoardView : BaseView
     [SerializeField]
     private TMP_Dropdown dropdownType;
 
+    [SerializeField]
+    private Image DdabongDochi;
+
     private List<TMP_Dropdown.OptionData> options;
     public DataBoardViewModel Model => GetModel<DataBoardViewModel>();
 
     public async override UniTask UpdateViewAsync()
     {
+        if (DdabongDochi)
+            DdabongDochi.sprite = await AddressableManager.Instance.LoadAssetAsync<Sprite>(DdabongDochi.gameObject.name);
+
         if (options == null)
             InitDropdownOptions();
 

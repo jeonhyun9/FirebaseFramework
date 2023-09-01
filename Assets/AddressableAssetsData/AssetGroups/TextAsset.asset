@@ -18,7 +18,7 @@ MonoBehaviour:
   m_GUID: 128713dd676abc9488b74e5185a399e0
   m_SerializeEntries:
   - m_GUID: 839628d527fa1e745a696b25900ac9e3
-    m_Address: 839628d527fa1e745a696b25900ac9e3
+    m_Address: UnityEngine.TextAsset_839628d527fa1e745a696b25900ac9e3
     m_ReadOnly: 0
     m_SerializedLabels:
     - TextAsset

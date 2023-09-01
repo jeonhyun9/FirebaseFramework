@@ -21,14 +21,14 @@ public static class ExtensionUtils
         }
     }
 
-    public static byte[] GetMD5(this byte[] bytes)
+    public static byte[] GetSHA256(this byte[] bytes)
     {
         if (!bytes.IsValidArray())
             return null;
 
-        using (System.Security.Cryptography.MD5 md5Hash = System.Security.Cryptography.MD5.Create())
+        using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
         {
-            return md5Hash.ComputeHash(bytes);
+            return sha256.ComputeHash(bytes);
         }
     }
 

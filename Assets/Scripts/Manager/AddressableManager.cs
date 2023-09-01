@@ -153,7 +153,7 @@ public class AddressableManager : BaseManager<AddressableManager>
         {
             addressableBuildInfo = JsonConvert.DeserializeObject<AddressableBuildInfo>(addressableBuildInfoJson);
 
-            Logger.Log($"fileCount : {addressableBuildInfo.FileNameWithByteDic.Count}");
+            Logger.Log($"fileCount : {addressableBuildInfo.FileNameWithHashDic.Count}");
             return true;
         }
 
@@ -169,7 +169,7 @@ public class AddressableManager : BaseManager<AddressableManager>
         {
             List<UniTask> tasks = new List<UniTask>();
 
-            foreach (string fileName in addressableBuildInfo.FileNameWithByteDic.Keys)
+            foreach (string fileName in addressableBuildInfo.FileNameWithHashDic.Keys)
                 tasks.Add(LoadAddressableBuildFileAsync(fileName, loadPath));
 
             await UniTask.WhenAll(tasks);
@@ -186,7 +186,7 @@ public class AddressableManager : BaseManager<AddressableManager>
     {
         string fullPath = $"{dataPath}/{fileName}";
 
-        byte[] originFileByte = addressableBuildInfo.FileNameWithByteDic[fileName];
+        byte[] originFileHash = addressableBuildInfo.FileNameWithHashDic[fileName];
 
         if (File.Exists(fullPath))
         {
@@ -194,7 +194,9 @@ public class AddressableManager : BaseManager<AddressableManager>
 
             await UniTask.RunOnThreadPool(() => { localFileByte = File.ReadAllBytes(fullPath); });
 
-            if (localFileByte.IntegrityCheck(originFileByte))
+            byte[] localHash = localFileByte.GetSHA256();
+
+            if (localHash.SequenceEqual(originFileHash))
             {
                 Logger.Success($"[Local] Load Addressable Build : {fullPath}");
                 return;

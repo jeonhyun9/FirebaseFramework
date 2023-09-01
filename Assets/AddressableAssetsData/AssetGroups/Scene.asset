@@ -18,7 +18,7 @@ MonoBehaviour:
   m_GUID: 36e11911789dfc34b843921f1d90545d
   m_SerializeEntries:
   - m_GUID: b38ee199b0998d74ea12f483d5f51421
-    m_Address: b38ee199b0998d74ea12f483d5f51421
+    m_Address: UnityEngine.SceneManagement.Scene_b38ee199b0998d74ea12f483d5f51421
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene
