@@ -30,7 +30,7 @@ public class DataUnit : BaseUnit<DataUnitModel<IBaseData>>
 
     private bool isResized = false;
 
-    public override void UpdateUI()
+    public override void Refresh()
     {
         gameObject.name = Model.Data.NameId;
 
@@ -51,9 +51,9 @@ public class DataUnit : BaseUnit<DataUnitModel<IBaseData>>
         if (rect == null)
             rect = GetComponent<RectTransform>();
 
-        Size = rect.sizeDelta = contentsRect.sizeDelta = GetContentSize();
+        Vector2 size = rect.sizeDelta = contentsRect.sizeDelta = GetContentSize();
 
-        OnResize?.Invoke(Size);
+        Model.OnResize?.Invoke(size);
 
         isResized = true;
     }

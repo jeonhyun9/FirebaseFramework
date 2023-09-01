@@ -11,19 +11,10 @@ public class BaseUnit<T> : MonoBehaviour where T : IBaseUnitModel
         Model = model;
     }
 
-    public Vector2 Size { get; protected set; }
+    public virtual void Refresh() { }
 
-    public virtual void UpdateUI() { }
-
-    public Action<Vector2> OnResize { get; protected set; }
-
-    public void Show()
+    public virtual void Show()
     {
         gameObject.SafeSetActive(true);
-    }
-
-    public void SetOnResize(Action<Vector2> func)
-    {
-        OnResize = func;
     }
 }

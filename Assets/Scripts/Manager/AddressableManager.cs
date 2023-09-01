@@ -7,57 +7,92 @@ using Firebase.Storage;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.Initialization;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.AddressableAssets.ResourceProviders;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 public class AddressableManager : BaseManager<AddressableManager>
 {
+    public enum Sequence
+    {
+        LoadAddressableVersion,
+        LoadAddressableBuildInfo,
+        LoadAddressableBuild,
+        Done,
+    }
+
+    public Sequence CurrentSequence { get; private set; } = Sequence.LoadAddressableVersion;
+
     private string loadPath = PathDefine.AddressableLoadPath;
 
     private AddressableBuildInfo addressableBuildInfo;
     private FireBaseStorage fireBaseStorage;
 
-    public async UniTask<bool> LoadAddressableAsync()
+    public async UniTask<bool> LoadAddressableAsync(Action onChangeSequenceCallback = null)
     {
         fireBaseStorage = new FireBaseStorage(NameDefine.BucketDefaultName);
 
-        if (await LoadAddressableVersion() == false)
-            return false;
-        
-        if (await LoadAddressableBuildInfo() == false)
-            return false;
+        while(CurrentSequence != Sequence.Done)
+        {
+            if (onChangeSequenceCallback != null)
+                onChangeSequenceCallback.Invoke();
 
-        if (await LoadAddressableBuild() == false)
-            return false;
+            bool result = await GetLoadAddressableSequence();
 
-        await Addressables.InitializeAsync();
-
-        await DownloadAllAssetsAsync();
+            if (result)
+            {
+                CurrentSequence++;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         return true;
     }
 
-    private async UniTask DownloadAllAssetsAsync()
+    public string CurrentSequenceMessage
     {
-        if (addressableBuildInfo.AddressableDic == null)
-            return;
-
-        List<UniTask> downloadTasks = new List<UniTask>();
-
-        foreach (Type type in addressableBuildInfo.AddressableDic.Keys)
+        get
         {
-            //라벨 설정이 타입별로 되어 있어서 첫번째 것만 불러오면 해당 타입의 라벨을 가진 에셋이 모두 로드됨.
-            string firstGuid = addressableBuildInfo.AddressableDic[type].Values.FirstOrDefault();
+            string prefix = $"[Version:{fireBaseStorage.AddressableVersion}]";
+            string suffix = $"{(int)CurrentSequence + 1} / {(int)Sequence.Done + 1}";
 
-            if (firstGuid != null)
-                downloadTasks.Add(DownLoadDependenciesAsUniTask(firstGuid));
+            string message = null;
+
+            switch (CurrentSequence)
+            {
+                case Sequence.LoadAddressableVersion:
+                    message = "Loading Addressable Version..";
+                    break;
+
+                case Sequence.LoadAddressableBuildInfo:
+                    message = "Loading Addressable Build Info..";
+                    break;
+
+                case Sequence.LoadAddressableBuild:
+                    message = "Loading Addressable Build..";
+                    break;
+            }
+
+            return $"{prefix} {message} {suffix}";
+        }
+    }
+
+    private async UniTask<bool> GetLoadAddressableSequence()
+    {
+        switch (CurrentSequence)
+        {
+            case Sequence.LoadAddressableVersion:
+                return await LoadAddressableVersion();
+
+            case Sequence.LoadAddressableBuildInfo:
+                return await LoadAddressableBuildInfo();
+
+            case Sequence.LoadAddressableBuild:
+                return await LoadAddressableBuild();
         }
 
-        await UniTask.WhenAll(downloadTasks);
+        return false;
     }
 
     public async UniTask DownLoadDependenciesAsUniTask(string guid)
@@ -138,7 +173,6 @@ public class AddressableManager : BaseManager<AddressableManager>
                 tasks.Add(LoadAddressableBuildFileAsync(fileName, loadPath));
 
             await UniTask.WhenAll(tasks);
-
             return true;
         }
         catch (Exception e)

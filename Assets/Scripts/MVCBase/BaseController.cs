@@ -3,12 +3,12 @@ using UnityEngine;
 
 public abstract class BaseController<T,V> where T : BaseView where V : IBaseViewModel
 {
+    /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
+    public abstract UIType UIType { get; }
+
     protected T View { get; private set; }
 
     protected V Model { get; private set; }
-
-    /// <summary> 프리팹 네이밍은 View와 동일하게.. ex)DataBoardController => DataBoardView </summary>
-    protected abstract ViewType GetViewType();
 
     protected abstract void Enter();
 
@@ -48,7 +48,7 @@ public abstract class BaseController<T,V> where T : BaseView where V : IBaseView
 
     private async UniTask<bool> LoadViewAsync()
     {
-        View = await UIManager.Instance.LoadView<T>(GetViewType());
+        View = await UIManager.Instance.LoadView<T>(UIType);
 
         if (View == null)
         {

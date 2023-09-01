@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class #name#Controller : BaseController<#name#View, #name#ViewModel>
 {
-    protected override ViewType GetViewType()
-    {
-        return ViewType.#name#View;
-    }
+    public override UIType UIType => UIType.#name#View;
 	
 	protected override void Enter()
     {

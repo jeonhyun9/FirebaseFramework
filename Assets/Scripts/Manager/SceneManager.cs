@@ -4,11 +4,15 @@ using UnityEngine.SceneManagement;
 
 public class SceneManager : BaseManager<SceneManager>
 {
-    public SceneType State { get; private set; }
+    public SceneType CurrentScene { get; private set; } = SceneType.RootScene;
 
     public async UniTask ChangeSceneAsync(SceneType scene, LoadSceneMode mode = LoadSceneMode.Single)
     {
+        Logger.Log($"Change Scene :: {scene}");
+
         await AddressableManager.Instance.LoadSceneAsync(scene, mode);
+
+        CurrentScene = scene;
     }
 
     public async UniTaskVoid ChangeSceneAsyncForget(SceneType scene, LoadSceneMode mode = LoadSceneMode.Single)

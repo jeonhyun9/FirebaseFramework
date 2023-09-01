@@ -100,7 +100,7 @@ namespace Tools
             GenerateScript(TemplatePathDefine.MVC_ViewModelTemplate, name, modelName);
             GenerateScript(TemplatePathDefine.MVC_ViewTemplate, name, viewName);
 
-            RefreshViewTypeEnum(name);
+            RefreshUITypeEnum(name);
 
             CreatePrefab(name, Path.GetFileNameWithoutExtension(viewName));
         }
@@ -116,19 +116,19 @@ namespace Tools
             CreatePrefab(name, Path.GetFileNameWithoutExtension(unitName));
         }
 
-        private void RefreshViewTypeEnum(string addName)
+        private void RefreshUITypeEnum(string addName)
         {
             folderPath = PathDefine.DefinePath;
             string viewName = $"{addName}View";
 
-            string currentEnums = string.Join(",\n\t", Enum.GetNames(typeof(ViewType)));
+            string currentEnums = string.Join(",\n\t", Enum.GetNames(typeof(UIType)));
 
             if (currentEnums.Contains(viewName))
                 return;
 
             currentEnums += $",\n\t{addName}View,";
 
-            GenerateScript(TemplatePathDefine.ViewTypeTemplate, currentEnums, NameDefine.ViewTypeDefineScriptName);
+            GenerateScript(TemplatePathDefine.UITypeTemplate, currentEnums, NameDefine.UITypeDefineScriptName);
         }
 
         private void CreatePrefab(string folderName, string prefabName)

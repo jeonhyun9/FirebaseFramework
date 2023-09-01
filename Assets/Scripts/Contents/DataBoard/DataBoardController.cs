@@ -2,10 +2,7 @@ using System;
 
 public class DataBoardController : BaseController<DataBoardView,DataBoardViewModel>
 {
-    protected override ViewType GetViewType()
-    {
-        return ViewType.DataBoardView;
-    }
+    public override UIType UIType => UIType.DataBoardView; 
 
     protected override void Enter()
     {

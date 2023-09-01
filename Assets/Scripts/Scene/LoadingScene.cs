@@ -2,8 +2,10 @@ using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
-public class LoadingScene : MonoBehaviour
+public class LoadingScene : BaseScene
 {
+    public override SceneType SceneType => SceneType.LoadingScene;
+
     [SerializeField]
     private DataLoadingController.LoadDataType loadDataType;
 

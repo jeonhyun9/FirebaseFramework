@@ -53,13 +53,6 @@ public class UIUnitItemList : MonoBehaviour
             BaseUnit<T> unit = go.GetComponent<BaseUnit<T>>();
 
             SetUnitModel(unit, models[i]);
-
-            //unit.SetOnResize((unitSize) =>
-            //{
-            //    newSize.x = Mathf.Max(newSize.x, unitSize.x);
-            //    newSize.y += unitSize.y + verticalLayoutGroup.spacing;
-            //    ResizeContents(newSize);                        
-            //});
         }
     }
 
@@ -88,7 +81,7 @@ public class UIUnitItemList : MonoBehaviour
         if (unit != null)
         {
             unit.SetModel(model);
-            unit.UpdateUI();
+            unit.Refresh();
             unit.Show();
         }
         else

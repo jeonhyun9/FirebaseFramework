@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoader>
 {
+    public override UIType UIType => UIType.DataLoadingView;
+
     public enum LoadDataType
     {
         LocalPath,
@@ -13,11 +15,6 @@ public class DataLoadingController : BaseController<DataLoadingView,BaseDataLoad
     private LocalDataLoader LocalDataLoader => Model.GetLoader<LocalDataLoader>();
 
     private FireBaseDataLoader FireBaseDataLoader => Model.GetLoader<FireBaseDataLoader>();
-
-    protected override ViewType GetViewType()
-    {
-        return ViewType.DataLoadingView;
-    }
 
     protected override void Enter()
     {

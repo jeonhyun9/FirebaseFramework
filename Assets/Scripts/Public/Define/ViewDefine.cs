@@ -1,7 +1,6 @@
-public enum ViewType
+public enum UIType
 {
 	AddressableLoadingView,
 	DataLoadingView,
 	DataBoardView,
-	TestView,
 }
