@@ -83,15 +83,6 @@ public struct FireBaseStorage
         return Storage.RootReference.Child(path);
     }
 
-    public async UniTask<string> GetDownloadUrl(string path)
-    {
-        var uri = await GetStoragePath(path).GetDownloadUrlAsync();
-
-        Logger.Log($"DownloadUrl : {uri.ToString()}");
-
-        return uri.ToString();
-    }
-
     public async UniTask<string> LoadString(StorageReference storageRef)
     {
         string stringValue;

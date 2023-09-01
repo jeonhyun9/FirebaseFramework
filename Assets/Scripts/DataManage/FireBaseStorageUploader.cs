@@ -143,8 +143,6 @@ public class FireBaseStorageUploader : MonoBehaviour
 
     private IEnumerator UploadAddressableBuildInfo(string storagePath, AddressableBuildInfo addressableBuildInfo)
     {
-        yield return fireBaseStorage.GetDownloadUrl(storagePath);
-
         EditorUtility.DisplayProgressBar(NameDefine.AddressableBuildInfoName, $"{NameDefine.AddressableBuildInfoName} 업로드 중..", progress += progressIncrementValue);
 
         string addressableBuildInfoJson = JsonConvert.SerializeObject(addressableBuildInfo);
