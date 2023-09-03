@@ -9,4 +9,19 @@ public class NameDefine
     public const string UITypeDefineScriptName = "UITypeDefine.cs";
     public const string SimpleTextUnitName = "SimpleTextUnit";
     public const string AddressableDefaultGroupName = "Default Local Group";
+
+    public static string CurrentPlatformName
+    {
+        get 
+        {
+            string platform;
+
+#if UNITY_STANDALONE
+            platform = "Windows";
+#elif UNITY_ANDROID
+            platform = "Android";
+#endif
+            return platform;
+        } 
+    }
 }

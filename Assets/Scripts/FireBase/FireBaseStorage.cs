@@ -32,7 +32,7 @@ public struct FireBaseStorage
         return $"{JsonDatasStoragePath}{jsonNameWithExtension}";
     }
 
-    public string AddressableBuildPath => $"{PathDefine.AddressableBuildPathByFlatform}/{AddressableVersion}";
+    public string AddressableBuildPath => $"{PathDefine.AddressableBuildPathByPlatform}/{AddressableVersion}";
 
     public string GetAddressableBuildStoragePath(string addressableBuildNameWithExtension)
     {

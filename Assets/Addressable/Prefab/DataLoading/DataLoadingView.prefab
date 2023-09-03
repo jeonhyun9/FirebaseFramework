@@ -55,7 +55,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   progressText: {fileID: 6860451687105057148}
   progressBar: {fileID: 945764138100904010}
-  backgroundImage: {fileID: 0}
   waitingMilliSec: 1000
 --- !u!1 &3024243418146115241
 GameObject:
@@ -524,7 +523,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 7bccdeddb7a113d488b6c1fd4f77a45a, type: 3}
+  m_Texture: {fileID: 2800000, guid: 0650bf730340014459368758f99c7198, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

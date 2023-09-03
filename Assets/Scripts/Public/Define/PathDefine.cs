@@ -18,7 +18,7 @@ public class PathDefine
     #endregion
 
     #region property
-    public static string AddressableBuildPathByFlatform
+    public static string AddressableBuildPathByPlatform
     {
         get
         {
@@ -36,7 +36,15 @@ public class PathDefine
     {
         get
         {
-            return $"{UnityEngine.Application.persistentDataPath}/{AddressableBuildPathByFlatform}";
+            return $"{UnityEngine.Application.persistentDataPath}/{AddressableBuildPathByPlatform}";
+        }
+    }
+
+    public static string AddressableBinPath
+    {
+        get
+        {
+            return $"Assets/AddressableAssetsData/{NameDefine.CurrentPlatformName}/addressables_content_state.bin";
         }
     }
 #endregion

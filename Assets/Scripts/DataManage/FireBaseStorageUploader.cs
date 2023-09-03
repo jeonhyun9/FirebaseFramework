@@ -101,7 +101,7 @@ public class FireBaseStorageUploader : MonoBehaviour
 
     private IEnumerator UploadAddressableBuild()
     {
-        string[] addressableBuildFiles = Directory.GetFiles(PathDefine.AddressableBuildPathByFlatform);
+        string[] addressableBuildFiles = Directory.GetFiles(PathDefine.AddressableBuildPathByPlatform);
         string addressablePathFile = File.ReadAllText(PathDefine.AddressablePathJson);
 
         if (addressableBuildFiles.Length == 0)

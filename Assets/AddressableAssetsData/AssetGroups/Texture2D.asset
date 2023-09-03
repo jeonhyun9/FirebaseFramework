@@ -17,11 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: f51b4ab4fb5aa5942bf541e9f831a6bd
   m_SerializeEntries:
-  - m_GUID: 7bccdeddb7a113d488b6c1fd4f77a45a
-    m_Address: UnityEngine.Texture2D_7bccdeddb7a113d488b6c1fd4f77a45a
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Texture2D
   - m_GUID: c01da8a0a0a023448ac0bdfb79a4d472
     m_Address: UnityEngine.Texture2D_c01da8a0a0a023448ac0bdfb79a4d472
     m_ReadOnly: 0
@@ -29,6 +24,11 @@ MonoBehaviour:
     - Texture2D
   - m_GUID: 317b8365a4649ab459f6cb58ec8f9f18
     m_Address: UnityEngine.Texture2D_317b8365a4649ab459f6cb58ec8f9f18
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Texture2D
+  - m_GUID: 0650bf730340014459368758f99c7198
+    m_Address: UnityEngine.Texture2D_0650bf730340014459368758f99c7198
     m_ReadOnly: 0
     m_SerializedLabels:
     - Texture2D

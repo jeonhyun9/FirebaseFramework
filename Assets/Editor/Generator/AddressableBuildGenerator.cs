@@ -8,6 +8,9 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using System.Linq;
+using UnityEditor.AddressableAssets.Build;
+using UnityEditor.AddressableAssets.Build.DataBuilders;
+using UnityEngine.AddressableAssets.Initialization;
 
 public class AddressableBuildGenerator : BaseGenerator
 {
@@ -44,6 +47,8 @@ public class AddressableBuildGenerator : BaseGenerator
 
             UpdateEntryForAsset(addressableSettings, guid, mainAssetType, assetPath);
         }
+
+        addressableSettings.OverridePlayerVersion = NameDefine.CurrentPlatformName;
 
         AssetDatabase.Refresh();
     }
@@ -150,10 +155,10 @@ public class AddressableBuildGenerator : BaseGenerator
             }
         }
 
+        AddressableAssetSettings.CleanPlayerContent(AddressableAssetSettingsDefaultObject.Settings.ActivePlayerDataBuilder);
         AssetDatabase.Refresh();
 
         AddressableAssetSettings.BuildPlayerContent();
-
         AssetDatabase.Refresh();
     }
 
@@ -168,5 +173,12 @@ public class AddressableBuildGenerator : BaseGenerator
         localBuildPath = localBuildPath.Replace("[BuildTarget]", buildTarget);
 
         return $"{projectPath}/{localBuildPath}";
+    }
+
+    public static void UpdatePreviousAddressablesBuild()
+    {
+        AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+
+        ContentUpdateScript.BuildContentUpdate(settings, PathDefine.AddressableBinPath);
     }
 }

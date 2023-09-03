@@ -14,11 +14,17 @@ public class AddressableBuildGeneratorEditorWindow : BaseEdtiorWindow
 
     private string AdressableAssetPath => GetParameter<string>("AddressableAssetPath");
 
-    [MenuItem("Tools/Addressable/Addressable Build Generator")]
+    [MenuItem("Tools/Addressable/New Addresable Build")]
     public static void OpenAddresableBuildGenerator()
     {
         AddressableBuildGeneratorEditorWindow window = (AddressableBuildGeneratorEditorWindow)GetWindow(typeof(AddressableBuildGeneratorEditorWindow));
         window.InitializeWindow(window, width, height, spacing);
+    }
+
+    [MenuItem("Tools/Addressable/Update Previous Addressable Build")]
+    public static void UpdatePreviousAddressableBuild()
+    {
+        AddressableBuildGenerator.UpdatePreviousAddressablesBuild();
     }
 
     protected override void InitializeParameters()

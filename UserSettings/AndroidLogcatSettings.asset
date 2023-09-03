@@ -2,8 +2,8 @@
     "m_SelectedDeviceId": "R3CN60K9MVW",
     "m_SelectedPackage": {
         "deviceId": "R3CN60K9MVW",
-        "name": "com.jhg.DataGenerator",
-        "processId": 19636,
+        "name": "com.jhg.FirebaseFramework",
+        "processId": 6169,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -12,12 +12,36 @@
             "deviceId": "R3CN60K9MVW",
             "name": "com.kakao.talk",
             "processId": 31005,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "R3CN60K9MVW",
             "name": "com.jhg.DataGenerator",
             "processId": 19636,
+            "exited": true
+        },
+        {
+            "deviceId": "R3CN60K9MVW",
+            "name": "com.jhg.FirebaseFramework",
+            "processId": 6012,
+            "exited": true
+        },
+        {
+            "deviceId": "R3CN60K9MVW",
+            "name": "com.sec.android.app.launcher",
+            "processId": 2918,
+            "exited": false
+        },
+        {
+            "deviceId": "R3CN60K9MVW",
+            "name": "com.jhg.FirebaseFramework",
+            "processId": 6871,
+            "exited": true
+        },
+        {
+            "deviceId": "R3CN60K9MVW",
+            "name": "com.jhg.FirebaseFramework",
+            "processId": 6169,
             "exited": false
         }
     ],

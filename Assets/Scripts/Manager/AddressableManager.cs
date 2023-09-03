@@ -26,8 +26,11 @@ public class AddressableManager : BaseManager<AddressableManager>
     private AddressableBuildInfo addressableBuildInfo;
     private FireBaseStorage fireBaseStorage;
 
+    private bool clearBundle;
+
     public async UniTask<bool> LoadAddressableAsync(Action onChangeSequenceCallback = null)
     {
+        clearBundle = false;
         fireBaseStorage = new FireBaseStorage(NameDefine.BucketDefaultName);
 
         while(CurrentSequence != Sequence.Done)
@@ -160,6 +163,40 @@ public class AddressableManager : BaseManager<AddressableManager>
         return false;
     }
 
+    private async UniTask CleanOldBuild()
+    {
+        HashSet<string> fileNames = new HashSet<string>(addressableBuildInfo.FileNameWithHashDic.Keys);
+
+        string[] existFilesPath = Directory.GetFiles(loadPath);
+
+        foreach (string filePath in existFilesPath)
+        {
+            string fileName = Path.GetFileName(filePath);
+            if (!fileNames.Contains(fileName))
+            {
+                Logger.Log($"Removed : {fileName}");
+                File.Delete(filePath);
+
+                if (clearBundle == false)
+                {
+                    try
+                    {
+                        Caching.ClearCache();
+                        await Addressables.CleanBundleCache();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Exception("ClearBundle", e);
+                    }
+                    finally
+                    {
+                        clearBundle = true;
+                    }
+                }
+            }
+        }
+    }
+
     private async UniTask<bool> LoadAddressableBuild()
     {
         if (!Directory.Exists(loadPath))
@@ -167,12 +204,15 @@ public class AddressableManager : BaseManager<AddressableManager>
 
         try
         {
+            await CleanOldBuild();
+
             List<UniTask> tasks = new List<UniTask>();
 
             foreach (string fileName in addressableBuildInfo.FileNameWithHashDic.Keys)
                 tasks.Add(LoadAddressableBuildFileAsync(fileName, loadPath));
 
             await UniTask.WhenAll(tasks);
+
             return true;
         }
         catch (Exception e)

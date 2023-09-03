@@ -26,7 +26,7 @@ namespace Tools
         {
             EditorPrefs.SetBool("isSetCurrentVersion", false);
 
-            AddParameter("AddressableBuildPath", PathDefine.AddressableBuildPathByFlatform);
+            AddParameter("AddressableBuildPath", PathDefine.AddressableBuildPathByPlatform);
             AddParameter("BucketName", NameDefine.BucketDefaultName);
             AddParameter("AddressableVersion", "0");
             AddParameter("IsSetAddressableVersion", false);

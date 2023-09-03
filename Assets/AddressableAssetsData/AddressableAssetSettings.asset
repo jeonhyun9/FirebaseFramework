@@ -39,7 +39,7 @@ MonoBehaviour:
     m_Id: 35bf62347cabcb546b198373533d8c6e
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 2
-  m_overridePlayerVersion: 
+  m_overridePlayerVersion: Android
   m_GroupAssets:
   - {fileID: 11400000, guid: a72922b0b679c1f4497daa4773456407, type: 2}
   - {fileID: 11400000, guid: a9a83fcc4b08c744bb79d6404f544768, type: 2}
