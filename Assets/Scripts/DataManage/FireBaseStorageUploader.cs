@@ -282,20 +282,6 @@ public class FireBaseStorageUploader : MonoBehaviour
         }
     }
 
-    private IEnumerator HandleTask(Task task, string storagePath)
-    {
-        yield return new WaitUntil(() => task.IsCompleted);
-
-        if (task.IsFaulted)
-        {
-            Logger.Error($"Task Fail : {storagePath} - {task.Exception}");
-        }
-        else if (task.IsCompleted)
-        {
-            Logger.Success($"Task Success : {storagePath}");
-        }
-    }
-
     private void OnEndUpload()
     {
         EditorUtility.ClearProgressBar();
