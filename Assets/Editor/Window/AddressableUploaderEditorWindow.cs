@@ -42,8 +42,8 @@ namespace Tools
                 if (firebaseUploader == null)
                     return;
 
-                if (firebaseUploader.Initialize(AddressableBuildPath, new FireBaseStorage(BucketName, addressableVersion:AddressableVersion), IsSetCurrentVersion))
-                    firebaseUploader.StartAddressableBuildUpload();
+                if (firebaseUploader.Initialize(AddressableBuildPath, new FireBaseStorage(BucketName, addressableVersion: AddressableVersion), IsSetCurrentVersion))
+                    firebaseUploader.StartUpload(FireBaseStorageUploader.Job.UploadAddressable);
 
                 Close();
             }

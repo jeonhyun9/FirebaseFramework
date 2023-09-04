@@ -21,13 +21,12 @@ public class AddressableManager : BaseManager<AddressableManager>
 
     public Sequence CurrentSequence { get; private set; } = Sequence.LoadAddressableVersion;
 
-    private string loadPath = PathDefine.AddressableLoadPath;
-
     private AddressableBuildInfo addressableBuildInfo;
     private FireBaseStorage fireBaseStorage;
 
     private bool clearBundle;
 
+    #region Initialize Addressable
     public async UniTask<bool> LoadAddressableAsync(Action onChangeSequenceCallback = null)
     {
         clearBundle = false;
@@ -98,42 +97,9 @@ public class AddressableManager : BaseManager<AddressableManager>
         return false;
     }
 
-    public async UniTask DownLoadDependenciesAsUniTask(string guid)
-    {
-        await Addressables.DownloadDependenciesAsync(guid);
-    }
-
-    public async UniTask<T> LoadAssetAsync<T>(string name) where T : UnityEngine.Object
-    {
-        if (!IsContain(typeof(T), name))
-            return null;
-
-        return await Addressables.LoadAssetAsync<T>(addressableBuildInfo.AddressableDic[typeof(T)][name]);
-    }
-
-    public async UniTask LoadSceneAsync(SceneType sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
-    {
-        string name = sceneName.ToString();
-
-        if (!IsContain(typeof(Scene), name))
-            return;
-
-        await Addressables.LoadSceneAsync(addressableBuildInfo.AddressableDic[typeof(Scene)][name], loadSceneMode);
-    }
-
-    public async UniTask<GameObject> InstantiateAsync(string name, Transform transform = null)
-    {
-        if (!IsContain(typeof(GameObject), name))
-            return null;
-
-        return await Addressables.InstantiateAsync(addressableBuildInfo.AddressableDic[typeof(GameObject)][name], transform);
-    }
-
     private async UniTask<bool> LoadAddressableVersion()
     {
-        StorageReference versionRef = fireBaseStorage.GetStoragePath(fireBaseStorage.CurrentAddressableVersionStoragePath);
-
-        string currentVersion = await fireBaseStorage.LoadString(versionRef);
+        string currentVersion = await fireBaseStorage.LoadString(fireBaseStorage.CurrentAddressableVersionStoragePath);
 
         if (!string.IsNullOrEmpty(currentVersion))
         {
@@ -148,9 +114,7 @@ public class AddressableManager : BaseManager<AddressableManager>
 
     private async UniTask<bool> LoadAddressableBuildInfo()
     {
-        StorageReference addressableBuildInfoRef = fireBaseStorage.GetStoragePath(fireBaseStorage.AddressableBuildInfoStoragePath);
-
-        string addressableBuildInfoJson = await fireBaseStorage.LoadString(addressableBuildInfoRef);
+        string addressableBuildInfoJson = await fireBaseStorage.LoadString(fireBaseStorage.AddressableBuildInfoStoragePath);
 
         if (!string.IsNullOrEmpty(addressableBuildInfoJson))
         {
@@ -167,7 +131,7 @@ public class AddressableManager : BaseManager<AddressableManager>
     {
         HashSet<string> fileNames = new HashSet<string>(addressableBuildInfo.FileNameWithHashDic.Keys);
 
-        string[] existFilesPath = Directory.GetFiles(loadPath);
+        string[] existFilesPath = Directory.GetFiles(PathDefine.AddressableLoadPath);
 
         foreach (string filePath in existFilesPath)
         {
@@ -199,8 +163,8 @@ public class AddressableManager : BaseManager<AddressableManager>
 
     private async UniTask<bool> LoadAddressableBuild()
     {
-        if (!Directory.Exists(loadPath))
-            Directory.CreateDirectory(loadPath);
+        if (!Directory.Exists(PathDefine.AddressableLoadPath))
+            Directory.CreateDirectory(PathDefine.AddressableLoadPath);
 
         try
         {
@@ -209,7 +173,7 @@ public class AddressableManager : BaseManager<AddressableManager>
             List<UniTask> tasks = new List<UniTask>();
 
             foreach (string fileName in addressableBuildInfo.FileNameWithHashDic.Keys)
-                tasks.Add(LoadAddressableBuildFileAsync(fileName, loadPath));
+                tasks.Add(LoadAddressableBuildFileAsync(fileName, PathDefine.AddressableLoadPath));
 
             await UniTask.WhenAll(tasks);
 
@@ -243,13 +207,14 @@ public class AddressableManager : BaseManager<AddressableManager>
             }
         }
 
-        StorageReference fileRef = fireBaseStorage.GetStoragePath(fireBaseStorage.GetAddressableBuildStoragePath(fileName));
-        byte[] loadedFileByte = await fireBaseStorage.LoadBytes(fileRef);
+        byte[] loadedFileByte = await fireBaseStorage.LoadBytes(fireBaseStorage.GetAddressableBuildStoragePath(fileName));
 
         await File.WriteAllBytesAsync(fullPath, loadedFileByte);
 
         Logger.Success($"[New] Load Addressable Build : {fullPath}");
     }
+
+    #endregion
 
     private bool IsContain(Type type, string name)
     {
@@ -261,16 +226,42 @@ public class AddressableManager : BaseManager<AddressableManager>
 
         if (!addressableBuildInfo.AddressableDic.ContainsKey(type))
         {
-            Logger.Error($"{type} is not contained in addressable.");
+            Logger.Error($"{type} type is not contained in addressable.");
             return false;
         }
 
         if (!addressableBuildInfo.AddressableDic[type].ContainsKey(name))
         {
-            Logger.Error($"{name} is not contained in addressable.");
+            Logger.Error($"{name} name is not contained in addressable.");
             return false;
         }
 
         return true;
+    }
+
+    public async UniTask<T> LoadAssetAsync<T>(string name) where T : UnityEngine.Object
+    {
+        if (!IsContain(typeof(T), name))
+            return null;
+
+        return await Addressables.LoadAssetAsync<T>(addressableBuildInfo.AddressableDic[typeof(T)][name]);
+    }
+
+    public async UniTask LoadSceneAsync(SceneType sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+    {
+        string name = sceneName.ToString();
+
+        if (!IsContain(typeof(Scene), name))
+            return;
+
+        await Addressables.LoadSceneAsync(addressableBuildInfo.AddressableDic[typeof(Scene)][name], loadSceneMode);
+    }
+
+    public async UniTask<GameObject> InstantiateAsync(string name, Transform transform = null)
+    {
+        if (!IsContain(typeof(GameObject), name))
+            return null;
+
+        return await Addressables.InstantiateAsync(addressableBuildInfo.AddressableDic[typeof(GameObject)][name], transform);
     }
 }

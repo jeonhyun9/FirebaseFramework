@@ -43,7 +43,7 @@ namespace Tools
                     return;
 
                 if (firebaseStorageUploader.Initialize(JsonPath, new FireBaseStorage(BucketName, JsonVersion), IsSetCurrentVersion))
-                    firebaseStorageUploader.StartJsonUpload();
+                    firebaseStorageUploader.StartUpload(FireBaseStorageUploader.Job.UploadData);
 
                 Close();
             }

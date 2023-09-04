@@ -49,9 +49,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadVersion);
 
-        StorageReference versionRef = fireBaseStorage.GetStoragePath(fireBaseStorage.CurrentJsonVersionStoragePath);
-
-        string currentVersion = await fireBaseStorage.LoadString(versionRef);
+        string currentVersion = await fireBaseStorage.LoadString(fireBaseStorage.CurrentJsonVersionStoragePath);
 
         if (!string.IsNullOrEmpty(currentVersion))
         {
@@ -67,24 +65,22 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         ChangeState(State.LoadJsonList);
 
-        StorageReference storageRef = fireBaseStorage.GetStoragePath(refPath);
-
         string[] jsonListArray;
 
         try
         {
-            byte[] jsonListBytes = await fireBaseStorage.LoadBytes(storageRef);
+            byte[] jsonListBytes = await fireBaseStorage.LoadBytes(refPath);
             jsonListArray = jsonListBytes.GetStringUTF8()?.Split(",");
 
             if (!jsonListArray.IsValidArray())
             {
-                Logger.Error($"Failed to load file : {storageRef.Name}");
+                Logger.Error($"Failed to load file : {refPath}");
                 return null;
             }
         }
         catch (System.Exception e)
         {
-            Logger.Exception($"Failed to load file : {storageRef.Name}", e);
+            Logger.Exception($"Failed to load file : {refPath}", e);
             return null;
         }
 
@@ -118,9 +114,7 @@ public class FireBaseDataLoader : BaseDataLoader
     {
         Logger.Log($"Try load {jsonName}");
 
-        StorageReference jsonDataRef = fireBaseStorage.GetStoragePath(fireBaseStorage.GetJsonStoragePath(jsonName));
-
-        byte[] loadedBytes = await fireBaseStorage.LoadBytes(jsonDataRef);
+        byte[] loadedBytes = await fireBaseStorage.LoadBytes(fireBaseStorage.GetJsonStoragePath(jsonName));
 
         //불러온 데이터 예외처리
         if (loadedBytes.IsValidArray())

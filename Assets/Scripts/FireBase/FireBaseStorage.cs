@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Firebase.Storage;
 using UnityEngine;
@@ -11,6 +12,10 @@ public struct FireBaseStorage
     public string CurrentJsonVersionStoragePath => $"CurrentVersion/{NameDefine.JsonVersionTxtName}";
 
     public string CurrentAddressableVersionStoragePath => $"CurrentVersion/{NameDefine.AddressableVersionTxtName}";
+
+    public string DataUploadHistoryStoargePath => $"{JsonDatasStoragePath}/{NameDefine.UploadHistory}";
+
+    public string AddressableUploadHistoryStoragePath => $"{AddressableBuildPath}/{NameDefine.UploadHistory}";
 
     public string JsonDatasStoragePath
     {
@@ -78,56 +83,71 @@ public struct FireBaseStorage
         get; private set;
     }
 
-    public StorageReference GetStoragePath(string path)
+    private StorageReference GetStorageRef(string path)
     {
         return Storage.RootReference.Child(path);
     }
 
-    public async UniTask<string> LoadString(StorageReference storageRef)
+    public async UniTask<string> LoadString(string storagePath)
     {
         string stringValue;
 
         try
         {
-            byte[] loadedBytes = await storageRef.GetBytesAsync(MaxJsonSizeBytes);
+            byte[] loadedBytes = await GetStorageRef(storagePath).GetBytesAsync(MaxJsonSizeBytes);
             stringValue = loadedBytes.GetStringUTF8();
 
             if (string.IsNullOrEmpty(stringValue))
             {
-                Logger.Error($"Failed to load file : {storageRef.Path}");
+                Logger.Error($"Failed to load file : {storagePath}");
                 return null;
             }
         }
         catch (Exception e)
         {
-            Logger.Exception($"Failed to load file : {storageRef.Path}", e);
+            Logger.Exception($"Failed to load file : {storagePath}", e);
             return null;
         }
 
         return stringValue;
     }
 
-    public async UniTask<byte[]> LoadBytes(StorageReference storageRef)
+    public async UniTask<byte[]> LoadBytes(string storagePath)
     {
         byte[] loadedBytes;
 
         try
         {
-            loadedBytes = await storageRef.GetBytesAsync(MaxJsonSizeBytes);
+            loadedBytes = await GetStorageRef(storagePath).GetBytesAsync(MaxJsonSizeBytes);
 
             if (!loadedBytes.IsValidArray())
             {
-                Logger.Error($"Failed to load file : {storageRef.Path}");
+                Logger.Error($"Failed to load file : {storagePath}");
                 return null;
             }
         }
         catch (Exception e)
         {
-            Logger.Exception($"Failed to load file : {storageRef.Path}", e);
+            Logger.Exception($"Failed to load file : {storagePath}", e);
             return null;
         }
 
         return loadedBytes;
+    }
+
+    public Task<byte[]> GetByteAsync(string storagePath)
+    {
+        return GetStorageRef(storagePath).GetBytesAsync(MaxJsonSizeBytes);
+    }
+
+    public Task<StorageMetadata> GetPutAsync(string storagePath, byte[] bytes)
+    {
+        return GetStorageRef(storagePath).PutBytesAsync(bytes);
+    }
+
+    public Task GetDeleteAsync(string storagePath)
+    {
+        return GetStorageRef(storagePath).DeleteAsync();
     }
 
     public void Dispose()

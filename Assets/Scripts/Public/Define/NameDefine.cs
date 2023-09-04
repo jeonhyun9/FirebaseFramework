@@ -9,6 +9,7 @@ public class NameDefine
     public const string UITypeDefineScriptName = "UITypeDefine.cs";
     public const string SimpleTextUnitName = "SimpleTextUnit";
     public const string AddressableDefaultGroupName = "Default Local Group";
+    public const string UploadHistory = "UploadHistory.txt";
 
     public static string CurrentPlatformName
     {
