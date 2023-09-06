@@ -10,6 +10,7 @@ public class NameDefine
     public const string SimpleTextUnitName = "SimpleTextUnit";
     public const string AddressableDefaultGroupName = "Default Local Group";
     public const string UploadHistory = "UploadHistory.txt";
+    public const string AddressableDefaultGroupName_Newer = "Default";
 
     public static string CurrentPlatformName
     {

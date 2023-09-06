@@ -102,6 +102,10 @@ public class AddressableBuildGenerator : BaseGenerator
         if (targetGroup == null)
         {
             AddressableAssetGroup defaultGroup = addressableSettings.FindGroup(NameDefine.AddressableDefaultGroupName);
+
+            if (defaultGroup == null)
+                defaultGroup = addressableSettings.FindGroup(NameDefine.AddressableDefaultGroupName_Newer);
+
             targetGroup = defaultGroup == null ? null : addressableSettings.CreateGroup(groupName, false, false, false, defaultGroup.Schemas);
         }
 
